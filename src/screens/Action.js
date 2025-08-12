@@ -3732,7 +3732,7 @@ export default function Action() {
         {phase === "chat" && (
           <div
             className={`chat-container embedded ${
-              phase === "chat" ? "wide" : ""
+              twoCol ? "wide" : ""
             }`}
           >
             <div className={`chat-body-grid ${twoCol ? "two-col" : ""}`}>
