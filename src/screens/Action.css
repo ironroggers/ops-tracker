@@ -42,9 +42,11 @@
   color: #212121;
   -webkit-tap-highlight-color: transparent; /* mobile tap area clarity */
   transition: background 120ms ease, border-color 120ms ease;
+  position: relative;
+  z-index: 1000;
 }
 .header-back * {
-  pointer-events: none;
+  pointer-events: auto;
 }
 .header-back:hover {
   background: rgba(0, 0, 0, 0.04);
