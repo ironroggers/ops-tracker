@@ -1360,180 +1360,180 @@ function CausesReport({ collapsed = false, onToggleCollapse }) {
         className={`report-body ${collapsed ? "collapsed" : "expanded"}`}
         aria-hidden={collapsed}
       >
-        <div className="report-causes-grid">
-          <article className="report-cause">
-            <div className="report-cause-head">
-              <div className="report-cause-index">1.</div>
-              <div className="report-cause-title">
-                Rapid Increase in PM Work Orders
-              </div>
+      <div className="report-causes-grid">
+        <article className="report-cause">
+          <div className="report-cause-head">
+            <div className="report-cause-index">1.</div>
+            <div className="report-cause-title">
+              Rapid Increase in PM Work Orders
             </div>
-            <p className="report-cause-desc">
-              Static PMs are not optimised with actual equipment condition and
-              criticality, leading to unnecessary maintenance tasks
-            </p>
-            <div className="report-mini">
-              <div className="report-mini-left">
-                <div className="report-mini-label">Trend</div>
-                <div className="report-mini-chart">
-                  <ResponsiveContainer width="100%" height={84}>
-                    <BarChart
-                      data={mini1}
-                      margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
-                    >
-                      <CartesianGrid
-                        vertical={false}
-                        stroke="#eef0f4"
-                        strokeDasharray="4 4"
-                      />
-                      <XAxis
-                        dataKey="month"
-                        tickLine={false}
-                        axisLine={false}
-                        fontSize={11}
-                      />
-                      <YAxis
-                        domain={[115, 160]}
-                        ticks={[115, 160]}
-                        width={28}
-                        tickLine={false}
-                        axisLine={{ stroke: "#e5e7eb" }}
-                        fontSize={10}
-                      />
-                      <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
-                      <Bar
-                        dataKey="value"
-                        radius={[4, 4, 0, 0]}
-                        fill="#ef4444"
-                        maxBarSize={18}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-              <div className="report-mini-stat">
-                <div className="report-mini-stat-val">+ 38%</div>
-                <div className="report-mini-stat-sub">in last 3 months</div>
-              </div>
-            </div>
-          </article>
-
-          <article className="report-cause">
-            <div className="report-cause-head">
-              <div className="report-cause-index">2.</div>
-              <div className="report-cause-title">
-                Increase in MTTR waiting on Permits
-              </div>
-            </div>
-            <p className="report-cause-desc">
-              Permit delays are primarily due to coordination gaps between
-              Operations and Maintenance teams on ground.
-            </p>
-            <div className="report-mini">
-              <div className="report-mini-left">
-                <div className="report-mini-label">Trend</div>
-                <div className="report-mini-chart">
-                  <ResponsiveContainer width="100%" height={84}>
-                    <BarChart
-                      data={mini2}
-                      margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
-                    >
-                      <CartesianGrid
-                        vertical={false}
-                        stroke="#eef0f4"
-                        strokeDasharray="4 4"
-                      />
-                      <XAxis
-                        dataKey="month"
-                        tickLine={false}
-                        axisLine={false}
-                        fontSize={11}
-                      />
-                      <YAxis
-                        domain={[115, 160]}
-                        ticks={[115, 160]}
-                        width={28}
-                        tickLine={false}
-                        axisLine={{ stroke: "#e5e7eb" }}
-                        fontSize={10}
-                      />
-                      <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
-                      <Bar
-                        dataKey="value"
-                        radius={[4, 4, 0, 0]}
-                        fill="#ef4444"
-                        maxBarSize={18}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-              <div className="report-mini-stat">
-                <div className="report-mini-stat-val">+ 38%</div>
-                <div className="report-mini-stat-sub">in last 3 months</div>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <div className="report-attrib">
-          <div className="report-attrib-title">Causes Attribution</div>
-          <div className="report-attrib-grid">
-            <div className="report-donut-wrap">
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie
-                    data={donut}
-                    dataKey="value"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={64}
-                    outerRadius={100}
-                    cornerRadius={6}
-                    paddingAngle={0}
+          </div>
+          <p className="report-cause-desc">
+            Static PMs are not optimised with actual equipment condition and
+            criticality, leading to unnecessary maintenance tasks
+          </p>
+          <div className="report-mini">
+            <div className="report-mini-left">
+              <div className="report-mini-label">Trend</div>
+              <div className="report-mini-chart">
+                <ResponsiveContainer width="100%" height={84}>
+                  <BarChart
+                    data={mini1}
+                    margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
                   >
-                    {donut.map((entry, i) => (
-                      <Cell
-                        key={entry.name}
-                        fill={donutColors[i % donutColors.length]}
+                    <CartesianGrid
+                      vertical={false}
+                      stroke="#eef0f4"
+                      strokeDasharray="4 4"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={11}
+                    />
+                      <YAxis
+                        domain={[115, 160]}
+                        ticks={[115, 160]}
+                        width={28}
+                        tickLine={false}
+                        axisLine={{ stroke: "#e5e7eb" }}
+                        fontSize={10}
                       />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="report-donut-center">60%</div>
+                    <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
+                    <Bar
+                      dataKey="value"
+                      radius={[4, 4, 0, 0]}
+                      fill="#ef4444"
+                      maxBarSize={18}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="report-mini-stat">
+              <div className="report-mini-stat-val">+ 38%</div>
+              <div className="report-mini-stat-sub">in last 3 months</div>
+            </div>
+          </div>
+        </article>
+
+        <article className="report-cause">
+          <div className="report-cause-head">
+            <div className="report-cause-index">2.</div>
+            <div className="report-cause-title">
+              Increase in MTTR waiting on Permits
+            </div>
+          </div>
+          <p className="report-cause-desc">
+            Permit delays are primarily due to coordination gaps between
+            Operations and Maintenance teams on ground.
+          </p>
+          <div className="report-mini">
+            <div className="report-mini-left">
+              <div className="report-mini-label">Trend</div>
+              <div className="report-mini-chart">
+                <ResponsiveContainer width="100%" height={84}>
+                  <BarChart
+                    data={mini2}
+                    margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
+                  >
+                    <CartesianGrid
+                      vertical={false}
+                      stroke="#eef0f4"
+                      strokeDasharray="4 4"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={11}
+                    />
+                      <YAxis
+                        domain={[115, 160]}
+                        ticks={[115, 160]}
+                        width={28}
+                        tickLine={false}
+                        axisLine={{ stroke: "#e5e7eb" }}
+                        fontSize={10}
+                      />
+                    <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
+                    <Bar
+                      dataKey="value"
+                      radius={[4, 4, 0, 0]}
+                      fill="#ef4444"
+                      maxBarSize={18}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="report-mini-stat">
+              <div className="report-mini-stat-val">+ 38%</div>
+              <div className="report-mini-stat-sub">in last 3 months</div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div className="report-attrib">
+        <div className="report-attrib-title">Causes Attribution</div>
+        <div className="report-attrib-grid">
+          <div className="report-donut-wrap">
+            <ResponsiveContainer width="100%" height={240}>
+              <PieChart>
+                <Pie
+                  data={donut}
+                  dataKey="value"
+                  cx="50%"
+                  cy="50%"
+                    innerRadius={64}
+                  outerRadius={100}
+                  cornerRadius={6}
+                  paddingAngle={0}
+                >
+                  {donut.map((entry, i) => (
+                    <Cell
+                      key={entry.name}
+                      fill={donutColors[i % donutColors.length]}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="report-donut-center">60%</div>
               {/* <div className="report-callout">
               Rapid increase in PM Work Orders
             </div> */}
-            </div>
-            <div className="report-attrib-legend">
-              <span className="legend-pill red">
-                Increase in MTTR due to waiting for Permits
-                <span className="legend-count">3</span>
-              </span>
-              <span className="legend-pill blue">
-                Rapid increase in PM Work Orders
-                <span className="legend-count">5</span>
-              </span>
-            </div>
+          </div>
+          <div className="report-attrib-legend">
+            <span className="legend-pill red">
+              Increase in MTTR due to waiting for Permits
+              <span className="legend-count">3</span>
+            </span>
+            <span className="legend-pill blue">
+              Rapid increase in PM Work Orders
+              <span className="legend-count">5</span>
+            </span>
           </div>
         </div>
+      </div>
 
-        <div className="report-sources">
-          <div className="sources-head">Sources go here</div>
-          <div className="sources-chips">
-            {[
-              "Hydraulic System Installment",
-              "Hydraulic System Installment",
-              "Repair Booster Pump",
-              "Hydraulic System Installment",
-              "Hydraulic System Installment",
-              "Repair Booster Pump",
-            ].map((t, i) => (
-              <span key={i} className="chip-soft">
-                {t}
-              </span>
-            ))}
+      <div className="report-sources">
+        <div className="sources-head">Sources go here</div>
+        <div className="sources-chips">
+          {[
+            "Hydraulic System Installment",
+            "Hydraulic System Installment",
+            "Repair Booster Pump",
+            "Hydraulic System Installment",
+            "Hydraulic System Installment",
+            "Repair Booster Pump",
+          ].map((t, i) => (
+            <span key={i} className="chip-soft">
+              {t}
+            </span>
+          ))}
           </div>
         </div>
       </div>
@@ -1922,12 +1922,12 @@ function CausesList({ onTakeAction, onPlansUpdate, onAddMessage }) {
           <span className="causes-bullet" aria-hidden="true">
             <IconBrand32 />
           </span>
-          <div>
+        <div>
             <div className="causes-title">Top 2 Causes identified</div>
-            <div className="causes-subtitle">
+          <div className="causes-subtitle">
               Aggregated from 180+ WO inspections
-            </div>
           </div>
+        </div>
         </div>
       </div>
 
@@ -2141,7 +2141,7 @@ function ChatMessage({ message, onTypedDone, onMessageClick }) {
             <TypingText
               text={message.text}
               cps={26}
-              onDone={() => onTypedDone?.(message.id)}
+              onDone={() => { onTypedDone?.(message.id); }}
             />
           ) : (
             message.text
@@ -3488,14 +3488,14 @@ export default function Action() {
       });
       const assistantMessages = (result?.messages ?? [])
         .map((m, idx) => ({
-          id: Date.now() + idx + 1,
-          role: m.role,
-          text: m.text,
+        id: Date.now() + idx + 1,
+        role: m.role,
+        text: m.text,
         }))
         .map((m, i, arr) => ({
           ...m,
           animated: m.role === "assistant" && i === arr.length - 1,
-        }));
+      }));
       if (assistantMessages.length) {
         setMessages((prev) => [...prev, ...assistantMessages]);
         if (result?.chart) setChartData(result.chart);
@@ -3577,11 +3577,23 @@ export default function Action() {
   }
 
   function handleFollowupClick(nextText, key) {
-    setText(nextText);
+    // Add the follow-up as a user message, and a canned assistant reply
+    const now = Date.now();
+    const userMsg = { id: now, role: "user", text: nextText };
+    const assistantMsg = {
+      id: now + 1,
+      role: "assistant",
+      text: `Lets Act upon ${nextText}`,
+      animated: true,
+    };
+    setAssistantCompleted(false);
+    setMessages((prev) => [...prev, userMsg, assistantMsg]);
+    setText("");
     setShowActionsPanel(true);
-    setReportCollapsed(true); // Collapse the Top 2 Causes section by default
-    dismissFollowup(key);
-  }
+    setReportCollapsed(false); // Keep Top 2 Causes expanded until assistant finishes
+        dismissFollowup(key);
+    // assistantCompleted will be set to true by markMessageDone when typing finishes
+   }
 
   function dismissFollowup(key) {
     if (!key) return;
@@ -3631,6 +3643,22 @@ export default function Action() {
       }
     }, 100);
   }
+
+  // Fade out and unmount the agent progress card when reaching 100%
+  useEffect(() => {
+    if (progressPct >= 100 && showAgentProgress) {
+      const t = setTimeout(() => setShowAgentProgress(false), 900);
+      return () => clearTimeout(t);
+    }
+  }, [progressPct, showAgentProgress]);
+
+  // After assistant finishes typing a follow-up response, collapse the first report
+  useEffect(() => {
+    if (assistantCompleted && showActionsPanel) {
+      const t = setTimeout(() => setReportCollapsed(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, [assistantCompleted, showActionsPanel]);
 
   return (
     <div className="action-overlay">
@@ -3704,13 +3732,13 @@ export default function Action() {
         {phase === "chat" && (
           <div
             className={`chat-container embedded ${
-              assistantCompleted ? "wide" : ""
+              phase === "chat" ? "wide" : ""
             }`}
           >
             <div className={`chat-body-grid ${twoCol ? "two-col" : ""}`}>
               <div
-                className={`left-pane ${twoCol ? "shift-left" : ""}`}
-                style={{ display: 'flex', flexDirection: 'column', minHeight: 0, maxHeight: 'calc(100vh - 180px)' }}
+                className={`left-pane ${twoCol && assistantCompleted ? "shift-left" : ""}`}
+                 style={{ display: 'flex', flexDirection: 'column', minHeight: 0, maxHeight: 'calc(100vh - 180px)' }}
               >
                 <div
                   className={`messages`}
@@ -3730,11 +3758,11 @@ export default function Action() {
                 {twoCol && (
                   showAgentProgress && (
                     <div className={progressPct >= 100 ? "panel-animate-out" : "panel-animate-in"}>
-                      <AgentProgress
-                        onCrossThreshold={() => setProgressAtTop(true)}
-                        onProgressChange={setProgressPct}
-                        threshold={40}
-                      />
+                  <AgentProgress
+                    onCrossThreshold={() => setProgressAtTop(true)}
+                    onProgressChange={setProgressPct}
+                    threshold={40}
+                  />
                     </div>
                   )
                 )}
@@ -3743,40 +3771,40 @@ export default function Action() {
                     <div className="followups-title">Suggested Follow-ups</div>
                     <div className="followup-list">
                       {!dismissedFollowups.has("validateWithSiteData") && (
-                        <button
-                          type="button"
-                          className="followup-btn"
+                      <button
+                        type="button"
+                        className="followup-btn"
                           onClick={() =>
                             handleFollowupClick("Validate with site data", "validateWithSiteData")
                           }
-                        >
-                          Validate with site data →
-                        </button>
+                      >
+                        Validate with site data →
+                      </button>
                       )}
                       {!dismissedFollowups.has("trace3MonthsPermitDelays") && (
-                        <button
-                          type="button"
-                          className="followup-btn"
-                          onClick={() =>
+                      <button
+                        type="button"
+                        className="followup-btn"
+                        onClick={() =>
                             handleFollowupClick("Trace 3 months of permit delays", "trace3MonthsPermitDelays")
-                          }
-                        >
-                          Trace 3 months of permit delays →
-                        </button>
+                        }
+                      >
+                        Trace 3 months of permit delays →
+                      </button>
                       )}
                       {!dismissedFollowups.has("create3MonthCostReductionRoadmap") && (
-                        <button
-                          type="button"
-                          className="followup-btn"
-                          onClick={() =>
+                      <button
+                        type="button"
+                        className="followup-btn"
+                        onClick={() =>
                             handleFollowupClick(
                               "Create a 3-month cost-reduction roadmap",
                               "create3MonthCostReductionRoadmap"
                             )
-                          }
-                        >
-                          Create a 3-month cost-reduction roadmap →
-                        </button>
+                        }
+                      >
+                        Create a 3-month cost-reduction roadmap →
+                      </button>
                       )}
                     </div>
                   </div>
@@ -3858,7 +3886,15 @@ export default function Action() {
                       />
                       {showActionsPanel && (
                         <div className="panel-animate-in">
-                          <RightActionsPanel collapsed={actionsCollapsed} onToggleCollapse={() => setActionsCollapsed(!actionsCollapsed)} onActionsChange={setApprovedActions} />
+                          {assistantCompleted ? (
+                            <RightActionsPanel
+                              collapsed={actionsCollapsed}
+                              onToggleCollapse={() => setActionsCollapsed(!actionsCollapsed)}
+                              onActionsChange={setApprovedActions}
+                            />
+                          ) : (
+                            <RightShimmerPanel showProgress={false} />
+                          )}
                         </div>
                       )}
                       {(approvedActions.length > 0 || showExecutionFromMessage) && (
@@ -3889,9 +3925,9 @@ export default function Action() {
                         {(() => {
                           if (rightStage === "chart") {
                             return chartReady ? (
-                              <MemoChartPanel chart={chartData} />
-                            ) : (
-                              <RightShimmerPanel showProgress={false} />
+                          <MemoChartPanel chart={chartData} />
+                        ) : (
+                          <RightShimmerPanel showProgress={false} />
                             );
                           }
                           if (rightStage === "collecting") {
@@ -3906,10 +3942,10 @@ export default function Action() {
                           return null;
                         })()}
                       </StageTransition>
-                    </div>
-                  )}
-                </div>
-              )}
+                        </div>
+                      )}
+                        </div>
+                      )}
             </div>
           </div>
         )}
