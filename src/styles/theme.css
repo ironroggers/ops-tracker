@@ -133,9 +133,9 @@ body {
   background: #f8fafc;
 }
 .icon-button.primary {
-  background: #111827;
+  background: #3d5afe; /* purple accent to match screenshot */
   color: #ffffff;
-  border-color: #111827;
+  border-color: #3d5afe;
 }
 .icon-button.primary:disabled {
   background: #cbd5e1;

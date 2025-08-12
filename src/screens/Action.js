@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import "./Action.css";
 import { useLocation, useNavigate } from "react-router-dom";
+import { sendActionPrompt } from "../services/chatApi";
 
 function IconBack() {
   return (
@@ -855,8 +856,10 @@ export default function Action() {
   const initialTextFromState = useMemo(() => state?.initialText ?? "", [state]);
   const [text, setText] = useState(initialTextFromState);
   const textareaRef = useRef(null);
+  const pendingRequestRef = useRef(null);
 
   const [phase, setPhase] = useState("input");
+  const [messages, setMessages] = useState([]);
   const [executeReady, setExecuteReady] = useState(false);
   const [approvedActions, setApprovedActions] = useState([]);
 
@@ -878,11 +881,58 @@ export default function Action() {
     }
   }, [textareaRef, text, phase]);
 
+  useEffect(() => {
+    return () => {
+      // Abort any in-flight request when navigating away
+      try {
+        pendingRequestRef.current?.abort();
+      } catch (_) {
+        // no-op
+      }
+    };
+  }, []);
+
+  async function sendPromptToAssistant(prompt) {
+    // Cancel previous request if any
+    try {
+      pendingRequestRef.current?.abort();
+    } catch (_) {
+      // ignore
+    }
+    const controller = new AbortController();
+    pendingRequestRef.current = controller;
+    try {
+      const result = await sendActionPrompt(prompt, {
+        signal: controller.signal,
+      });
+      const assistantMessages = (result?.messages ?? []).map((m, idx) => ({
+        id: Date.now() + idx + 1,
+        role: m.role,
+        text: m.text,
+      }));
+      if (assistantMessages.length) {
+        setMessages((prev) => [...prev, ...assistantMessages]);
+      }
+    } catch (err) {
+      if (err?.name === "AbortError") return;
+      // For now, fail silently to avoid UX changes; can add toast later
+      // console.warn("Assistant request failed", err);
+    }
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
-    if (!text.trim()) return;
-    setPhase("shimmer");
-    setTimeout(() => setPhase("graph"), 3000);
+    const prompt = text.trim();
+    if (!prompt) return;
+    // Add the user's message and switch to chat view
+    setMessages((prev) => [
+      ...prev,
+      { id: Date.now(), role: "user", text: prompt },
+    ]);
+    setText("");
+    setPhase("chat");
+    // Ask assistant (backend shim)
+    sendPromptToAssistant(prompt);
   }
 
   function handleTakeActionCause(cause, subCause) {
@@ -950,8 +1000,70 @@ export default function Action() {
                   id="action-textarea"
                   ref={textareaRef}
                   className="action-textarea"
-                  placeholder="Deep dive into the month on month increased maintenance cost. Last month it was increased by 7% ($450 annualized)"
-                  rows={3}
+                  placeholder="Deep dive into the month on month increased maintenance cost. Last month it was increased by 7%($450 annualized)"
+                  rows={1}
+                  value={text}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                    autoSizeTextArea(textareaRef.current);
+                  }}
+                />
+                <div className="action-controls">
+                  <button
+                    type="button"
+                    className="icon-button"
+                    title="Voice input"
+                    aria-label="Voice input"
+                  >
+                    <IconMic />
+                  </button>
+                  <button
+                    type="submit"
+                    className="icon-button primary"
+                    title="Send"
+                    aria-label="Send"
+                    disabled={!text.trim()}
+                  >
+                    <IconSend />
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {phase === "chat" && (
+          <div className="chat-container">
+            <div className="messages" role="log" aria-live="polite">
+              {messages.map((m) => (
+                <div key={m.id} className={`bubble-row ${m.role}`}>
+                  {m.role === "assistant" ? (
+                    <>
+                      <span className="assistant-avatar" aria-hidden="true">
+                        <img src="/inn_logo.svg" alt="" />
+                      </span>
+                      <div className={`bubble ${m.role}`}>{m.text}</div>
+                    </>
+                  ) : (
+                    <div className={`bubble ${m.role}`}>{m.text}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <form className="chat-input-form" onSubmit={handleSubmit}>
+              <label className="sr-only" htmlFor="action-textarea">
+                Type your message
+              </label>
+              <div className="input-row">
+                <span className="input-plus" aria-hidden="true">
+                  📎
+                </span>
+                <textarea
+                  id="action-textarea"
+                  ref={textareaRef}
+                  className="action-textarea"
+                  placeholder="Type your next instruction…"
+                  rows={1}
                   value={text}
                   onChange={(e) => {
                     setText(e.target.value);
