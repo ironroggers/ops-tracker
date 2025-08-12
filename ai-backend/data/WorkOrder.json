@@ -1,0 +1,13 @@
+{
+    "name": "Cylinder Type A Leaking Fix",
+    "description": "Fix the leaking cylinder",
+    "createdAt": "2025-06-20T12:00:00.000Z",
+    "updatedAt": "2025-06-20T12:00:00.000Z",
+    "status": "overdue",
+    "priority": "high",
+    "assignedTo": ["Vivek", "John", "Jane"],
+    "permit": "Cold Work Permit",
+    "asset": "Cylinder Type A",
+    "plant": "Norway Plant",
+    "operations": ["Tighten the bolts", "Replace the cylinder"]
+}

@@ -1,0 +1,12 @@
+{
+    "asset": "Cylinder Type A",
+    "name": "Cylinder Type A Leaking",
+    "description": "The cylinder is leaking",
+    "createdAt": "2025-06-20T12:00:00.000Z",
+    "updatedAt": "2025-06-20T12:00:00.000Z",
+    "status": "open",
+    "priority": "high",
+    "assignedTo": "Vivek",
+    "remarks": ["The cylinder is leaking please fix it by tightening the bolts"],
+    "workOrder": "SCREW CONVEYOR 1W WO"
+}

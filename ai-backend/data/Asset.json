@@ -1,0 +1,13 @@
+{
+    "_id": "68239d1b50c32a36edbb8f29",
+    "name": "Cylinder Type A",
+    "description": "This is a cylinder type A",
+    "createdAt": "2025-06-20T12:00:00.000Z",
+    "updatedAt": "2025-06-20T12:00:00.000Z",
+    "warranty": {
+        "startDate": "2025-06-20T12:00:00.000Z",
+        "endDate": "2025-06-20T12:00:00.000Z"
+    },
+    "plant": "Norway Plant",
+    "manufacturer": "Tata"
+}

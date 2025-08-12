@@ -1,0 +1,198 @@
+.header-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #ffffff;
+  border-bottom: 1px solid #e6e8ef;
+  /* box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.02); */
+}
+
+/* Ensure header respects sidebar width */
+.header-toolbar {
+  margin-left: 280px;
+}
+body.sidebar-collapsed .header-toolbar {
+  margin-left: 12px;
+}
+body.sidebar-expanded .header-toolbar {
+  margin-left: 280px;
+}
+
+.header-top,
+.header-filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px; /* sleeker spacing */
+}
+
+.header-filters {
+  padding-top: 8px;
+  padding-bottom: 12px;
+  /* border-top: 1px solid #f0f2f8; */
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-title {
+  margin-left: -65px;
+  font-size: 18px; /* smaller title */
+  font-weight: 700; /* slightly lighter for a sleeker feel */
+  color: #1a1f36;
+}
+
+.breadcrumbs {
+  margin-top: 2px;
+  color: #727caf;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px; /* slightly smaller */
+}
+
+.crumb.active {
+  color: #2a3eb1;
+  font-weight: 600;
+}
+
+.crumb-sep {
+  color: #9aa1c5;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* tighter */
+}
+
+.profile-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px; /* smaller button */
+  border: 1px solid #e6e8ef;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.profile-badge {
+  width: 22px;
+  height: 22px; /* smaller avatar */
+  border-radius: 50%;
+  background: #f2f3fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5aa6; /* icon color */
+}
+
+.inn-logo {
+  height: 22px; /* smaller Innovapptive logo */
+}
+
+/* Filters row */
+.filters-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.filters-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field {
+  position: relative;
+  display: inline-block;
+}
+.field-label {
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  padding: 0 6px; /* create a small white mask over the border */
+  font-size: 12px;
+  color: #111827; /* black label */
+  background: #ffffff; /* hide the input border under label */
+  border-radius: 6px;
+  z-index: 1;
+  cursor: pointer;
+}
+.field-select {
+  appearance: none;
+  background: #ffffff;
+  border: 1px solid #e6e8ef;
+  color: #111827;
+  padding: 10px 30px 10px 12px; /* more compact */
+  border-radius: 10px;
+  font-size: 13px;
+  min-width: 200px; /* narrower selects */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="%236b7280" d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+}
+
+.timeframes {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: 8px;
+  padding: 6px 8px; /* smaller group */
+  background: #eef2ff;
+  border: 1px solid #dbe2fe;
+  border-radius: 14px;
+}
+.chip {
+  padding: 6px 10px; /* smaller pills */
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+}
+.chip-active {
+  background: #c7d2fe;
+  border-color: #c7d2fe;
+  color: #111827;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; /* smaller action buttons */
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e6e8ef;
+  background: #ffffff;
+  color: #4b5563;
+  cursor: pointer;
+}
+.icon-btn:hover {
+  filter: brightness(0.98);
+}
+
+@media (max-width: 768px) {
+  .header-top,
+  .header-filters {
+    padding: 10px 12px;
+  }
+  .filters-left {
+    flex-wrap: wrap;
+  }
+  .field-select {
+    min-width: 260px;
+  }
+  .header-title {
+    font-size: 18px;
+  }
+  .header-toolbar {
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,14 @@
+{
+    "name": "Tighten the bolts",
+    "description": "Tighten the bolts of the cylinder",
+    "createdAt": "2025-06-20T12:00:00.000Z",
+    "updatedAt": "2025-06-20T12:00:00.000Z",
+    "status": "completed",
+    "workOrder": "Cylinder Type A Leaking Fix",
+    "components": ["Screw"],
+    "plannedCapacity": 3,
+    "actualCapacity": 1,
+    "plannedTimeHours": 5,
+    "actualTimeHours": 8,
+    "assignedTo": ["Vivek"]
+}

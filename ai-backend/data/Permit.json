@@ -1,0 +1,12 @@
+{
+"name": "Cold Work Permit",
+"type": "cold",
+"description": "This is a cold work permit",
+"createdAt": "2025-06-20T12:00:00.000Z",
+"updatedAt": "2025-06-20T12:00:00.000Z",
+"status": "issued",
+"workOrder": "Cylinder Type A Leaking Fix",
+"actualWaitingTime": 10,
+"plannedWaitingTime": 7,
+"associatedUsers": ["Vivek", "John", "Jane"]
+}

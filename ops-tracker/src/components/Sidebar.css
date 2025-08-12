@@ -1,0 +1,479 @@
+/* Sidebar styles (keeps original component class names so logo and layout are not disturbed) */
+
+/* App sidebar wrapper used by React component */
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 78px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 16px 12px;
+  background: #ffffff;
+  border-right: 1px solid #e6e8ef;
+  z-index: 20;
+}
+
+.app-sidebar .sidebar-top {
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+}
+.app-sidebar .sidebar-logo {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+}
+.app-sidebar .sidebar-logo img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.sidebar-link {
+  text-decoration: none;
+}
+
+.sidebar-button {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  color: #5b67a6;
+  border: 1px solid #eef0f4;
+  background: #f3f4f8;
+  transition: background 160ms ease, box-shadow 160ms ease, transform 80ms ease,
+    color 160ms ease;
+}
+.sidebar-button:hover {
+  filter: brightness(0.99);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.sidebar-button:active {
+  transform: translateY(1px);
+}
+.sidebar-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(42, 62, 177, 0.22);
+}
+.sidebar-button.active {
+  background: #eef2ff;
+  border-color: #dbe2fe;
+  color: #2a3eb1;
+  box-shadow: 0 0 0 4px #f3f6ff;
+}
+
+/* Offset page content to start after the left rail (React sidebar uses .mat-drawer) */
+.with-sidebar {
+  margin-left: 280px;
+}
+body.sidebar-collapsed .with-sidebar {
+  margin-left: -11px;
+}
+body.sidebar-expanded .with-sidebar {
+  margin-left: 280px;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 92px;
+  right: -18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #2a3eb1;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(42, 62, 177, 0.35);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.sidebar-toggle:hover {
+  filter: brightness(1.05);
+}
+
+.app-sidebar.collapsed {
+  width: 72px;
+}
+
+@media (max-width: 640px) {
+  .app-sidebar {
+    display: none;
+  }
+  .with-sidebar {
+    margin-left: 0;
+  }
+}
+
+/* --- The following styles are from the Angular theme to match the visual look, but they no longer override layout fundamentals --- */
+/* Exact copy of Angular app.component.scss converted to CSS */
+
+.mat-drawer-content {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  background-color: #f2f2ff;
+  margin: 0 !important;
+}
+
+.mat-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-right: 1px solid #e6e8ef;
+  height: 100vh; /* Fill full viewport height */
+  /* Allow the collapse button to sit slightly outside without being clipped */
+  overflow: visible;
+  background-color: #ffffff;
+  width: 280px;
+  transition: all 0.5s ease 0s;
+  -webkit-transition: all 0.5s ease 0s;
+  -webkit-transform: translate3d(0, 0px, 0px);
+  transform: translate3d(0, 0px, 0px);
+  visibility: visible;
+  /* Ensure any overhanging controls (like the chevron button) render above adjacent content */
+  z-index: 1001;
+}
+
+.main-app {
+  padding: 0; /* Remove extra spacing that pushed things down */
+  margin: 0;
+}
+
+.collapse-btn {
+  position: absolute;
+  top: 72px; /* consistent placement below the logo */
+  right: -14px;
+  /* Sit above the drawer border and any neighboring content */
+  z-index: 1002;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  background: #ffffff;
+  border: 1px solid #e6e8ef;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Add a subtle white ring so the vertical divider line never visually cuts the button */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 2px #ffffff;
+}
+
+.collapse-icon {
+  width: 16px;
+  height: 16px;
+  color: #727caf;
+  background: none;
+}
+
+ul {
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+.logo-img {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #f0f2f7;
+}
+
+.submenu {
+  font-style: normal;
+  font-weight: 400 !important;
+  font-size: 13px;
+  color: #727caf;
+  cursor: pointer;
+  height: 42px !important;
+  width: 208px !important;
+}
+
+.submenu .sub-menu-icons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.submenu-title {
+  margin-top: 3px !important;
+}
+
+.submenu.subSelected {
+  color: #2a3eb1;
+  border-radius: 8px;
+  font-weight: 400;
+}
+
+.sidebar-icons {
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 7px;
+}
+
+.m-l-70 {
+  margin-left: 70px;
+}
+
+.menu-title {
+  white-space: nowrap;
+  position: relative;
+  left: 20px;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+}
+
+.menu-name {
+  color: #727caf;
+  font-size: 100%;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.menu-name.active {
+  color: #2a3eb1;
+}
+
+.menu-name:hover {
+  background-color: transparent;
+  font-weight: 700;
+}
+
+.menu-name:focus {
+  background-color: transparent;
+}
+
+/* Apply background and border-radius only to the selected icon */
+.menu-name.active .side-img-icons {
+  border-radius: 10px;
+  outline: 2px solid #2a3eb1;
+  background-color: #eaf0ff;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+/* Make the icon color white inside the selected icon */
+.menu-name.active .side-img-icons img,
+.menu-name.active .side-img-icons svg {
+  fill: white;
+  width: 22px;
+  height: 22px;
+}
+
+.submenu:hover {
+  font-weight: 400;
+}
+
+.hide-content {
+  display: none;
+}
+
+.hidden {
+  display: none;
+}
+
+.arrow-margin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 10px;
+}
+
+.innov-big-img {
+  position: absolute;
+  left: 21px;
+  width: 195px;
+  top: -68px;
+}
+
+.innova-small-img {
+  width: 44px; /* matches viewBox width better and avoids cropping */
+  height: auto;
+  display: block; /* ensure full visibility within header */
+}
+
+.show-content {
+  margin: 14px 0 0 90px;
+}
+
+.show-login {
+  margin: 0;
+  height: 100%;
+}
+
+.menu-close {
+  width: 75px;
+}
+
+.sidebar-menu-items {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100vh - 96px); /* account for logo + spacing */
+  padding: 12px 8px; /* breathing room around first/last icons */
+}
+
+.sidebar-menu-items .menu-item {
+  padding: 4px 0 !important;
+  margin: 6px 0; /* vertical spacing between icons */
+}
+
+.sidebar-menu-items .menu-item li {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 110%;
+  color: #76767b;
+  cursor: pointer;
+  display: flex;
+}
+
+.sidebar-menu-items .menu-item li .sidebar-icons {
+  width: 16px;
+  height: 16px;
+  padding: 10px 30px 30px 10px;
+}
+
+.sidebar-menu-items .menu-item li:hover {
+  background-color: #eeeeee;
+}
+
+.version {
+  color: #727caf;
+  width: 229px;
+  margin-top: 14px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.sidebar-icon {
+  background-color: transparent;
+  height: 40px;
+  width: 40px;
+}
+
+.side-bar-images {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  margin-left: 8px; /* give a little left gutter */
+}
+
+.side-bar-images .side-img-icons {
+  width: 36px !important;
+  height: 36px !important;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background-color: #ededed;
+  padding: 6px !important;
+}
+
+.expand-arrow {
+  color: rgba(114, 124, 175, 1);
+}
+
+.subRoutes {
+  margin-left: 34px;
+  padding-left: 35px;
+  border-left: 2px solid rgba(114, 124, 175, 1);
+}
+
+.full-width {
+  width: 100%;
+  margin-left: 7px;
+  padding: 0;
+}
+
+.app-container {
+  height: 90vh;
+}
+
+.content-shift {
+  margin-left: 200px;
+  transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-unshift {
+  transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Utility classes */
+.m-0 {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dis-flex {
+  display: flex;
+  align-items: center;
+}
+
+/* Content shift helper (already used in App.js) */
+/* keep original content offset; we already defined .with-sidebar above */
+
+/* When collapsed, shrink content offset */
+/* collapsing is handled by the component's body class with the original widths */
+
+/* Responsive breakpoints */
+@media screen and (min-width: 990px) {
+  .min-app {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1022px) {
+  .min-app {
+    position: fixed;
+    top: 40%;
+    left: 25%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    text-align: center;
+    color: black;
+  }
+}
+
+@media screen and (max-width: 1022px) {
+  .main-app {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .mat-drawer {
+    display: none;
+  }
+  .with-sidebar {
+    margin-left: 0;
+  }
+}
