@@ -165,7 +165,7 @@ function AlertBanner({
 function InsightPopup({ onClose, actionTo = "/action" }) {
   const navigate = useNavigate();
   const message =
-    "I can see increase in OPEX from last 3 months. Lets find RCA and resolve this issue.";
+    "I can see increase in Maintenenace cost from last 3 months. Let's analyse this issue";
   return (
     <Box
       position="fixed"

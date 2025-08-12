@@ -742,7 +742,13 @@
   border: 1px solid var(--card-border);
   border-radius: 16px;
   background: #f3f4f6; /* light gray background per request */
-  padding: 10px;
+  padding: 10px 14px;
+  margin-bottom: 15px;
+}
+/* Header bar inside causes card that needs rounded top corners */
+.cause-actions-header {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 .report-body {
   overflow: hidden;
@@ -750,7 +756,7 @@
   display: grid;
   grid-template-rows: 1fr;
   max-height: 2000px; /* big enough to show fully */
-  margin-top: 10px;
+  margin-top: 13px;
 }
 .report-body.collapsed {
   grid-template-rows: 0fr;
@@ -1058,8 +1064,8 @@
   font-weight: 700;
 }
 .cause-title {
-  color: var(--text-primary);
-  font-weight: 700;
+  color: white;
+  font-weight: 500;
 }
 .cause-chip {
   background: #f8fafc;
@@ -1222,7 +1228,7 @@
 .action-card {
   border: 1px solid var(--card-border);
   border-radius: 12px;
-  padding: 121px 12px;
+  padding: 121px 22px;
   display: grid;
   gap: 8px;
   background: #3d5afe14;
@@ -1461,7 +1467,7 @@
 /* ===== Actions table (right panel) ===== */
 .table-wrapper {
   border: 1px solid var(--card-border);
-  border-radius: 14px;
+  border-radius: 0 0 8px 8px; /* round only bottom corners */
   overflow: hidden;
   background: var(--card-bg);
 }
@@ -1472,14 +1478,18 @@
 .actions-table th,
 .actions-table td {
   padding: 12px 14px;
-  vertical-align: top;
 }
 .actions-table thead th {
-  background: #fbfdff;
+  background: #F4F4F4;
   color: var(--text-primary);
   font-weight: 700;
   font-size: 14px;
   border-bottom: 1px solid #e5e7eb;
+}
+/* Vertical column borders */
+.actions-table thead th + th,
+.actions-table tbody td + td {
+  border-left: 1px solid #e5e7eb;
 }
 .actions-table tbody tr + tr td {
   border-top: 1px solid #e5e7eb;
@@ -1492,7 +1502,10 @@
   width: auto;
 }
 .actions-table .col.impact {
-  width: 280px;
+  width: 131px;
+}
+.actions-table .col.cta {
+  width: 260px;
 }
 .action-main {
   font-weight: 600;
@@ -1500,7 +1513,42 @@
   margin-bottom: 4px;
 }
 .action-sub {
-  color: #475569;
-  font-size: 13px;
+  color: black;
+  font-size: 14px;
   line-height: 1.4;
+}
+
+/* Priority chips */
+.chip-high,
+.chip-med,
+.chip-low {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 71px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 16px;
+  gap: 8px;
+  font-family: Roboto, system-ui, -apple-system, Segoe UI, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: 0.15px;
+  border: none;
+}
+/* High */
+.chip-high {
+  background: rgba(244, 67, 54, 0.10); /* #F44336 at 10% */
+  color: #AA2E25;
+}
+/* Medium */
+.chip-med {
+  background: rgba(255, 193, 7, 0.12); /* Amber */
+  color: #8F6400;
+}
+/* Low */
+.chip-low {
+  background: rgba(76, 175, 80, 0.12); /* Green */
+  color: #1B5E20;
 }

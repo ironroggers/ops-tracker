@@ -598,7 +598,8 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
           >
             <div
               className="cause-actions-header"
-              style={{ marginBottom: "16px" }}
+              style={{ background: "#3D5AFE",
+                padding: "12px 10px" }}
             >
               <div
                 className="cause-actions-title"
@@ -609,7 +610,7 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
                 }}
               >
                 <div
-                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
+                  style={{ display: "flex", alignItems: "center" }}
                 >
                   <span
                     className="cause-rank-dark"
@@ -617,211 +618,121 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
                       backgroundColor: "#3D5AFE",
                       color: "white",
                       borderRadius: "8px",
-                      padding: "6px 10px",
                       fontSize: "14px",
                       fontWeight: "600",
                     }}
                   >
-                    {causeIdx + 1}
+                    {causeIdx + 1}.
                   </span>
                   <div>
                     <div
                       className="cause-title"
                       style={{
                         fontSize: "16px",
-                        fontWeight: "600",
+                        fontWeight: "500",
                         marginBottom: "2px",
                       }}
                     >
                       {cause.causeTitle}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                    {/* <div style={{ fontSize: '12px', color: '#6b7280' }}>
                       {getVisibleActions(cause.actions).length} action{getVisibleActions(cause.actions).length !== 1 ? 's' : ''} planned
-                    </div>
+                    </div> */}
                   </div>
                 </div>
-                <span
+                {/* <span
                   className="cause-chip chip-high"
                   style={{ fontSize: "14px", fontWeight: "600" }}
                 >
                   {cause.causePercent}%
-                </span>
+                </span> */}
               </div>
             </div>
 
-            <div style={{ display: "grid", gap: "12px" }}>
-              {getVisibleActions(cause.actions).map((action, actionIdx) => {
-                const status = actionStatuses[action.id];
-                const isApproved = status === 'approved';
-                return (
-                  <div
-                    key={actionIdx}
-                    className="chart-card"
-                    style={{
-                      padding: "16px",
-                      border: isApproved ? "1px solid #86efac" : "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                      backgroundColor: isApproved ? "#f0fdf4" : "#ffffff",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "12px",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          color: "#6b7280",
-                          fontWeight: "500",
-                        }}
-                      >
-                        Action {actionIdx + 1}
-                      </span>
-                      <span
-                        className={
-                          action.priority === "High" ? "chip-high" : "chip-med"
-                        }
-                        style={{ fontSize: "12px" }}
-                      >
-                        {action.priority}
-                      </span>
-                      {isApproved && (
-                        <span
-                          style={{
-                            marginLeft: 8,
-                            backgroundColor: '#dcfce7',
-                            color: '#16a34a',
-                            border: '1px solid #86efac',
-                            borderRadius: '999px',
-                            padding: '2px 8px',
-                            fontSize: '11px',
-                            fontWeight: 600,
-                          }}
-                          aria-label="Approved action"
-                        >
-                          Approved
-                        </span>
-                      )}
-                    </div>
-
-                    <div style={{ marginBottom: "12px" }}>
-                      <h4
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: "600",
-                          marginBottom: "6px",
-                          color: "#111827",
-                        }}
-                      >
-                        {action.title}
-                      </h4>
-                      <p
-                        style={{
-                          fontSize: "13px",
-                          color: "#6b7280",
-                          lineHeight: "1.4",
-                          margin: "0",
-                        }}
-                      >
-                        {action.description}
-                      </p>
-                    </div>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div>
-                        <div
-                          style={{
-                            fontSize: "11px",
-                            color: "#9ca3af",
-                            marginBottom: "2px",
-                          }}
-                        >
-                          Potential Impact
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            color: "#111827",
-                          }}
-                        >
-                          {action.impact}
-                        </div>
-                      </div>
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        <button
-                          className="btn-outline sm"
-                          type="button"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                            fontSize: "12px",
-                          }}
-                          onClick={() => handleDismiss(action.id)}
-                          disabled={isApproved}
-                        >
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <path
-                              d="M6 18L18 6M6 6l12 12"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                            />
-                          </svg>
-                          Dismiss
-                        </button>
-                        <button
-                          className="btn sm"
-                          type="button"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                            fontSize: "12px",
-                          }}
-                          onClick={() => handleApprove(action.id)}
-                          disabled={isApproved}
-                        >
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <path
-                              d="M20 6L9 17l-5-5"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                          {isApproved ? 'Approved' : 'Approve'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="table-wrapper">
+              <table className="actions-table" role="table" aria-label="Actions list">
+                <thead>
+                  <tr role="row" className="actions-row header">
+                    <th className="col priority" role="columnheader">Priority</th>
+                    <th className="col action" role="columnheader">Action</th>
+                    <th className="col impact" role="columnheader">Impact</th>
+                    <th className="col cta" role="columnheader"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {getVisibleActions(cause.actions).map((action, actionIdx) => {
+                    const status = actionStatuses[action.id];
+                    const isApproved = status === 'approved';
+                    return (
+                      <tr key={actionIdx} role="row" className="actions-row">
+                        <td className="col priority" role="cell">
+                          <span className={`${((action.priority||'').toLowerCase()==='high')?'chip-high':((action.priority||'').toLowerCase()==='low')?'chip-low':'chip-med'}`}>{action.priority}</span>
+                        </td>
+                        <td className="col action" role="cell">
+                          <div className="action-main">{action.title}</div>
+                          <div className="action-sub">{action.description}</div>
+                          <div style={{ marginTop: 6, fontSize: 12, color: '#6b7280' }}>Show Reasoning</div>
+                        </td>
+                        <td className="col impact" role="cell">
+                          <span>{action.impact}</span>
+                        </td>
+                        <td className="col cta" role="cell">
+                          <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                            <button
+                              className="btn-outline sm"
+                              type="button"
+                              onClick={() => handleDismiss(action.id)}
+                              disabled={isApproved}
+                              style={{
+                                background: '#EFF1F5',
+                                color: '#525560',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '8px',
+                                // padding: '10px 14px',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                width: '79px',
+                                height: '40px',
+                                cursor: 'pointer',
+                                transition: 'background 160ms ease, border-color 160ms ease, transform 80ms ease'
+                              }}
+                            >
+                              Dismiss
+                            </button>
+                            <button
+                              className="btn sm"
+                              type="button"
+                              onClick={() => handleApprove(action.id)}
+                              disabled={isApproved}
+                              style={{
+                                background: '#357A38',
+                                color: 'white',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '8px',
+                                // padding: '10px 14px',
+                                fontSize: '13px',
+                                fontWeight: '500',
+                                width: '79px',
+                                height: '40px',
+                                cursor: 'pointer',
+                                transition: 'background 160ms ease, border-color 160ms ease, transform 80ms ease'
+                              }}
+                            >
+                              {isApproved ? 'Approved' : 'Approve'}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
+            {/* <div style={{ marginTop: 8 }}>
+              <button type="button" className="btn-outline sm" style={{ color: '#3D5AFE', borderColor: 'transparent' }}>+ Add Action</button>
+            </div> */}
 
-            {causeIdx < causeActions.length - 1 && (
+            {/* {causeIdx < causeActions.length - 1 && (
               <div style={{ margin: "24px 0", textAlign: "center" }}>
                 <div
                   style={{
@@ -831,11 +742,11 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
                   }}
                 ></div>
               </div>
-            )}
+            )} */}
           </div>
         ))}
 
-        <div style={{ marginTop: "20px", textAlign: "center" }}>
+        {/* <div style={{ marginTop: "20px", textAlign: "center" }}>
           <button
             type="button"
             className="btn-outline sm"
@@ -856,7 +767,7 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
             </svg>
             Add New Action
           </button>
-        </div>
+        </div> */}
       </div>
     </section>
   );
@@ -2229,7 +2140,7 @@ function ChatMessage({ message, onTypedDone, onMessageClick }) {
           {message.animated ? (
             <TypingText
               text={message.text}
-              cps={18}
+              cps={26}
               onDone={() => onTypedDone?.(message.id)}
             />
           ) : (
@@ -3399,6 +3310,9 @@ export default function Action() {
   const [showExecutionFromMessage, setShowExecutionFromMessage] = useState(false);
   const [executeAllSignal, setExecuteAllSignal] = useState(0);
   const [executeOneSignal, setExecuteOneSignal] = useState({ actionId: null, tick: 0 });
+  const [showAgentProgress, setShowAgentProgress] = useState(true);
+  const [assistantCompleted, setAssistantCompleted] = useState(false);
+  const [dismissedFollowups, setDismissedFollowups] = useState(new Set());
 
   // Stage transitions for right pane
   useEffect(() => {
@@ -3517,6 +3431,14 @@ export default function Action() {
     }
   }, [progressPct]);
 
+  // Fade out and unmount the agent progress card when reaching 100%
+  useEffect(() => {
+    if (progressPct >= 100 && showAgentProgress) {
+      const t = setTimeout(() => setShowAgentProgress(false), 900);
+      return () => clearTimeout(t);
+    }
+  }, [progressPct, showAgentProgress]);
+
   // Enable scrollbar only for the final report at 100%
   useEffect(() => {
     setRightScrollAuto(progressPct === 100);
@@ -3611,6 +3533,7 @@ export default function Action() {
       hasRequestedShiftRef.current = true;
       setTwoCol(true);
     }
+    setAssistantCompleted(true);
   }
 
   function handleSubmit(event) {
@@ -3627,6 +3550,9 @@ export default function Action() {
     setTwoCol(false); // start in single column; shift after first assistant reply
     hasRequestedShiftRef.current = false; // allow shift scheduling for this round
     setShowActionsPanel(false); // reset actions panel on new submit
+    setShowAgentProgress(true); // show progress again for new round
+    setAssistantCompleted(false); // reset wide state until assistant finishes
+    setDismissedFollowups(new Set()); // reset follow-ups visibility for new round
     // Ask assistant (backend shim)
     sendPromptToAssistant(prompt);
   }
@@ -3650,10 +3576,20 @@ export default function Action() {
     }
   }
 
-  function handleFollowupClick(nextText) {
+  function handleFollowupClick(nextText, key) {
     setText(nextText);
     setShowActionsPanel(true);
     setReportCollapsed(true); // Collapse the Top 2 Causes section by default
+    dismissFollowup(key);
+  }
+
+  function dismissFollowup(key) {
+    if (!key) return;
+    setDismissedFollowups((prev) => {
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
   }
 
   function handleAddMessage(message) {
@@ -3712,7 +3648,7 @@ export default function Action() {
         <div className="header-title">
           <span className="ai-brand">
             <IconBrand32 />
-            AI Assistant
+            GovernX
           </span>
         </div>
         <div className="header-spacer" />
@@ -3720,7 +3656,7 @@ export default function Action() {
       <div className="action-content">
         {phase === "input" && (
           <div className="action-card" role="region" aria-label="Assistant">
-            <h1 className="action-title">What's on your mind today?</h1>
+            <h1 className="action-title">Let's chat and optimise your next action !</h1>
             <form className="action-form" onSubmit={handleSubmit}>
               <label className="sr-only" htmlFor="action-textarea">
                 Describe your task
@@ -3768,7 +3704,7 @@ export default function Action() {
         {phase === "chat" && (
           <div
             className={`chat-container embedded ${
-              showActionsPanel ? "wide" : ""
+              assistantCompleted ? "wide" : ""
             }`}
           >
             <div className={`chat-body-grid ${twoCol ? "two-col" : ""}`}>
@@ -3792,45 +3728,56 @@ export default function Action() {
                   ))}
                 </div>
                 {twoCol && (
-                  <AgentProgress
-                    onCrossThreshold={() => setProgressAtTop(true)}
-                    onProgressChange={setProgressPct}
-                    threshold={40}
-                  />
+                  showAgentProgress && (
+                    <div className={progressPct >= 100 ? "panel-animate-out" : "panel-animate-in"}>
+                      <AgentProgress
+                        onCrossThreshold={() => setProgressAtTop(true)}
+                        onProgressChange={setProgressPct}
+                        threshold={40}
+                      />
+                    </div>
+                  )
                 )}
                 {twoCol && progressPct >= 100 && (
                   <div className="followups-card">
                     <div className="followups-title">Suggested Follow-ups</div>
                     <div className="followup-list">
-                      <button
-                        type="button"
-                        className="followup-btn"
-                        onClick={() =>
-                          handleFollowupClick("Validate with site data")
-                        }
-                      >
-                        Validate with site data →
-                      </button>
-                      <button
-                        type="button"
-                        className="followup-btn"
-                        onClick={() =>
-                          handleFollowupClick("Trace 3 months of permit delays")
-                        }
-                      >
-                        Trace 3 months of permit delays →
-                      </button>
-                      <button
-                        type="button"
-                        className="followup-btn"
-                        onClick={() =>
-                          handleFollowupClick(
-                            "Create a 3-month cost-reduction roadmap"
-                          )
-                        }
-                      >
-                        Create a 3-month cost-reduction roadmap →
-                      </button>
+                      {!dismissedFollowups.has("validateWithSiteData") && (
+                        <button
+                          type="button"
+                          className="followup-btn"
+                          onClick={() =>
+                            handleFollowupClick("Validate with site data", "validateWithSiteData")
+                          }
+                        >
+                          Validate with site data →
+                        </button>
+                      )}
+                      {!dismissedFollowups.has("trace3MonthsPermitDelays") && (
+                        <button
+                          type="button"
+                          className="followup-btn"
+                          onClick={() =>
+                            handleFollowupClick("Trace 3 months of permit delays", "trace3MonthsPermitDelays")
+                          }
+                        >
+                          Trace 3 months of permit delays →
+                        </button>
+                      )}
+                      {!dismissedFollowups.has("create3MonthCostReductionRoadmap") && (
+                        <button
+                          type="button"
+                          className="followup-btn"
+                          onClick={() =>
+                            handleFollowupClick(
+                              "Create a 3-month cost-reduction roadmap",
+                              "create3MonthCostReductionRoadmap"
+                            )
+                          }
+                        >
+                          Create a 3-month cost-reduction roadmap →
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -3896,7 +3843,7 @@ export default function Action() {
               {twoCol && (
                 <div style={{ alignSelf: "start" }} className="right-pane">
                   <div className="right-title">
-                    Causes for increased Maintenance Opex
+                    Causes for increased Maintenance Cost
                   </div>
                   {progressPct === 100 ? (
                     <div
