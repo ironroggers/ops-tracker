@@ -436,73 +436,201 @@ function RightInfoPanel() {
 }
 
 // New: Static actions chart-card (now enabled)
-function RightActionsPanel() {
-  const rows = [
+function RightActionsPanel({ collapsed = false, onToggleCollapse }) {
+  const causeActions = [
     {
-      priority: "High",
-      impact: "Loss < $1M",
-      title: "PM Optimization",
-      description:
-        "Identify & deactivate unnecessary PM based on failure history and execution data",
-      thinking:
-        "Meeting to discuss the root causes of delays in work orders and identify corrective actions to streamline operations.",
+      causeTitle: "Rapid Increase in PM Work Orders",
+      causePercent: 70,
+      actions: [
+        {
+          priority: "High",
+          impact: "Loss < $1M",
+          title: "PM Optimization",
+          description: "Identify & deactivate unnecessary PM based on failure history and execution data"
+        },
+        {
+          priority: "Medium",
+          impact: "Loss < $500K",
+          title: "Risk-based PM Scheduling",
+          description: "Risk-rank assets and adjust PM frequencies using criticality + condition data"
+        }
+      ]
     },
     {
-      priority: "High",
-      impact: "Loss < $1M",
-      title: "Inventory Readiness",
-      description:
-        "Create document outlining strategies to improve inventory management to prevent delays",
-      thinking:
-        "Create a document outlining strategies to improve inventory management, ensuring sufficient component availability to prevent operational delays.",
-    },
+      causeTitle: "Increase in MTTR due to Waiting for Permits",
+      causePercent: 30,
+      actions: [
+        {
+          priority: "High",
+          impact: "Loss < $800K",
+          title: "Permit Pre-check System",
+          description: "Implement early permit pre-checks to reduce waiting time"
+        },
+        {
+          priority: "High",
+          impact: "Loss < $600K",
+          title: "Shift Handover Enhancement",
+          description: "Introduce shift handover checklist including pending permits"
+        },
+        {
+          priority: "Medium",
+          impact: "Loss < $400K",
+          title: "Operations SLA",
+          description: "Create SLA with Operations for isolation/LOTO readiness"
+        }
+      ]
+    }
   ];
+
   return (
-    <div className="chart-card actions-card" aria-live="polite">
-      <div className="chart-header">
-        <div>
-          <div className="chart-title">Actions for Maintenance Opex cost reductions</div>
-          <div className="chart-subtitle">Contributing to 7% increase in Maintenance Opex trend</div>
+    <section className="report-card" aria-label="Project Plan Report">
+      <div className="report-head">
+        <div className="report-head-left">
+          <span className="report-bullet" aria-hidden="true">
+            <IconBrand32 />
+          </span>
+          <div>
+            <div className="report-title">Project Plan for Maintenance Cost Reduction</div>
+            <div className="report-subtitle">Contributing to 7% increase in Maintenance Opex trend</div>
+          </div>
+        </div>
+        <div className="report-head-actions" aria-hidden="true">
+          <button type="button" className="icon-badge" title="Copy">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <rect
+                x="9"
+                y="9"
+                width="10"
+                height="10"
+                rx="2"
+                stroke="#4B5563"
+                strokeWidth="1.5"
+              />
+              <rect
+                x="5"
+                y="5"
+                width="10"
+                height="10"
+                rx="2"
+                stroke="#4B5563"
+                strokeWidth="1.5"
+              />
+            </svg>
+          </button>
+          <button 
+            type="button" 
+            className="icon-badge" 
+            title={collapsed ? "Expand" : "Collapse"}
+            onClick={onToggleCollapse}
+          >
+            {collapsed ? <IconChevronDown /> : <IconChevronUp />}
+          </button>
         </div>
       </div>
 
-      <div className="table-wrapper">
-        <table className="actions-table" role="table" aria-label="Actions list">
-          <thead>
-            <tr role="row" className="actions-row header">
-              <th className="col priority" role="columnheader">Priority</th>
-              <th className="col action" role="columnheader">Action</th>
-              <th className="col impact" role="columnheader">Impact</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r, idx) => (
-              <tr key={idx} role="row" className="actions-row">
-                <td className="col priority" role="cell">
-                  <span className="chip-high">{r.priority}</span>
-                </td>
-                <td className="col action" role="cell">
-                  <div className="action-main">{r.title}</div>
-                  <div className="action-sub">{r.description}</div>
-                </td>
-                <td className="col impact" role="cell">
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span>{r.impact}</span>
-                    <div className="spacer" />
-                    <button className="btn-outline sm" type="button">Dismiss</button>
-                    <button className="btn sm" type="button">Approve</button>
+      <div className={`report-body ${collapsed ? "collapsed" : "expanded"}`} aria-hidden={collapsed}>
+        {causeActions.map((cause, causeIdx) => (
+          <div key={causeIdx} className="cause-actions-section" style={{ marginBottom: '24px' }}>
+            <div className="cause-actions-header" style={{ marginBottom: '16px' }}>
+              <div className="cause-actions-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span className="cause-rank-dark" style={{ 
+                    backgroundColor: '#3D5AFE', 
+                    color: 'white', 
+                    borderRadius: '8px', 
+                    padding: '6px 10px', 
+                    fontSize: '14px', 
+                    fontWeight: '600' 
+                  }}>
+                    {causeIdx + 1}
+                  </span>
+                  <div>
+                    <div className="cause-title" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '2px' }}>
+                      {cause.causeTitle}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                      {cause.actions.length} action{cause.actions.length > 1 ? 's' : ''} planned
+                    </div>
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                </div>
+                <span className="cause-chip chip-high" style={{ fontSize: '14px', fontWeight: '600' }}>
+                  {cause.causePercent}%
+                </span>
+              </div>
+            </div>
+            
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {cause.actions.map((action, actionIdx) => (
+                <div key={actionIdx} className="chart-card" style={{ 
+                  padding: '16px', 
+                  border: '1px solid #e5e7eb', 
+                  borderRadius: '8px',
+                  backgroundColor: '#ffffff'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500' }}>
+                      Action {actionIdx + 1}
+                    </span>
+                    <span className={action.priority === "High" ? "chip-high" : "chip-med"} style={{ fontSize: '12px' }}>
+                      {action.priority}
+                    </span>
+                  </div>
+                  
+                  <div style={{ marginBottom: '12px' }}>
+                    <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '6px', color: '#111827' }}>
+                      {action.title}
+                    </h4>
+                    <p style={{ fontSize: '13px', color: '#6b7280', lineHeight: '1.4', margin: '0' }}>
+                      {action.description}
+                    </p>
+                  </div>
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '2px' }}>
+                        Potential Impact
+                      </div>
+                      <div style={{ fontSize: '13px', fontWeight: '500', color: '#111827' }}>
+                        {action.impact}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button className="btn-outline sm" type="button" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                          <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                        Dismiss
+                      </button>
+                      <button className="btn sm" type="button" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                          <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Approve
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {causeIdx < causeActions.length - 1 && (
+              <div style={{ margin: '24px 0', textAlign: 'center' }}>
+                <div style={{ height: '1px', backgroundColor: '#e5e7eb', width: '100%' }}></div>
+              </div>
+            )}
+          </div>
+        ))}
 
-      <div style={{ marginTop: 8 }}>
-        <button type="button" className="btn-outline sm">+ Add Action</button>
+        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+          <button type="button" className="btn-outline sm" style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '0 auto' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            Add New Action
+          </button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -979,7 +1107,48 @@ function SubCauses({
   );
 }
 
-function CausesReport({ collapsed = false }) {
+// Add ChevronUp and ChevronDown icon components after the existing icon components
+function IconChevronUp() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M18 15l-6-6-6 6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconChevronDown() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M6 9l6 6 6-6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CausesReport({ collapsed = false, onToggleCollapse }) {
   const mini1 = [
     { month: "Jan", value: 118 },
     { month: "Feb", value: 131 },
@@ -1010,9 +1179,6 @@ function CausesReport({ collapsed = false }) {
           </div>
         </div>
         <div className="report-head-actions" aria-hidden="true">
-          {/* <button type="button" className="icon-badge" title="Settings">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="#4B5563" strokeWidth="1.5"/><path d="M19.4 15a1 1 0 00.2-1.1l-1-1.7a7.5 7.5 0 000-2.4l1-1.7a1 1 0 00-.2-1.1l-1.1-1.1a1 1 0 00-1.1-.2l-1.7 1a7.5 7.5 0 00-2.4 0l-1.7-1a1 1 0 00-1.1.2L8.3 5a1 1 0 00-.2 1.1l1 1.7a7.5 7.5 0 000 2.4l-1 1.7a1 1 0 00.2 1.1l1.1 1.1a1 1 0 001.1.2l1.7-1a7.5 7.5 0 002.4 0l1.7 1a1 1 0 001.1-.2l1.1-1.1z" stroke="#4B5563" strokeWidth="1.5"/></svg>
-          </button> */}
           <button type="button" className="icon-badge" title="Copy">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <rect
@@ -1035,22 +1201,13 @@ function CausesReport({ collapsed = false }) {
               />
             </svg>
           </button>
-          <button type="button" className="icon-badge" title="Download">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 3v10m0 0l-3-3m3 3l3-3"
-                stroke="#4B5563"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M6 19h12"
-                stroke="#4B5563"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
+          <button 
+            type="button" 
+            className="icon-badge" 
+            title={collapsed ? "Expand" : "Collapse"}
+            onClick={onToggleCollapse}
+          >
+            {collapsed ? <IconChevronDown /> : <IconChevronUp />}
           </button>
         </div>
       </div>
@@ -1732,6 +1889,8 @@ export default function Action() {
   const reportScrollRef = useRef(null);
   const [rightScrollAuto, setRightScrollAuto] = useState(false);
   const [showActionsPanel, setShowActionsPanel] = useState(false);
+  const [reportCollapsed, setReportCollapsed] = useState(false);
+  const [actionsCollapsed, setActionsCollapsed] = useState(false);
 
   // Stage transitions for right pane
   useEffect(() => {
@@ -2108,10 +2267,10 @@ export default function Action() {
                       className="report-scroll panel-animate-in"
                       ref={reportScrollRef}
                     >
-                      <CausesReport collapsed={showActionsPanel} />
+                      <CausesReport collapsed={reportCollapsed} onToggleCollapse={() => setReportCollapsed(!reportCollapsed)} />
                       {showActionsPanel && (
                         <div className="panel-animate-in">
-                          <RightActionsPanel />
+                          <RightActionsPanel collapsed={actionsCollapsed} onToggleCollapse={() => setActionsCollapsed(!actionsCollapsed)} />
                         </div>
                       )}
                     </div>
