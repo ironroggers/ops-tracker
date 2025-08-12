@@ -8,6 +8,16 @@ import React, {
 import "./Action.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sendActionPrompt } from "../services/chatApi";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 
 function IconBack() {
   return (
@@ -154,19 +164,121 @@ function IconInnovaSmall() {
   );
 }
 
+function IconPdf() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="25"
+      viewBox="0 0 24 25"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7.00078 4.19999C6.656 4.19999 6.32534 4.33695 6.08154 4.58075C5.83775 4.82455 5.70078 5.15521 5.70078 5.49999V19.5C5.70078 19.8448 5.83774 20.1754 6.08154 20.4192C6.32534 20.663 6.656 20.8 7.00078 20.8H17.0008C17.3456 20.8 17.6762 20.663 17.92 20.4192C18.1638 20.1754 18.3008 19.8448 18.3008 19.5V9.19999H15.0008C14.5499 9.19999 14.1175 9.02088 13.7987 8.70207C13.4799 8.38326 13.3008 7.95086 13.3008 7.49999V4.19999H7.00078ZM14.7008 5.18994L17.3108 7.79999H15.0008C14.9212 7.79999 14.8449 7.76838 14.7886 7.71212C14.7324 7.65586 14.7008 7.57955 14.7008 7.49999V5.18994ZM5.09159 3.5908C5.59794 3.08445 6.2847 2.79999 7.00078 2.79999H14.0008C14.1864 2.79999 14.3645 2.87374 14.4958 3.00501L19.4958 8.00501C19.627 8.13629 19.7008 8.31434 19.7008 8.49999V19.5C19.7008 20.2161 19.4163 20.9028 18.91 21.4092C18.4036 21.9155 17.7169 22.2 17.0008 22.2H7.00078C6.2847 22.2 5.59794 21.9155 5.09159 21.4092C4.58524 20.9028 4.30078 20.2161 4.30078 19.5V5.49999C4.30078 4.7839 4.58524 4.09715 5.09159 3.5908ZM8.30078 9.49999C8.30078 9.11339 8.61418 8.79999 9.00078 8.79999H10.0008C10.3874 8.79999 10.7008 9.11339 10.7008 9.49999C10.7008 9.88659 10.3874 10.2 10.0008 10.2H9.00078C8.61418 10.2 8.30078 9.88659 8.30078 9.49999ZM8.30078 13.5C8.30078 13.1134 8.61418 12.8 9.00078 12.8H15.0008C15.3874 12.8 15.7008 13.1134 15.7008 13.5C15.7008 13.8866 15.3874 14.2 15.0008 14.2H9.00078C8.61418 14.2 8.30078 13.8866 8.30078 13.5ZM8.30078 17.5C8.30078 17.1134 8.61418 16.8 9.00078 16.8H15.0008C15.3874 16.8 15.7008 17.1134 15.7008 17.5C15.7008 17.8866 15.3874 18.2 15.0008 18.2H9.00078C8.61418 18.2 8.30078 17.8866 8.30078 17.5Z"
+        fill="#4F5561"
+      />
+    </svg>
+  );
+}
+
+// Brand icon requested for titles
+function IconBrand32() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M9.05059 16.1617C10.4292 17.4452 11.5413 19.7215 12.2154 21.3532C12.4567 21.9372 13.402 21.9372 13.6433 21.3532C14.3175 19.7215 15.4296 17.4452 16.8082 16.1617C18.0338 15.0206 20.0807 14.0957 21.5429 13.5322C22.112 13.3129 22.1549 12.4372 21.6073 12.1687C20.1446 11.4517 18.0602 10.3027 16.8082 9.05059C15.4888 7.73122 14.2839 5.48771 13.5782 4.0213C13.3275 3.5003 12.5312 3.5003 12.2805 4.0213C11.5749 5.48771 10.3699 7.73122 9.05059 9.05059C7.79851 10.3027 5.71412 11.4517 4.25148 12.1687C3.70382 12.4372 3.74677 13.3129 4.31589 13.5322C5.77809 14.0957 7.82494 15.0206 9.05059 16.1617Z"
+        fill="#3D5AFE"
+      />
+      <path
+        d="M21.3329 24.889C22.0222 25.5307 22.5783 26.6689 22.9153 27.4847C23.036 27.7767 23.5086 27.7767 23.6293 27.4847C23.9664 26.6689 24.5224 25.5307 25.2117 24.889C25.8245 24.3184 26.8479 23.856 27.579 23.5742C27.8636 23.4645 27.8851 23.0267 27.6113 22.8925C26.8799 22.534 25.8377 21.9594 25.2117 21.3334C24.552 20.6737 23.9495 19.552 23.5967 18.8188C23.4714 18.5583 23.0732 18.5583 22.9479 18.8188C22.5951 19.552 21.9926 20.6737 21.3329 21.3334C20.7069 21.9594 19.6647 22.534 18.9334 22.8925C18.6595 23.0267 18.681 23.4645 18.9656 23.5742C19.6967 23.856 20.7201 24.3184 21.3329 24.889Z"
+        fill="#3D5AFE"
+      />
+    </svg>
+  );
+}
+
+function IconFolder() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M3.5 6.5h6l2 2h9v9.5a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 18.5v-10a2 2 0 012-2z"
+        stroke="#6b7280"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function IconWrench() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M14 3a5 5 0 00-4.24 7.58l-5.59 5.59a2 2 0 102.83 2.83l5.59-5.59A5 5 0 1014 3z"
+        stroke="#6b7280"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function IconSparkle() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M12 2l2.2 5.1L19.5 9l-5.3 1.9L12 16l-2.2-5.1L4.5 9l5.3-1.9L12 2z"
+        fill="#3D5AFE"
+        opacity="0.9"
+      />
+      <path
+        d="M7 14l1 2.3L10.5 17 8 17.8 7 20l-1-2.2L3.5 17 6 16.3 7 14z"
+        fill="#5db6e6"
+      />
+    </svg>
+  );
+}
+
 function RightShimmerPanel({ showProgress = true }) {
   const [progress, setProgress] = useState(10);
   useEffect(() => {
-    // Light pulse to keep it alive; caps at 35% for now
+    // Light pulse to keep it alive; caps at 35% for now (slightly faster)
     const id = setInterval(() => {
-      setProgress((p) => Math.min(35, p + Math.round(Math.random() * 3)));
-    }, 900);
+      setProgress((p) => Math.min(35, p + (2 + Math.floor(Math.random() * 3)))); // +2..+4
+    }, 500);
     return () => clearInterval(id);
   }, []);
 
   return (
-    <div className="right-panel" aria-live="polite" aria-busy="true">
-      <div className="right-title">Causes for increased Maintenance Opex</div>
+    <div className="chart-card" aria-live="polite" aria-busy="true">
       <div className="skeleton-stack">
         <div className="shimmer-line w-90" />
         <div className="shimmer-line w-80" />
@@ -178,7 +290,10 @@ function RightShimmerPanel({ showProgress = true }) {
         <div className="agent-progress-card">
           <div className="agent-progress-head">
             <div className="agent-progress-title">
-              Finding Causes for increased Maintenance Opex
+              <span className="agent-title-icon" aria-hidden="true">
+                <IconPdf />
+              </span>
+              <span>Finding Causes for increased Maintenance Opex</span>
             </div>
             <div className="agent-progress-sub">Deep Analysis Agent</div>
           </div>
@@ -195,19 +310,195 @@ function RightShimmerPanel({ showProgress = true }) {
   );
 }
 
-function AgentProgress() {
+function RightInfoInitialPanel() {
+  return (
+    <div className="chart-card" aria-live="polite">
+      <div className="info-title">Causes for increased Maintenance Opex</div>
+      <div className="info-section">
+        <span className="info-bullet" aria-hidden="true">
+          <IconSparkle />
+        </span>
+        <div className="info-content">
+          <div className="info-heading">Collecting real-time data</div>
+          <p className="info-body">
+            I'm starting my research on how to bake a cake. I've broken down the
+            topic into several key areas to ensure a comprehensive understanding
+            for a beginner. This includes finding a simple, reliable recipe,
+            identifying the necessary ingredients and equipment, and outlining
+            the step-by-step process. I'll also be investigating common problems
+            and how to troubleshoot them.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RightInfoPanel() {
+  return (
+    <div className="chart-card" aria-live="polite">
+      <div className="info-title">Causes for increased Maintenance Opex</div>
+      <div className="info-section">
+        <span className="info-bullet" aria-hidden="true">
+          <IconSparkle />
+        </span>
+        <div className="info-content">
+          <div className="info-heading">Collecting References</div>
+          <p className="info-body">
+            I'm starting my research on how to bake a cake. I've broken down the
+            topic into several key areas to ensure a comprehensive understanding
+            for a beginner. This includes finding a simple, reliable recipe,
+            identifying the necessary ingredients and equipment, and outlining
+            the step-by-step process. I'll also be investigating common problems
+            and how to troubleshoot them.
+          </p>
+        </div>
+      </div>
+      <div className="info-group">
+        <div className="info-group-title">
+          <IconFolder />
+          <span>Permits</span>
+        </div>
+        <div className="info-chip-row">
+          <span className="info-chip">Cold Work Permit</span>
+          <span className="info-chip">Hot Work Permit</span>
+        </div>
+      </div>
+      <div className="info-group">
+        <div className="info-group-title">
+          <IconWrench />
+          <span>Work Orders</span>
+        </div>
+        <div className="info-chip-row">
+          <span className="info-chip">Repair Booster Pump</span>
+          <span className="info-chip">Repair Booster Pump</span>
+          <span className="info-chip">Repair Booster Pump</span>
+          <span className="info-chip">Repair Booster Pump</span>
+          <span className="info-chip">Repair Booster Pump</span>
+        </div>
+      </div>
+      <div className="info-group">
+        <div className="info-group-title">
+          <IconPdf />
+          <span>Manuals and SOPs</span>
+        </div>
+        <div className="info-chip-row">
+          <span className="info-chip">Pump SOP</span>
+          <span className="info-chip">Safety Manual</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChartPanel({ chart }) {
+  if (!chart) return <RightShimmerPanel showProgress={false} />;
+  const { title, subtitle, unit, seriesName, data, trendYoY, vsLastQuarter } =
+    chart;
+  return (
+    <div style={{ alignSelf: "start" }} aria-live="polite">
+      <div className="chart-card">
+        <div className="chart-header">
+          <div>
+            <div className="chart-title">{title}</div>
+            <div className="chart-subtitle">{subtitle}</div>
+          </div>
+          <div className="chart-legend">{unit}</div>
+        </div>
+        <div style={{ width: "100%", height: 260 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={data}
+              margin={{ top: 8, left: 8, right: 8, bottom: 8 }}
+            >
+              <defs>
+                <linearGradient id="areaFillRe" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#2563eb" stopOpacity={0.25} />
+                  <stop offset="100%" stopColor="#2563eb" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                vertical={false}
+                stroke="#e5e7eb"
+                strokeDasharray="4 4"
+              />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={{ stroke: "#e5e7eb" }}
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={{ stroke: "#e5e7eb" }}
+                width={40}
+                domain={["dataMin - 10", "dataMax + 10"]}
+              />
+              <Tooltip formatter={(v) => [`${v}`, seriesName]} />
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke="none"
+                fill="url(#areaFillRe)"
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#2563eb"
+                strokeWidth={3}
+                dot={{ r: 3, stroke: "#2563eb", fill: "#2563eb" }}
+                isAnimationActive={false}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div
+          className="chart-footer"
+          style={{
+            display: "flex",
+            marginTop: 6,
+            justifyContent: "space-between",
+          }}
+        >
+          <div className="chart-caption">Trend: {trendYoY}</div>
+          <div className="spacer" />
+          <div className="chart-note" style={{ color: "#ef4444" }}>
+            {vsLastQuarter}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Prevent Recharts from re-rendering on unrelated state updates (like progress ticks)
+const MemoChartPanel = React.memo(ChartPanel);
+
+function AgentProgress({ onCrossThreshold, onProgressChange, threshold = 40 }) {
   const [progress, setProgress] = useState(10);
+  const firedRef = useRef(false);
   useEffect(() => {
     const id = setInterval(() => {
-      setProgress((p) => Math.min(35, p + Math.round(Math.random() * 3)));
-    }, 900);
+      setProgress((p) => Math.min(65, p + (2 + Math.floor(Math.random() * 3)))); // +2..+4 for a bit quicker ramp-up
+    }, 500);
     return () => clearInterval(id);
   }, []);
+  useEffect(() => {
+    if (!firedRef.current && progress >= threshold) {
+      firedRef.current = true;
+      onCrossThreshold?.();
+    }
+  }, [progress, threshold, onCrossThreshold]);
+  useEffect(() => {
+    onProgressChange?.(progress);
+  }, [progress, onProgressChange]);
   return (
     <div className="agent-progress-card" aria-live="polite">
       <div className="agent-progress-head">
         <div className="agent-progress-title">
-          Finding Causes for increased Maintenance Opex
+          <span className="agent-title-icon" aria-hidden="true">
+            <IconPdf />
+          </span>
+          <span>Finding Causes for increased Maintenance Opex</span>
         </div>
         <div className="agent-progress-sub">Deep Analysis Agent</div>
       </div>
@@ -974,6 +1265,30 @@ export default function Action() {
   const [executeReady, setExecuteReady] = useState(false);
   const [approvedActions, setApprovedActions] = useState([]);
   const hasRequestedShiftRef = useRef(false);
+  const [chartData, setChartData] = useState(null);
+  const [chartReady, setChartReady] = useState(false);
+  const [progressAtTop, setProgressAtTop] = useState(false);
+  const [progressPct, setProgressPct] = useState(10);
+  const [rightStage, setRightStage] = useState("chart"); // chart → collecting → references
+
+  // Stage transitions for right pane
+  useEffect(() => {
+    if (progressAtTop && rightStage === "chart") {
+      setRightStage("collecting");
+    }
+  }, [progressAtTop, rightStage]);
+
+  useEffect(() => {
+    if (rightStage === "collecting" && progressPct >= 50) {
+      setRightStage("collectingFadeOut");
+    }
+  }, [rightStage, progressPct]);
+
+  useEffect(() => {
+    if (rightStage !== "collectingFadeOut") return;
+    const t = setTimeout(() => setRightStage("references"), 900);
+    return () => clearTimeout(t);
+  }, [rightStage]);
 
   useEffect(() => {
     setText(initialTextFromState);
@@ -1024,12 +1339,13 @@ export default function Action() {
       }));
       if (assistantMessages.length) {
         setMessages((prev) => [...prev, ...assistantMessages]);
+        if (result?.chart) setChartData(result.chart);
         // After the very first assistant response renders, wait briefly,
         // then shift to the two-column layout smoothly. Run only once.
         if (!hasRequestedShiftRef.current) {
           hasRequestedShiftRef.current = true;
           requestAnimationFrame(() => {
-            setTimeout(() => setTwoCol(true), 1200);
+            setTimeout(() => setTwoCol(true), 2000);
           });
         }
       }
@@ -1039,6 +1355,14 @@ export default function Action() {
       // console.warn("Assistant request failed", err);
     }
   }
+
+  // When a new chart payload arrives, show shimmer for a brief time before the chart
+  useEffect(() => {
+    if (!chartData) return;
+    setChartReady(false);
+    const t = setTimeout(() => setChartReady(true), 3000);
+    return () => clearTimeout(t);
+  }, [chartData]);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -1091,16 +1415,7 @@ export default function Action() {
         </button>
         <div className="header-title">
           <span className="ai-brand">
-            <svg className="ai-logo" viewBox="0 0 32 32" aria-hidden="true">
-              <path
-                d="M9.05059 16.1617C10.4292 17.4452 11.5413 19.7215 12.2154 21.3532C12.4567 21.9372 13.402 21.9372 13.6433 21.3532C14.3175 19.7215 15.4296 17.4452 16.8082 16.1617C18.0338 15.0206 20.0807 14.0957 21.5429 13.5322C22.112 13.3129 22.1549 12.4372 21.6073 12.1687C20.1446 11.4517 18.0602 10.3027 16.8082 9.05059C15.4888 7.73122 14.2839 5.48771 13.5782 4.0213C13.3275 3.5003 12.5312 3.5003 12.2805 4.0213C11.5749 5.48771 10.3699 7.73122 9.05059 9.05059C7.79851 10.3027 5.71412 11.4517 4.25148 12.1687C3.70382 12.4372 3.74677 13.3129 4.31589 13.5322C5.77809 14.0957 7.82494 15.0206 9.05059 16.1617Z"
-                fill="#3D5AFE"
-              />
-              <path
-                d="M21.3329 24.889C22.0222 25.5307 22.5783 26.6689 22.9153 27.4847C23.036 27.7767 23.5086 27.7767 23.6293 27.4847C23.9664 26.6689 24.5224 25.5307 25.2117 24.889C25.8245 24.3184 26.8479 23.856 27.579 23.5742C27.8636 23.4645 27.8851 23.0267 27.6113 22.8925C26.8799 22.534 25.8377 21.9594 25.2117 21.3334C24.552 20.6737 23.9495 19.552 23.5967 18.8188C23.4714 18.5583 23.0732 18.5583 22.9479 18.8188C22.5951 19.552 21.9926 20.6737 21.3329 21.3334C20.7069 21.9594 19.6647 22.534 18.9334 22.8925C18.6595 23.0267 18.681 23.4645 18.9656 23.5742C19.6967 23.856 20.7201 24.3184 21.3329 24.889Z"
-                fill="#3D5AFE"
-              />
-            </svg>
+            <IconBrand32 />
             AI Assistant
           </span>
         </div>
@@ -1174,7 +1489,13 @@ export default function Action() {
                     </div>
                   ))}
                 </div>
-                {twoCol && <AgentProgress />}
+                {twoCol && (
+                  <AgentProgress
+                    onCrossThreshold={() => setProgressAtTop(true)}
+                    onProgressChange={setProgressPct}
+                    threshold={40}
+                  />
+                )}
                 <form className="chat-input-form" onSubmit={handleSubmit}>
                   <label className="sr-only" htmlFor="action-textarea">
                     Type your message
@@ -1217,7 +1538,37 @@ export default function Action() {
                   </div>
                 </form>
               </div>
-              {twoCol && <RightShimmerPanel showProgress={false} />}
+              {twoCol && (
+                <div style={{ alignSelf: "start" }}>
+                  <div className="right-title">
+                    Causes for increased Maintenance Opex
+                  </div>
+                  {rightStage === "chart" && (
+                    <div className="panel-animate-in">
+                      {chartReady ? (
+                        <MemoChartPanel chart={chartData} />
+                      ) : (
+                        <RightShimmerPanel showProgress={false} />
+                      )}
+                    </div>
+                  )}
+                  {rightStage === "collecting" && (
+                    <div className="panel-animate-in">
+                      <RightInfoInitialPanel />
+                    </div>
+                  )}
+                  {rightStage === "collectingFadeOut" && (
+                    <div className="panel-animate-out">
+                      <RightInfoInitialPanel />
+                    </div>
+                  )}
+                  {rightStage === "references" && (
+                    <div className="panel-animate-in">
+                      <RightInfoPanel />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}

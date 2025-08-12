@@ -131,6 +131,99 @@
   }
 }
 
+/* Smooth fade/float for right-pane replacement when progress moves to top */
+@keyframes progressFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes progressFadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+/* Generic, reusable panel animations for right-side content */
+.panel-animate-in {
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  will-change: transform, opacity;
+  animation: progressFadeIn 1400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.panel-animate-out {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  will-change: transform, opacity;
+  animation: progressFadeOut 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Right pane info block */
+.info-title {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 18px;
+  margin-bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.info-section {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: flex-start;
+  gap: 10px;
+}
+.info-bullet {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+}
+.info-heading {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.info-body {
+  color: #374151;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.info-group {
+  margin-top: 14px;
+}
+.info-group-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.info-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+.info-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 8px 12px;
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  font-size: 13px;
+}
+
 /* Right shimmer panel */
 .right-panel {
   border: 1px solid var(--card-border);
@@ -140,9 +233,12 @@
   align-self: start;
 }
 .right-title {
-  font-weight: 700;
+  font-weight: 500;
   margin-bottom: 10px;
   color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .skeleton-stack {
   display: grid;
@@ -162,6 +258,14 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.agent-title-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 25px;
 }
 .agent-progress-sub {
   font-size: 12px;

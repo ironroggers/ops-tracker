@@ -28,7 +28,28 @@ export async function sendActionPrompt(prompt, options = {}) {
   const assistantText =
     "Let me do a deep dive into the month on month increased maintenance cost. As soon as my analysis is complete, I'll let you know";
 
+  // Hardcoded chart payload to drive the UI chart
+  const chart = {
+    title: "Maintenance Opex",
+    subtitle: "Monthly trend (Jan - Aug)",
+    unit: "USD × 1000",
+    seriesName: "Opex",
+    data: [
+      { month: "Jan", value: 415 },
+      { month: "Feb", value: 436 },
+      { month: "Mar", value: 445 },
+      { month: "Apr", value: 462 },
+      { month: "May", value: 468 },
+      { month: "Jun", value: 487 },
+      { month: "Jul", value: 497 },
+      { month: "Aug", value: 515 },
+    ],
+    trendYoY: "+21% YoY",
+    vsLastQuarter: "↑ 7% vs last quarter",
+  };
+
   return {
     messages: [{ role: "assistant", text: assistantText }],
+    chart,
   };
 }
