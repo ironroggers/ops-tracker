@@ -929,7 +929,7 @@ function CausesReport() {
       <div className="report-head">
         <div className="report-head-left">
           <span className="report-bullet" aria-hidden="true">
-            <IconSparkle />
+            <IconBrand32 />
           </span>
           <div>
             <div className="report-title">Top 2 Causes</div>
@@ -1595,6 +1595,7 @@ export default function Action() {
   const [progressPct, setProgressPct] = useState(10);
   const [rightStage, setRightStage] = useState("chart"); // chart → collecting → references → hypothesis
   const rightFeedRef = useRef(null);
+  const reportScrollRef = useRef(null);
   const [rightScrollAuto, setRightScrollAuto] = useState(false);
 
   // Stage transitions for right pane
@@ -1663,6 +1664,15 @@ export default function Action() {
     const max = Math.max(0, el.scrollHeight - el.clientHeight);
     scrollStateRef.current.target = (progressPct / 100) * max;
   }, [progressPct, chartReady, rightStage]);
+
+  // Ensure report scroll starts at top when it becomes visible at 100%
+  useEffect(() => {
+    if (progressPct === 100 && reportScrollRef.current) {
+      try {
+        reportScrollRef.current.scrollTop = 0;
+      } catch (_) {}
+    }
+  }, [progressPct]);
 
   // Enable scrollbar only after first feed item after shimmer (references stage)
   useEffect(() => {
@@ -1957,7 +1967,10 @@ export default function Action() {
                     Causes for increased Maintenance Opex
                   </div>
                   {progressPct === 100 ? (
-                    <div className="report-scroll panel-animate-in">
+                    <div
+                      className="report-scroll panel-animate-in"
+                      ref={reportScrollRef}
+                    >
                       <CausesReport />
                     </div>
                   ) : (

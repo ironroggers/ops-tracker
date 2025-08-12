@@ -712,6 +712,7 @@
   width: 20px;
   height: 20px;
   display: inline-flex;
+  margin-top: -14px;
 }
 .report-title {
   font-weight: 800;
