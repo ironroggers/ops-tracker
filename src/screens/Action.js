@@ -887,28 +887,48 @@ function RightHypothesisPanel() {
           <div className="mini-caption">Choosing from these</div>
           <div className="select-grid">
             <div className="select-chip">
-              <div className="select-title">Cause 1 90%</div>
-              <div className="select-sub">Reason for choosing this cause</div>
+              <div className="select-title">PM frequency too high — 62%</div>
+              <div className="select-sub">
+                Strong correlation with PM WO surge in last 3 months
+              </div>
             </div>
             <div className="select-chip">
-              <div className="select-title">Cause 2 80%</div>
-              <div className="select-sub">Reason for choosing this cause</div>
+              <div className="select-title">Permit approval delays — 41%</div>
+              <div className="select-sub">
+                High overlap with longer MTTR and waiting time tags
+              </div>
             </div>
             <div className="select-chip">
-              <div className="select-title">Repair Booster Pump</div>
-              <div className="select-sub">Reason for choosing this cause</div>
+              <div className="select-title">
+                Seal wear on Booster Pump P-102A — 35%
+              </div>
+              <div className="select-sub">
+                Repeat failures and increased vibration alerts
+              </div>
             </div>
             <div className="select-chip">
-              <div className="select-title">Cause 1 90%</div>
-              <div className="select-sub">Reason for choosing this cause</div>
+              <div className="select-title">
+                Spare parts lead-time variance — 28%
+              </div>
+              <div className="select-sub">
+                Stockouts align with extended repair durations
+              </div>
             </div>
             <div className="select-chip">
-              <div className="select-title">Cause 2 80%</div>
-              <div className="select-sub">Reason for choosing this cause</div>
+              <div className="select-title">
+                Operator round coverage gaps — 24%
+              </div>
+              <div className="select-sub">
+                Missed checks on critical assets before failures
+              </div>
             </div>
             <div className="select-chip">
-              <div className="select-title">Repair Booster Pump</div>
-              <div className="select-sub">Reason for choosing this cause</div>
+              <div className="select-title">
+                Ops–Maintenance scheduling conflicts — 21%
+              </div>
+              <div className="select-sub">
+                Clashes around isolation/LOTO windows delaying starts
+              </div>
             </div>
           </div>
         </div>
