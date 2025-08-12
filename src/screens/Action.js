@@ -354,6 +354,27 @@ function RightShimmerPanel({ showProgress = true }) {
 }
 
 function RightInfoInitialPanel() {
+  const items = [
+    "Fetching real-time operational data from connected systems...",
+    "Work Orders: Pulling latest maintenance and repair records.",
+    "Operations: Syncing task status and execution logs.",
+    "Spare Parts: Retrieving current inventory, usage trends, and lead times.",
+    "Permits: Checking active and pending work permits.",
+    "Asset Documents: Fetching technical specifications, manuals, and historical performance data.",
+  ];
+  const [idx, setIdx] = React.useState(0);
+  const [animFlip, setAnimFlip] = React.useState(false);
+  React.useEffect(() => {
+    let shown = 0;
+    const id = setInterval(() => {
+      setIdx((i) => (i + 1) % items.length);
+      setAnimFlip((f) => !f); // toggle class to retrigger animation
+      shown += 1;
+      if (shown >= items.length - 1) clearInterval(id);
+    }, 3200);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <div className="chart-card" aria-live="polite">
       <div className="info-section">
@@ -361,15 +382,10 @@ function RightInfoInitialPanel() {
           <IconBrand32 />
         </span>
         <div className="info-content">
-          <div className="info-heading">Collecting real-time data</div>
-          <p className="info-body">
-            I'm starting my research on how to bake a cake. I've broken down the
-            topic into several key areas to ensure a comprehensive understanding
-            for a beginner. This includes finding a simple, reliable recipe,
-            identifying the necessary ingredients and equipment, and outlining
-            the step-by-step process. I'll also be investigating common problems
-            and how to troubleshoot them.
-          </p>
+          <div className="info-heading">Collecting Real-time data</div>
+          <div className="ticker" role="status" aria-label="Collecting real-time operational data">
+            <div className={`ticker-line ${animFlip ? 'ticker-b' : 'ticker-a'}`}>{items[idx]}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -377,6 +393,12 @@ function RightInfoInitialPanel() {
 }
 
 function RightInfoPanel() {
+  const [step, setStep] = React.useState(1);
+  React.useEffect(() => {
+    const t1 = setTimeout(() => setStep(2), 1600);
+    const t2 = setTimeout(() => setStep(3), 3200);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
   return (
     <div className="chart-card" aria-live="polite">
       {/* Summary */}
@@ -385,67 +407,51 @@ function RightInfoPanel() {
           <IconBrand32 />
         </span>
         <div className="info-content">
-          <div className="info-heading">Collected references</div>
-          <p className="info-body">
-            Linked relevant work orders and manuals that commonly appear in
-            investigations for increased maintenance spend.
-          </p>
+          <div className="info-heading">Collecting References</div>
+          <p className="info-body">Linking relevant Workorders and manuals…</p>
         </div>
       </div>
 
-      {/* Top chips row like screenshot */}
-      <div className="info-chip-row">
-        <span className="info-chip">Repair Booster Pump</span>
-        <span className="info-chip">Repair Booster Pump</span>
-        <span className="info-chip">Repair Booster Pump</span>
-      </div>
-
-      {/* Manuals and SOPs group (row 1) */}
-      <div className="info-group">
-        <div className="info-group-title">
-          <IconPdf />
-          <span>Manuals and SOPs</span>
-        </div>
-        <div className="info-chip-row">
-          <span className="info-chip">Hydraulic System Installment</span>
-          <span className="info-chip">Hydraulic System Installment</span>
-          <span className="info-chip">Repair Booster Pump</span>
-        </div>
-        <div className="info-chip-row">
-          <span className="info-chip">Hydraulic System Installment</span>
-          <span className="info-chip">Hydraulic System Installment</span>
-          <span className="info-chip">Repair Booster Pump</span>
-        </div>
-      </div>
-
-      {/* Only one Manuals and SOPs group as requested */}
-
-      {/* Checklist */}
-      <div className="checklist">
-        <div className="check-item">
-          <span className="check-icon" aria-hidden="true">
-            <IconCheckCircle />
-          </span>
-          <div>
-            <div className="check-title">Entity Linking</div>
-            <div className="check-desc">
-              Matching data to assets, locations, and teams to avoid duplication
-            </div>
+      {/* Iteration 2: Work Orders */}
+      {step >= 2 && (
+        <div className="info-group">
+          <div className="info-group-title">
+            <IconFolder />
+            <span>Work Orders</span>
+          </div>
+          <div className="info-chip-row">
+            <span className="chip-soft">WO-45219 – Replace mechanical seal on Pump P-102A</span>
+            <span className="chip-soft">Quarterly PM on Heat Exchanger</span>
+          </div>
+          <div className="info-body" style={{ marginTop: 8 }}>
+            {"WO-45219 – Replace mechanical seal on Pump P-102A"}
+            <br />
+            {"Quarterly PM on Heat Exchanger"}
           </div>
         </div>
-        <div className="check-item">
-          <span className="check-icon" aria-hidden="true">
-            <IconCheckCircle />
-          </span>
-          <div>
-            <div className="check-title">Time Correlation</div>
-            <div className="check-desc">
-              Aligning events across work orders, permits, and inspections over
-              the same time windows
-            </div>
+      )}
+
+      {/* Iteration 3: Manuals and SOPs */}
+      {step >= 3 && (
+        <div className="info-group">
+          <div className="info-group-title">
+            <IconPdf />
+            <span>Manuals and SOPs</span>
+          </div>
+          <div className="info-chip-row">
+            <span className="chip-soft">Pump P-102A OEM Manual</span>
+            <span className="chip-soft">HX-07 Maintenance Guide</span>
+            <span className="chip-soft">Heat Exchanger PM Procedure</span>
+          </div>
+          <div className="info-body" style={{ marginTop: 8 }}>
+            {" Pump P-102A OEM Manual"}
+            <br />
+            {" HX-07 Maintenance Guide"}
+            <br />
+            {" Heat Exchanger PM Procedure"}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -691,7 +697,7 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
                                 // padding: '10px 14px',
                                 fontSize: '14px',
                                 fontWeight: '500',
-                                width: '79px',
+                                width: '85px',
                                 height: '40px',
                                 cursor: 'pointer',
                                 transition: 'background 160ms ease, border-color 160ms ease, transform 80ms ease'
@@ -712,7 +718,7 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
                                 // padding: '10px 14px',
                                 fontSize: '13px',
                                 fontWeight: '500',
-                                width: '79px',
+                                width: '87px',
                                 height: '40px',
                                 cursor: 'pointer',
                                 transition: 'background 160ms ease, border-color 160ms ease, transform 80ms ease'
@@ -747,23 +753,9 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
         ))}
 
         {/* <div style={{ marginTop: "20px", textAlign: "center" }}>
-          <button
-            type="button"
-            className="btn-outline sm"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              margin: "0 auto",
-            }}
-          >
+          <button type="button" className="btn-outline sm" style={{ display: "flex", alignItems: "center", gap: "6px", margin: "0 auto" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 5v14M5 12h14"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
+              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
             Add New Action
           </button>
@@ -783,7 +775,7 @@ function RightHypothesisPanel() {
         <div className="info-content">
           <div className="info-heading">Generating Hypothesis</div>
           <p className="info-body">
-            Uses RCA logic trees (Ishikawa/Fishbone, 5 Whys) to generate
+            Uses RCA logic trees to generate
             possible causes.
           </p>
           <p className="info-body">
@@ -926,25 +918,52 @@ function ChartPanel({ chart }) {
 const MemoChartPanel = React.memo(ChartPanel);
 
 function AgentProgress({ onCrossThreshold, onProgressChange, threshold = 40 }) {
-  // Time-based smooth progress for a natural, slower pace
+  // Time-phased smooth progress
   const [progress, setProgress] = useState(0);
   const firedRef = useRef(false);
   const rafRef = useRef(0);
   const startRef = useRef(0);
-  const durationMs = 24000; // ~24s total for a ChatGPT-like pace
+
+  // Ticker shows 8 items at ~3.2s each → ensure 30–60% lasts long enough
+  const tickerItems = 8;
+  const tickerIntervalMs = 3200; // must match ticker speed
+  const bandHoldMs = tickerItems * tickerIntervalMs; // duration for 30→60
+  const earlyMs = 6000; // 0→30 a bit slower for smoother ramp
+  const afterMs = 6000; // 60→100 faster finish
+  const totalMs = earlyMs + bandHoldMs + afterMs;
 
   useEffect(() => {
-    const easeInOut = (t) =>
-      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     startRef.current = performance.now();
     const tick = (now) => {
       const elapsed = now - startRef.current;
-      const t = Math.min(1, elapsed / durationMs);
-      // Hold slightly before 100 to mimic finalization step
-      const eased = easeInOut(t);
-      const pct = t < 0.985 ? Math.min(99, Math.round(eased * 100)) : 100;
+      let pctFloat = 0;
+      if (elapsed <= 0) pctFloat = 0;
+      else if (elapsed <= earlyMs) {
+        // 0 → 30
+        const t = elapsed / earlyMs;
+        pctFloat = 30 * t;
+      } else if (elapsed <= earlyMs + bandHoldMs) {
+        // 30 → 60 (slow overall, but a bit faster near the end 50→60)
+        const tBand = (elapsed - earlyMs) / bandHoldMs; // 0..1
+        const accel = Math.pow(tBand, 1.6); // accelerates toward the end
+        pctFloat = 30 + 30 * accel;
+      } else if (elapsed <= totalMs) {
+        // 60 → 100 (slightly faster from 60→70, then normal to 100)
+        const tAfter = (elapsed - earlyMs - bandHoldMs) / afterMs; // 0..1
+        const fastPortion = 0.25; // first 25% time covers 60→70
+        if (tAfter <= fastPortion) {
+          const u = tAfter / fastPortion; // 0..1
+          pctFloat = 60 + 10 * u;
+        } else {
+          const v = (tAfter - fastPortion) / (1 - fastPortion); // 0..1
+          pctFloat = 70 + 30 * v;
+        }
+      } else {
+        pctFloat = 100;
+      }
+      const pct = Math.min(100, Math.max(0, Math.round(pctFloat)));
       setProgress(pct);
-      if (t < 1) rafRef.current = requestAnimationFrame(tick);
+      if (elapsed < totalMs) rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
@@ -3577,23 +3596,30 @@ export default function Action() {
   }
 
   function handleFollowupClick(nextText, key) {
-    // Add the follow-up as a user message, and a canned assistant reply
+    // Add the follow-up as a user message immediately, then reply after 2s
     const now = Date.now();
     const userMsg = { id: now, role: "user", text: nextText };
-    const assistantMsg = {
-      id: now + 1,
-      role: "assistant",
-      text: `Lets Act upon ${nextText}`,
-      animated: true,
-    };
     setAssistantCompleted(false);
-    setMessages((prev) => [...prev, userMsg, assistantMsg]);
+    setMessages((prev) => [...prev, userMsg]);
     setText("");
     setShowActionsPanel(true);
     setReportCollapsed(false); // Keep Top 2 Causes expanded until assistant finishes
-        dismissFollowup(key);
+    dismissFollowup(key);
+
+    // Delay assistant response by 2 seconds
+    const t = setTimeout(() => {
+      const assistantMsg = {
+        id: now + 1,
+        role: "assistant",
+        text: `Lets Act upon ${nextText}`,
+        animated: true,
+      };
+      setMessages((prev) => [...prev, assistantMsg]);
+    }, 2000);
+    // Optional cleanup if needed later
+    // return () => clearTimeout(t);
     // assistantCompleted will be set to true by markMessageDone when typing finishes
-   }
+  }
 
   function dismissFollowup(key) {
     if (!key) return;
@@ -3761,7 +3787,7 @@ export default function Action() {
                   <AgentProgress
                     onCrossThreshold={() => setProgressAtTop(true)}
                     onProgressChange={setProgressPct}
-                    threshold={40}
+                    threshold={30}
                   />
                     </div>
                   )

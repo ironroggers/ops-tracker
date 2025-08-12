@@ -1552,3 +1552,76 @@
   background: rgba(76, 175, 80, 0.12); /* Green */
   color: #1B5E20;
 }
+
+/* Circular rotator for RightInfoInitialPanel */
+.circle-rotator {
+  position: relative;
+  height: 300px;
+  display: grid;
+  place-items: center;
+  margin-top: 8px;
+}
+.rotator-stage {
+  position: relative;
+  width: 260px;
+  height: 260px;
+}
+.rotator-wheel {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  animation: wheel-rotate 18s linear infinite;
+}
+.rotator-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #374151;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 9999px;
+  padding: 6px 10px;
+  box-shadow: 0 2px 6px rgba(2, 6, 23, 0.06);
+}
+@keyframes wheel-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Vertical ticker (fade + slide up) */
+.ticker {
+  position: relative;
+  height: 40px;
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+  margin-top: 8px;
+}
+ .ticker-line {
+  animation: tickerFadeUp 2800ms cubic-bezier(0.22, 1, 0.36, 1);
+  color: #374151;
+  font-size: 14px;
+}
+.ticker-line.ticker-a { animation-name: tickerFadeUp; }
+.ticker-line.ticker-b { animation-name: tickerFadeUp; }
+@keyframes tickerFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
