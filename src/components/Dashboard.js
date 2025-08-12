@@ -548,7 +548,11 @@ export default function Dashboard() {
     <Box as="main" className="dashboard-container" px={pagePad}>
       {/* Filters row (moved from header) */}
       <Box maxW={maxW} mx="auto" mb={4}>
-        <HStack className="header-filters" justify="space-between">
+        <HStack
+          className="header-filters"
+          justify="space-between"
+          style={{ marginLeft: "-11px" }}
+        >
           <HStack className="filters-left">
             <div className="field">
               <label htmlFor="product" className="field-label">

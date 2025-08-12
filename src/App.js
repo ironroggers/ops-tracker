@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import Action from "./screens/Action";
@@ -12,24 +13,37 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Calendar from './screens/Calendar';
 
-function App() {
+function AppLayout() {
+  const location = useLocation();
+  const isActionRoute = location.pathname.startsWith("/action");
   return (
-    <Router>
-      <Sidebar />
-      <div className="with-sidebar" style={{ paddingTop: 0 }}>
+    <>
+      {!isActionRoute && <Sidebar />}
+      <div className={isActionRoute ? undefined : "with-sidebar"} style={{ paddingTop: 0 }}>
         <Routes>
-          <Route path="/" element={
-            <>
-              <Header />
-              <Dashboard />
-            </>
-          } />
+          <Route
+            path="/"
+            element={
+              <>
+                <Header />
+                <Dashboard />
+              </>
+            }
+          />
           <Route path="/action" element={<Action />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/execute" element={<ExecuteActions />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppLayout />
     </Router>
   );
 }

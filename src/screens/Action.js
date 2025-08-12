@@ -18,7 +18,13 @@ function IconBack() {
       aria-hidden="true"
     >
       <path
-        d="M15 18l-6-6 6-6"
+        d="M19 12H7"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M11 8l-4 4 4 4"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
@@ -418,11 +424,23 @@ function PlanAgentLoader({ onDone }) {
   );
 }
 
-function ActionPlanCards({ title = 'Recommended Action Plan', items = [], onStatusesChange }) {
-  const [actions, setActions] = useState(() => items.map((item, i) => {
-    const obj = typeof item === 'string' ? { text: item, type: 'document' } : item;
-    return { id: i, text: obj.text, type: obj.type ?? 'document', status: 'proposed' };
-  }));
+function ActionPlanCards({
+  title = "Recommended Action Plan",
+  items = [],
+  onStatusesChange,
+}) {
+  const [actions, setActions] = useState(() =>
+    items.map((item, i) => {
+      const obj =
+        typeof item === "string" ? { text: item, type: "document" } : item;
+      return {
+        id: i,
+        text: obj.text,
+        type: obj.type ?? "document",
+        status: "proposed",
+      };
+    })
+  );
   const onStatusesChangeRef = useRef(onStatusesChange);
 
   useEffect(() => {
@@ -430,10 +448,18 @@ function ActionPlanCards({ title = 'Recommended Action Plan', items = [], onStat
   }, [onStatusesChange]);
 
   useEffect(() => {
-    setActions(items.map((item, i) => {
-      const obj = typeof item === 'string' ? { text: item, type: 'document' } : item;
-      return { id: i, text: obj.text, type: obj.type ?? 'document', status: 'proposed' };
-    }));
+    setActions(
+      items.map((item, i) => {
+        const obj =
+          typeof item === "string" ? { text: item, type: "document" } : item;
+        return {
+          id: i,
+          text: obj.text,
+          type: obj.type ?? "document",
+          status: "proposed",
+        };
+      })
+    );
   }, [items]);
 
   useEffect(() => {
@@ -461,7 +487,11 @@ function ActionPlanCards({ title = 'Recommended Action Plan', items = [], onStat
   }
 
   function typeChip(type) {
-    const labelMap = { meeting: 'Meeting', document: 'Document', 'wo-permit': 'WO Permit' };
+    const labelMap = {
+      meeting: "Meeting",
+      document: "Document",
+      "wo-permit": "WO Permit",
+    };
     const label = labelMap[type] ?? type;
     return <span className="type-chip">{label}</span>;
   }
@@ -482,8 +512,22 @@ function ActionPlanCards({ title = 'Recommended Action Plan', items = [], onStat
             <div className="action-card-foot">
               {typeChip(a.type)}
               <div className="spacer" />
-              <button className="btn sm" type="button" onClick={() => approve(a.id)} disabled={a.status === 'approved'}>Approve</button>
-              <button className="btn-outline sm" type="button" onClick={() => reject(a.id)} disabled={a.status === 'rejected'}>Reject</button>
+              <button
+                className="btn sm"
+                type="button"
+                onClick={() => approve(a.id)}
+                disabled={a.status === "approved"}
+              >
+                Approve
+              </button>
+              <button
+                className="btn-outline sm"
+                type="button"
+                onClick={() => reject(a.id)}
+                disabled={a.status === "rejected"}
+              >
+                Reject
+              </button>
             </div>
           </article>
         ))}
@@ -533,17 +577,41 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
     const topic = sub?.title ?? cause.title;
     if (cause.rank === 1) {
       return [
-        { text: `Audit PM library to eliminate non-critical tasks for ${topic}`, type: 'document' },
-        { text: 'Risk-rank assets and adjust PM frequencies using criticality + condition data', type: 'document' },
-        { text: '30-min sync between Ops, Maintenance, and EHS to review upcoming permit needs.', type: 'meeting' },
-        { text: 'Set weekly review with planners to remove redundant inspections', type: 'document' },
+        {
+          text: `Audit PM library to eliminate non-critical tasks for ${topic}`,
+          type: "document",
+        },
+        {
+          text: "Risk-rank assets and adjust PM frequencies using criticality + condition data",
+          type: "document",
+        },
+        {
+          text: "30-min sync between Ops, Maintenance, and EHS to review upcoming permit needs.",
+          type: "meeting",
+        },
+        {
+          text: "Set weekly review with planners to remove redundant inspections",
+          type: "document",
+        },
       ];
     }
     return [
-      { text: `Implement early permit pre-checks specifically for ${topic}`, type: 'wo-permit' },
-      { text: 'Introduce shift handover checklist including pending permits', type: 'document' },
-      { text: 'Create SLA with Operations for isolation/LOTO readiness', type: 'wo-permit' },
-      { text: 'Track MTTR by permit wait reason and publish weekly dashboard', type: 'document' },
+      {
+        text: `Implement early permit pre-checks specifically for ${topic}`,
+        type: "wo-permit",
+      },
+      {
+        text: "Introduce shift handover checklist including pending permits",
+        type: "document",
+      },
+      {
+        text: "Create SLA with Operations for isolation/LOTO readiness",
+        type: "wo-permit",
+      },
+      {
+        text: "Track MTTR by permit wait reason and publish weekly dashboard",
+        type: "document",
+      },
     ];
   }
 
@@ -828,17 +896,42 @@ export default function Action() {
     setApprovedActions(approved);
   }
 
+  function handleBackClick() {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  }
+
   return (
-    <div className="action-page">
+    <div className="action-overlay">
       <header className="action-header">
         <button
           className="header-back"
-          onClick={() => navigate(-1)}
+          onClick={handleBackClick}
           aria-label="Back"
         >
-          <IconBack />
+          <span className="back-icon" aria-hidden="true">
+            <IconBack />
+          </span>
+          <span className="back-text">Back</span>
         </button>
-        <div className="header-title">Ops Assistant</div>
+        <div className="header-title">
+          <span className="ai-brand">
+            <svg className="ai-logo" viewBox="0 0 32 32" aria-hidden="true">
+              <path
+                d="M9.05059 16.1617C10.4292 17.4452 11.5413 19.7215 12.2154 21.3532C12.4567 21.9372 13.402 21.9372 13.6433 21.3532C14.3175 19.7215 15.4296 17.4452 16.8082 16.1617C18.0338 15.0206 20.0807 14.0957 21.5429 13.5322C22.112 13.3129 22.1549 12.4372 21.6073 12.1687C20.1446 11.4517 18.0602 10.3027 16.8082 9.05059C15.4888 7.73122 14.2839 5.48771 13.5782 4.0213C13.3275 3.5003 12.5312 3.5003 12.2805 4.0213C11.5749 5.48771 10.3699 7.73122 9.05059 9.05059C7.79851 10.3027 5.71412 11.4517 4.25148 12.1687C3.70382 12.4372 3.74677 13.3129 4.31589 13.5322C5.77809 14.0957 7.82494 15.0206 9.05059 16.1617Z"
+                fill="#3D5AFE"
+              />
+              <path
+                d="M21.3329 24.889C22.0222 25.5307 22.5783 26.6689 22.9153 27.4847C23.036 27.7767 23.5086 27.7767 23.6293 27.4847C23.9664 26.6689 24.5224 25.5307 25.2117 24.889C25.8245 24.3184 26.8479 23.856 27.579 23.5742C27.8636 23.4645 27.8851 23.0267 27.6113 22.8925C26.8799 22.534 25.8377 21.9594 25.2117 21.3334C24.552 20.6737 23.9495 19.552 23.5967 18.8188C23.4714 18.5583 23.0732 18.5583 22.9479 18.8188C22.5951 19.552 21.9926 20.6737 21.3329 21.3334C20.7069 21.9594 19.6647 22.534 18.9334 22.8925C18.6595 23.0267 18.681 23.4645 18.9656 23.5742C19.6967 23.856 20.7201 24.3184 21.3329 24.889Z"
+                fill="#3D5AFE"
+              />
+            </svg>
+            AI Assistant
+          </span>
+        </div>
         <div className="header-spacer" />
       </header>
       <div className="action-content">
@@ -851,13 +944,13 @@ export default function Action() {
               </label>
               <div className="input-row">
                 <span className="input-plus" aria-hidden="true">
-                  +
+                  📎
                 </span>
                 <textarea
                   id="action-textarea"
                   ref={textareaRef}
                   className="action-textarea"
-                  placeholder="Ask anything"
+                  placeholder="Deep dive into the month on month increased maintenance cost. Last month it was increased by 7% ($450 annualized)"
                   rows={3}
                   value={text}
                   onChange={(e) => {
