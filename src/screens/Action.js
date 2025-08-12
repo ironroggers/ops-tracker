@@ -24,6 +24,20 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import WoPermitGif from '../assets/Create using AI (3).gif';
+
+// Constants for execution timelines and AI behavior
+const TIMELINE_STEPS = ['Creating EHS Meet', 'Inviting People', 'Finding Time', 'Blocking Calendar'];
+const WOP_STEPS = ['Authoring Permit Forms', 'Attaching it with Workorders', 'Saving Edits', 'Done'];
+const ROUND_STEPS = ['Analyzing Routes', 'Optimizing Sequence', 'Validating Safety', 'Publishing Plan'];
+const TIMELINE_STEP_MS = 1500;
+const AI_THINK_MS = 3000;
+const THINK_TYPE_INTERVAL_MS = 18;
+const THINK_CURSOR_BLINK_MS = 500;
+const GSI_SRC = 'https://accounts.google.com/gsi/client';
+const HARDCODED_ATTENDEES = [
+  // Add actual email addresses here if needed
+];
 
 function IconBack() {
   return (
@@ -437,56 +451,90 @@ function RightInfoPanel() {
 }
 
 // New: Static actions chart-card (now enabled)
-function RightActionsPanel({ collapsed = false, onToggleCollapse }) {
+function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChange }) {
+  const [actionStatuses, setActionStatuses] = useState({});
+
   const causeActions = [
     {
       causeTitle: "Rapid Increase in PM Work Orders",
       causePercent: 70,
       actions: [
         {
+          id: "c1-a1",
           priority: "High",
           impact: "Loss < $1M",
           title: "PM Optimization",
-          description:
-            "Identify & deactivate unnecessary PM based on failure history and execution data",
+          description: "Identify & deactivate unnecessary PM based on failure history and execution data",
+          type: "document"
         },
         {
+          id: "c1-a2",
           priority: "Medium",
           impact: "Loss < $500K",
           title: "Risk-based PM Scheduling",
-          description:
-            "Risk-rank assets and adjust PM frequencies using criticality + condition data",
-        },
-      ],
+          description: "Risk-rank assets and adjust PM frequencies using criticality + condition data",
+          type: "wo-permit"
+        }
+      ]
     },
     {
       causeTitle: "Increase in MTTR due to Waiting for Permits",
       causePercent: 30,
       actions: [
         {
+          id: "c2-a1",
           priority: "High",
           impact: "Loss < $800K",
           title: "Permit Pre-check System",
-          description:
-            "Implement early permit pre-checks to reduce waiting time",
+          description: "Implement early permit pre-checks to reduce waiting time",
+          type: "wo-permit"
         },
         {
+          id: "c2-a2",
           priority: "High",
           impact: "Loss < $600K",
           title: "Shift Handover Enhancement",
-          description:
-            "Introduce shift handover checklist including pending permits",
+          description: "Introduce shift handover checklist including pending permits",
+          type: "meeting"
         },
         {
+          id: "c2-a3",
           priority: "Medium",
           impact: "Loss < $400K",
           title: "Operations SLA",
-          description:
-            "Create SLA with Operations for isolation/LOTO readiness",
-        },
-      ],
-    },
+          description: "Create SLA with Operations for isolation/LOTO readiness",
+          type: "round-plan"
+        }
+      ]
+    }
   ];
+
+  const handleApprove = (actionId) => {
+    setActionStatuses(prev => ({
+      ...prev,
+      [actionId]: 'approved'
+    }));
+  };
+
+  const handleDismiss = (actionId) => {
+    setActionStatuses(prev => ({
+      ...prev,
+      [actionId]: 'dismissed'
+    }));
+  };
+
+  // Get approved actions for parent component
+  React.useEffect(() => {
+    const approvedActions = causeActions.flatMap(cause =>
+      cause.actions.filter(action => actionStatuses[action.id] === 'approved')
+    );
+    onActionsChange?.(approvedActions);
+  }, [actionStatuses, onActionsChange]);
+
+  // Filter out dismissed actions
+  const getVisibleActions = (actions) => {
+    return actions.filter(action => actionStatuses[action.id] !== 'dismissed');
+  };
 
   return (
     <section className="report-card" aria-label="Project Plan Report">
@@ -587,9 +635,8 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse }) {
                     >
                       {cause.causeTitle}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                      {cause.actions.length} action
-                      {cause.actions.length > 1 ? "s" : ""} planned
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                      {getVisibleActions(cause.actions).length} action{getVisibleActions(cause.actions).length !== 1 ? 's' : ''} planned
                     </div>
                   </div>
                 </div>
@@ -603,150 +650,175 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse }) {
             </div>
 
             <div style={{ display: "grid", gap: "12px" }}>
-              {cause.actions.map((action, actionIdx) => (
-                <div
-                  key={actionIdx}
-                  className="chart-card"
-                  style={{
-                    padding: "16px",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px",
-                    backgroundColor: "#ffffff",
-                  }}
-                >
+              {getVisibleActions(cause.actions).map((action, actionIdx) => {
+                const status = actionStatuses[action.id];
+                const isApproved = status === 'approved';
+                return (
                   <div
+                    key={actionIdx}
+                    className="chart-card"
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: "12px",
+                      padding: "16px",
+                      border: isApproved ? "1px solid #86efac" : "1px solid #e5e7eb",
+                      borderRadius: "8px",
+                      backgroundColor: isApproved ? "#f0fdf4" : "#ffffff",
                     }}
                   >
-                    <span
+                    <div
                       style={{
-                        fontSize: "12px",
-                        color: "#6b7280",
-                        fontWeight: "500",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "12px",
                       }}
                     >
-                      Action {actionIdx + 1}
-                    </span>
-                    <span
-                      className={
-                        action.priority === "High" ? "chip-high" : "chip-med"
-                      }
-                      style={{ fontSize: "12px" }}
-                    >
-                      {action.priority}
-                    </span>
-                  </div>
-
-                  <div style={{ marginBottom: "12px" }}>
-                    <h4
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        marginBottom: "6px",
-                        color: "#111827",
-                      }}
-                    >
-                      {action.title}
-                    </h4>
-                    <p
-                      style={{
-                        fontSize: "13px",
-                        color: "#6b7280",
-                        lineHeight: "1.4",
-                        margin: "0",
-                      }}
-                    >
-                      {action.description}
-                    </p>
-                  </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div>
-                      <div
+                      <span
                         style={{
-                          fontSize: "11px",
-                          color: "#9ca3af",
-                          marginBottom: "2px",
+                          fontSize: "12px",
+                          color: "#6b7280",
+                          fontWeight: "500",
                         }}
                       >
-                        Potential Impact
-                      </div>
-                      <div
+                        Action {actionIdx + 1}
+                      </span>
+                      <span
+                        className={
+                          action.priority === "High" ? "chip-high" : "chip-med"
+                        }
+                        style={{ fontSize: "12px" }}
+                      >
+                        {action.priority}
+                      </span>
+                      {isApproved && (
+                        <span
+                          style={{
+                            marginLeft: 8,
+                            backgroundColor: '#dcfce7',
+                            color: '#16a34a',
+                            border: '1px solid #86efac',
+                            borderRadius: '999px',
+                            padding: '2px 8px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                          }}
+                          aria-label="Approved action"
+                        >
+                          Approved
+                        </span>
+                      )}
+                    </div>
+
+                    <div style={{ marginBottom: "12px" }}>
+                      <h4
                         style={{
-                          fontSize: "13px",
-                          fontWeight: "500",
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          marginBottom: "6px",
                           color: "#111827",
                         }}
                       >
-                        {action.impact}
+                        {action.title}
+                      </h4>
+                      <p
+                        style={{
+                          fontSize: "13px",
+                          color: "#6b7280",
+                          lineHeight: "1.4",
+                          margin: "0",
+                        }}
+                      >
+                        {action.description}
+                      </p>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div>
+                        <div
+                          style={{
+                            fontSize: "11px",
+                            color: "#9ca3af",
+                            marginBottom: "2px",
+                          }}
+                        >
+                          Potential Impact
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            color: "#111827",
+                          }}
+                        >
+                          {action.impact}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button
+                          className="btn-outline sm"
+                          type="button"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            fontSize: "12px",
+                          }}
+                          onClick={() => handleDismiss(action.id)}
+                          disabled={isApproved}
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <path
+                              d="M6 18L18 6M6 6l12 12"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          Dismiss
+                        </button>
+                        <button
+                          className="btn sm"
+                          type="button"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            fontSize: "12px",
+                          }}
+                          onClick={() => handleApprove(action.id)}
+                          disabled={isApproved}
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <path
+                              d="M20 6L9 17l-5-5"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          {isApproved ? 'Approved' : 'Approve'}
+                        </button>
                       </div>
                     </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button
-                        className="btn-outline sm"
-                        type="button"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          fontSize: "12px",
-                        }}
-                      >
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <path
-                            d="M6 18L18 6M6 6l12 12"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                        Dismiss
-                      </button>
-                      <button
-                        className="btn sm"
-                        type="button"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          fontSize: "12px",
-                        }}
-                      >
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <path
-                            d="M20 6L9 17l-5-5"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                        Approve
-                      </button>
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {causeIdx < causeActions.length - 1 && (
@@ -1155,11 +1227,11 @@ function TimelineLoader({ onDone }) {
 
 function MiniTimelineLoader({ onDone }) {
   const steps = [
-    { label: "Workorders", ms: 1200 },
-    { label: "History", ms: 1200 },
-    { label: "Sensors", ms: 1200 },
-    { label: "Permits", ms: 1200 },
-    { label: "Inventory", ms: 1200 },
+    { label: "Workorders", ms: 500 },
+    { label: "History", ms: 400 },
+    { label: "Sensors", ms: 400 },
+    { label: "Permits", ms: 500 },
+    { label: "Inventory", ms: 400 },
   ];
   const [index, setIndex] = useState(0);
 
@@ -1199,6 +1271,7 @@ function SubCauses({
   planStateFor,
   onPlanDone,
   onPlanStatusesChange,
+  onAddMessage,
 }) {
   if (!items || items.length === 0) return null;
   return (
@@ -1254,6 +1327,7 @@ function SubCauses({
                     onStatusesChange={(actions) =>
                       onPlanStatusesChange?.(parentCause, sc, actions)
                     }
+                    onAddMessage={onAddMessage}
                   />
                 );
               }
@@ -1558,11 +1632,11 @@ function CausesReport({ collapsed = false, onToggleCollapse }) {
 
 function PlanAgentLoader({ onDone }) {
   const steps = [
-    { label: "Collecting recent workorders", ms: 900 },
-    { label: "Analyzing trends and bottlenecks", ms: 1100 },
-    { label: "Cross-checking inventory and permits", ms: 900 },
-    { label: "Synthesizing optimal actions", ms: 1100 },
-    { label: "Drafting plan", ms: 900 },
+    { label: "Collecting recent workorders", ms: 400 },
+    { label: "Analyzing trends and bottlenecks", ms: 500 },
+    { label: "Cross-checking inventory and permits", ms: 400 },
+    { label: "Synthesizing optimal actions", ms: 500 },
+    { label: "Drafting plan", ms: 400 },
   ];
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -1598,6 +1672,8 @@ function ActionPlanCards({
   title = "Recommended Action Plan",
   items = [],
   onStatusesChange,
+  onAddMessage,
+  onMessageClick,
 }) {
   const [actions, setActions] = useState(() =>
     items.map((item, i) => {
@@ -1641,8 +1717,24 @@ function ActionPlanCards({
   }
 
   function approve(id) {
+    const currentApprovedCount = actions.filter(a => a.status === "approved").length;
     updateStatus(id, "approved");
+    
+    // Check if this is the first approved action to add the execution message
+    if (currentApprovedCount === 0 && onAddMessage) {
+      // Add a clickable message to execute all approved actions
+      const messageId = Date.now();
+      onAddMessage({
+        id: messageId,
+        role: "assistant",
+        text: "✅ Action approved! Click here to execute all approved actions.",
+        animated: false,
+        clickable: true,
+        action: "showExecution"
+      });
+    }
   }
+  
   function reject(id) {
     updateStatus(id, "rejected");
   }
@@ -1707,7 +1799,7 @@ function ActionPlanCards({
   );
 }
 
-function CausesList({ onTakeAction, onPlansUpdate }) {
+function CausesList({ onTakeAction, onPlansUpdate, onAddMessage }) {
   const causes = [
     {
       rank: 1,
@@ -1913,17 +2005,18 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
   );
 
   return (
-    <section className="causes-card" aria-label="Top 2 Causes">
-      <div className="causes-header">
-        <div>
-          <div className="section-title">Top 2 Causes</div>
-          <div className="causes-subtitle">
-            Contributing to 7% increase in Maintenance Opex trend
+    <section className="causes-card" aria-label="Analysis Report">
+      <div className="causes-head">
+        <div className="causes-head-left">
+          <span className="causes-bullet" aria-hidden="true">
+            <IconBrand32 />
+          </span>
+          <div>
+            <div className="causes-title">Top 2 Causes identified</div>
+            <div className="causes-subtitle">
+              Aggregated from 180+ WO inspections
+            </div>
           </div>
-        </div>
-        <div className="causes-stat">
-          <div className="stat-value">+7%</div>
-          <div className="stat-label">Opex increase</div>
         </div>
       </div>
 
@@ -1931,24 +2024,30 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
         {causes.map((c) => (
           <li key={c.rank} className="cause-item elevated">
             <div className="cause-title-row">
-              <span className="cause-rank-dark">{c.rank}</span>
-              <div className="cause-title">{c.title}</div>
-              <span className={`cause-chip ${chipClass(c.percent)}`}>
-                {c.percent}%
+              <span className="cause-rank">{c.rank}</span>
+              <div className="cause-title-text">
+                <h3 className="cause-title">{c.title}</h3>
+                <p className="cause-summary">{c.summary}</p>
+              </div>
+              <span className={`cause-prob ${chipClass(c.probability)}`}>
+                {c.probability}% probability
               </span>
             </div>
-            <p className="cause-desc">{c.description}</p>
 
-            {c.metric?.type === "trendPercent" && (
+            {c.metric?.type === "wo" && (
               <div className="metric-box">
                 <div className="metric-box-head">
                   <span className="metric-head-icon">
-                    <IconTrend />
+                    <IconWrench />
                   </span>
                   <span className="metric-head-title">Trend</span>
                 </div>
-                <div className="metric-hero metric-danger">
-                  {c.metric.change}
+                <div className="metric-hero">
+                  <span className="metric-hero-value">{c.metric.from}</span>
+                  <span className="metric-arrow">→</span>
+                  <span className="metric-hero-value metric-danger">
+                    {c.metric.to}
+                  </span>
                 </div>
                 <div className="metric-caption">{c.metric.caption}</div>
               </div>
@@ -2002,6 +2101,7 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
                 onStatusesChange={(actions) =>
                   handlePlanStatusesChange(c, undefined, actions)
                 }
+                onAddMessage={onAddMessage}
               />
             )}
 
@@ -2019,6 +2119,7 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
                 planStateFor={(parent, sub) => planning[planKey(parent, sub)]}
                 onPlanDone={(parent, sub) => handlePlanDone(parent, sub)}
                 onPlanStatusesChange={handlePlanStatusesChange}
+                onAddMessage={onAddMessage}
               />
             )}
           </li>
@@ -2107,14 +2208,24 @@ function TypingText({ text, cps = 18, onDone }) {
   return <>{text.slice(0, count)}</>;
 }
 
-function ChatMessage({ message, onTypedDone }) {
+function ChatMessage({ message, onTypedDone, onMessageClick }) {
+  const handleClick = () => {
+    if (message.clickable && onMessageClick) {
+      onMessageClick(message);
+    }
+  };
+
   if (message.role === "assistant") {
     return (
       <div className={`bubble-row ${message.role}`}>
         <span className="assistant-avatar" aria-hidden="true">
           <IconInnovaSmall />
         </span>
-        <div className={`bubble ${message.role}`}>
+        <div 
+          className={`bubble ${message.role} ${message.clickable ? 'clickable' : ''}`}
+          onClick={handleClick}
+          style={message.clickable ? { cursor: 'pointer' } : {}}
+        >
           {message.animated ? (
             <TypingText
               text={message.text}
@@ -2132,6 +2243,1128 @@ function ChatMessage({ message, onTypedDone }) {
     <div className={`bubble-row ${message.role}`}>
       <div className={`bubble ${message.role}`}>{message.text}</div>
     </div>
+  );
+}
+
+// Action Execution Panel
+function ActionExecutionPanel({ collapsed = false, onToggleCollapse, approvedActions = [], executeAllSignal = 0, executeOneRequest = null }) {
+  const [executedActions, setExecutedActions] = useState(new Set());
+  const [executingActions, setExecutingActions] = useState(new Set());
+  const [executionTimelines, setExecutionTimelines] = useState({});
+  const [thinkingStates, setThinkingStates] = useState({});
+  const [executionInfo, setExecutionInfo] = useState({});
+  const [expandedDocs, setExpandedDocs] = useState({});
+  const [docContents, setDocContents] = useState({});
+  const [aiGenStates, setAiGenStates] = useState({});
+  const [woGifLoaded, setWoGifLoaded] = useState(false);
+  const executingAllRef = useRef(false);
+  const executedActionsRef = useRef(new Set());
+  const [failedActions, setFailedActions] = useState(new Set());
+  const failedActionsRef = useRef(new Set());
+
+  // Google Calendar integration states
+  const [gsiReady, setGsiReady] = useState(false);
+  const [tokenClient, setTokenClient] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
+  const [tokenExpiresAt, setTokenExpiresAt] = useState(null);
+  const [authStatus, setAuthStatus] = useState('unknown');
+
+  const timelinesRef = useRef({});
+  const thinkingRef = useRef({});
+  const aiGenRef = useRef({});
+  const authAttemptRef = useRef('idle');
+  const pendingExecuteIndexRef = useRef(null);
+
+  const clientId = useMemo(() => process.env.REACT_APP_GOOGLE_CLIENT_ID || '', []);
+
+  // Preload WO-permit GIF
+  useEffect(() => {
+    const img = new Image();
+    img.src = WoPermitGif;
+    img.onload = () => setWoGifLoaded(true);
+  }, []);
+
+  // Load Google Identity Services
+  useEffect(() => {
+    const existing = document.querySelector(`script[src="${GSI_SRC}"]`);
+    if (existing) {
+      setGsiReady(true);
+    } else {
+      const script = document.createElement('script');
+      script.src = GSI_SRC;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => setGsiReady(true);
+      script.onerror = () => console.error('Failed to load Google Identity Services');
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  // Configure token client when GSI is ready
+  useEffect(() => {
+    if (!gsiReady || !clientId) return;
+
+    // @ts-ignore
+    const tc = window.google?.accounts?.oauth2?.initTokenClient?.({
+      client_id: clientId,
+      scope: 'https://www.googleapis.com/auth/calendar.events',
+      callback: (resp) => {
+        if (resp && resp.access_token) {
+          setAccessToken(resp.access_token);
+          const seconds = Number(resp.expires_in) || 3600;
+          setTokenExpiresAt(Date.now() + seconds * 1000);
+          setAuthStatus('authorized');
+          if (pendingExecuteIndexRef.current != null) {
+            const actionId = pendingExecuteIndexRef.current;
+            pendingExecuteIndexRef.current = null;
+            handleCreateEventForAction(actionId);
+          }
+        } else if (authAttemptRef.current === 'silent') {
+          setAuthStatus('unauthorized');
+        }
+        authAttemptRef.current = 'idle';
+      },
+      error_callback: (err) => {
+        console.warn('Google auth error:', err);
+        if (authAttemptRef.current !== 'silent') {
+          setExecutionInfo(prev => ({
+            ...prev,
+            [pendingExecuteIndexRef.current]: 'Authorization failed. Please try again.'
+          }));
+          const failedId = pendingExecuteIndexRef.current;
+          if (failedId != null) {
+            setFailedActions(prev => new Set([...prev, failedId]));
+            failedActionsRef.current = new Set([...failedActionsRef.current, failedId]);
+            setExecutingActions(prev => {
+              const next = new Set(prev);
+              next.delete(failedId);
+              return next;
+            });
+          }
+        }
+        authAttemptRef.current = 'idle';
+      },
+    });
+
+    setTokenClient(tc || null);
+
+    if (tc) {
+      // Silent auth check
+      authAttemptRef.current = 'silent';
+      // @ts-ignore
+      tc.requestAccessToken({ prompt: '' });
+    }
+  }, [gsiReady, clientId]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(timelinesRef.current).forEach(({ timers }) => {
+        timers?.forEach(t => clearTimeout(t));
+      });
+      Object.values(thinkingRef.current).forEach(({ timers }) => {
+        timers?.forEach(t => clearTimeout(t) || clearInterval(t));
+      });
+      Object.values(aiGenRef.current).forEach((entry) => {
+        if (entry?.typingId) clearInterval(entry.typingId);
+        if (entry?.thoughtTypingId) clearInterval(entry.thoughtTypingId);
+        if (entry?.blinkId) clearInterval(entry.blinkId);
+        if (entry?.timeoutId) clearTimeout(entry.timeoutId);
+        if (entry?.writeTimeoutId) clearTimeout(entry.writeTimeoutId);
+      });
+    };
+  }, []);
+
+  const normalizeType = (type) => {
+    const s = String(type ?? '').toLowerCase().trim();
+    if (s === 'meeting') return 'meeting';
+    if (s === 'wo-permit' || s === 'wo permit' || s === 'permit' || s === 'wo' || s === 'wo_permit' || s === 'wopermit') return 'wo-permit';
+    if (s === 'round-plan' || s === 'round plan' || s === 'roundplan' || s === 'round_plan') return 'round-plan';
+    if (s === 'document' || s === 'documents' || s === 'doc') return 'document';
+    return 'document';
+  };
+
+  const buildAIThought = (actionText) => {
+    const subject = actionText || 'this action';
+    return `Planning execution for ${subject}: Analyzing requirements → Checking dependencies → Preparing resources → Executing steps → Validating completion.`;
+  };
+
+  const buildAIDocument = (actionId, actionText) => {
+    const action = approvedActions.find(a => a.id === actionId);
+    const title = action?.title || `Action Document`;
+    const today = new Date().toLocaleString();
+    return (
+      `${title}\n\n` +
+      `Generated: ${today}\n\n` +
+      `Executive Summary\n` +
+      `- Objective: ${actionText || 'Complete the assigned action.'}\n` +
+      `- Scope: Define what is in and out of scope for this action.\n` +
+      `- Outcome: What success looks like upon completion.\n\n` +
+      `Details\n` +
+      `1) Context\n` +
+      `   Background and constraints related to: ${actionText || 'the action.'}\n\n` +
+      `2) Analysis\n` +
+      `   Key findings, risks, and mitigations. Include data points and references.\n\n` +
+      `3) Plan\n` +
+      `   - Tasks to be completed\n` +
+      `   - Responsible parties\n` +
+      `   - Timeline and milestones\n` +
+      `   - Dependencies and prerequisites\n\n` +
+      `4) Acceptance Criteria\n` +
+      `   - Clear, measurable checkpoints to validate completion.\n\n` +
+      `Notes\n` +
+      `Add any additional observations, links, or open questions here.`
+    );
+  };
+
+  const startAIGeneration = (actionId, actionText) => {
+    const fullText = buildAIDocument(actionId, actionText);
+    setDocContents(prev => ({ ...prev, [actionId]: '' }));
+
+    let cursor = 0;
+    const tick = () => {
+      const remaining = fullText.length - cursor;
+      if (remaining <= 0) {
+        setAiGenStates(prev => {
+          const next = { ...prev };
+          delete next[actionId];
+          return next;
+        });
+    setExecutedActions(prev => new Set([...prev, actionId]));
+        executedActionsRef.current = new Set([...executedActionsRef.current, actionId]);
+        setExecutingActions(prev => {
+          const next = new Set(prev);
+          next.delete(actionId);
+          return next;
+        });
+        setExecutionInfo(prev => ({
+          ...prev,
+          [actionId]: 'Document generated and ready for download.'
+        }));
+        setTimeout(() => {
+          setExecutionInfo(prev => {
+            const next = { ...prev };
+            delete next[actionId];
+            return next;
+          });
+        }, 3000);
+        return;
+      }
+      const chunkLen = Math.min(remaining, Math.floor(Math.random() * 4) + 1);
+      const nextChunk = fullText.slice(cursor, cursor + chunkLen);
+      cursor += chunkLen;
+      setDocContents(prev => ({ ...prev, [actionId]: (prev[actionId] || '') + nextChunk }));
+    };
+
+    const typingId = setInterval(tick, 18);
+    aiGenRef.current[actionId] = { typingId, cursor: 0, fullText, phase: 'writing' };
+    setAiGenStates(prev => ({ ...prev, [actionId]: { isGenerating: true } }));
+  };
+
+  const handleCreateEventForAction = async (actionId) => {
+    try {
+      if (!accessToken) {
+        throw new Error('No access token');
+      }
+
+      const action = approvedActions.find(a => a.id === actionId);
+      const now = Date.now();
+      const start = new Date(now + 60 * 60 * 1000).toISOString(); // 1 hour from now
+      const end = new Date(now + 90 * 60 * 1000).toISOString(); // 1.5 hours from now
+
+      const event = {
+        summary: action?.title || 'Action Meeting',
+        description: action?.description || 'Scheduled via Action Execution',
+        start: { dateTime: start },
+        end: { dateTime: end },
+        reminders: { useDefault: true },
+        attendees: HARDCODED_ATTENDEES.map((email) => ({ email })),
+      };
+
+      const resp = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=all', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(event),
+      });
+
+      if (resp.status === 200 || resp.status === 201) {
+        // Meeting creation successful
+        setExecutedActions(prev => new Set([...prev, actionId]));
+        executedActionsRef.current = new Set([...executedActionsRef.current, actionId]);
+        setExecutingActions(prev => {
+          const next = new Set(prev);
+          next.delete(actionId);
+          return next;
+        });
+        setExecutionInfo(prev => ({
+          ...prev,
+          [actionId]: 'Meeting scheduled and invites sent successfully.'
+        }));
+        setTimeout(() => {
+          setExecutionInfo(prev => {
+            const next = { ...prev };
+            delete next[actionId];
+            return next;
+          });
+        }, 3000);
+      } else {
+        throw new Error('Calendar API error');
+      }
+    } catch (e) {
+      console.error('Failed to create calendar event:', e);
+      setExecutionInfo(prev => ({
+        ...prev,
+        [actionId]: 'Failed to schedule meeting. Please try again.'
+      }));
+      setExecutingActions(prev => {
+        const next = new Set(prev);
+        next.delete(actionId);
+        return next;
+      });
+      setFailedActions(prev => new Set([...prev, actionId]));
+      failedActionsRef.current = new Set([...failedActionsRef.current, actionId]);
+    }
+  };
+
+  const startThinking = (actionId, actionText) => {
+    const thoughtFull = buildAIThought(actionText);
+
+    if (thinkingRef.current[actionId]) {
+      thinkingRef.current[actionId].timers?.forEach(t => clearTimeout(t) || clearInterval(t));
+    }
+
+    thinkingRef.current[actionId] = {
+      thoughtFull,
+      thoughtVisible: '',
+      thoughtCursor: 0,
+      blinkOn: true,
+      timers: []
+    };
+
+    setThinkingStates(prev => ({
+      ...prev,
+      [actionId]: {
+        isThinking: true,
+        thoughtVisible: '',
+        blinkOn: true
+      }
+    }));
+
+    const thoughtTypingId = setInterval(() => {
+      const state = thinkingRef.current[actionId];
+      if (!state) return;
+
+      const remaining = state.thoughtFull.length - state.thoughtCursor;
+      if (remaining <= 0) {
+        clearInterval(thoughtTypingId);
+        return;
+      }
+
+      const chunkLen = Math.min(remaining, Math.floor(Math.random() * 3) + 1);
+      const nextChunk = state.thoughtFull.slice(state.thoughtCursor, state.thoughtCursor + chunkLen);
+      state.thoughtCursor += chunkLen;
+      state.thoughtVisible += nextChunk;
+
+      setThinkingStates(prev => ({
+        ...prev,
+        [actionId]: {
+          ...prev[actionId],
+          thoughtVisible: state.thoughtVisible
+        }
+      }));
+    }, THINK_TYPE_INTERVAL_MS);
+
+    const blinkId = setInterval(() => {
+      const state = thinkingRef.current[actionId];
+      if (!state) return;
+
+      state.blinkOn = !state.blinkOn;
+      setThinkingStates(prev => ({
+        ...prev,
+        [actionId]: {
+          ...prev[actionId],
+          blinkOn: state.blinkOn
+        }
+      }));
+    }, THINK_CURSOR_BLINK_MS);
+
+    thinkingRef.current[actionId].timers = [thoughtTypingId, blinkId];
+
+    const finishThinkingId = setTimeout(() => {
+      setThinkingStates(prev => {
+        const next = { ...prev };
+        delete next[actionId];
+        return next;
+      });
+      if (thinkingRef.current[actionId]) {
+        thinkingRef.current[actionId].timers.forEach(t => clearTimeout(t) || clearInterval(t));
+        delete thinkingRef.current[actionId];
+      }
+    }, AI_THINK_MS);
+
+    thinkingRef.current[actionId].timers.push(finishThinkingId);
+  };
+
+  const startExecutionTimeline = (actionId, actionType) => {
+    let steps, stepDuration;
+
+    switch (actionType) {
+      case 'meeting':
+        steps = TIMELINE_STEPS;
+        stepDuration = TIMELINE_STEP_MS;
+        break;
+      case 'wo-permit':
+        steps = WOP_STEPS;
+        stepDuration = TIMELINE_STEP_MS;
+        break;
+      case 'round-plan':
+        steps = ROUND_STEPS;
+        stepDuration = TIMELINE_STEP_MS;
+        break;
+      case 'document':
+        // For documents, expand the editor and start AI generation
+        setExpandedDocs(prev => ({ ...prev, [actionId]: true }));
+        const action = approvedActions.find(a => a.id === actionId);
+        startAIGeneration(actionId, action?.description || action?.title);
+        return;
+      default:
+        steps = ['Preparing', 'Executing', 'Validating', 'Completing'];
+        stepDuration = 1000;
+    }
+
+    if (timelinesRef.current[actionId]) {
+      timelinesRef.current[actionId].timers?.forEach(t => clearTimeout(t));
+    }
+
+    timelinesRef.current[actionId] = {
+      steps,
+      current: -1,
+      timers: [],
+      completed: false
+    };
+
+    setExecutionTimelines(prev => ({
+      ...prev,
+      [actionId]: {
+        steps,
+        current: -1,
+        completed: false
+      }
+    }));
+
+    const timers = [];
+    steps.forEach((_, stepIdx) => {
+      const timerId = setTimeout(() => {
+        if (timelinesRef.current[actionId]) {
+          timelinesRef.current[actionId].current = stepIdx;
+          setExecutionTimelines(prev => ({
+            ...prev,
+            [actionId]: {
+              ...prev[actionId],
+              current: stepIdx
+            }
+          }));
+        }
+      }, stepIdx * stepDuration);
+      timers.push(timerId);
+    });
+
+    const completeId = setTimeout(() => {
+      if (timelinesRef.current[actionId]) {
+        timelinesRef.current[actionId].completed = true;
+        setExecutionTimelines(prev => ({
+          ...prev,
+          [actionId]: {
+            ...prev[actionId],
+            completed: true
+          }
+        }));
+
+        setExecutedActions(prev => new Set([...prev, actionId]));
+        executedActionsRef.current = new Set([...executedActionsRef.current, actionId]);
+        setExecutingActions(prev => {
+          const next = new Set(prev);
+          next.delete(actionId);
+          return next;
+        });
+
+        let message;
+        switch (actionType) {
+          case 'meeting':
+            message = 'Meeting scheduled and invites sent.';
+            break;
+          case 'wo-permit':
+            message = 'Edited 4 Workorders and added Permits.';
+            break;
+          case 'round-plan':
+            message = 'Round plan optimized and published.';
+            break;
+          default:
+            message = 'Action completed successfully.';
+        }
+
+        setExecutionInfo(prev => ({
+          ...prev,
+          [actionId]: message
+        }));
+
+        setTimeout(() => {
+          setExecutionInfo(prev => {
+            const next = { ...prev };
+            delete next[actionId];
+            return next;
+          });
+        }, 3000);
+      }
+    }, steps.length * stepDuration);
+    timers.push(completeId);
+
+    timelinesRef.current[actionId].timers = timers;
+  };
+
+  const handleExecuteAction = (action) => {
+    if (executingActions.has(action.id) || executedActions.has(action.id)) {
+      return;
+    }
+
+    const actionType = normalizeType(action.type || 'document');
+
+    setExecutingActions(prev => new Set([...prev, action.id]));
+
+    startThinking(action.id, action.title || action.description);
+
+    setTimeout(() => {
+      if (!executedActions.has(action.id)) {
+        if (actionType === 'meeting') {
+          // For meetings, handle Google Calendar integration
+          if (!accessToken && tokenClient) {
+            pendingExecuteIndexRef.current = action.id;
+            authAttemptRef.current = 'exec';
+            // @ts-ignore
+            tokenClient.requestAccessToken({ prompt: 'consent' });
+          } else if (accessToken) {
+            handleCreateEventForAction(action.id);
+          } else {
+            setExecutionInfo(prev => ({
+              ...prev,
+              [action.id]: 'Google Calendar not available. Please check configuration.'
+            }));
+            setExecutingActions(prev => {
+              const next = new Set(prev);
+              next.delete(action.id);
+              return next;
+            });
+            setFailedActions(prev => new Set([...prev, action.id]));
+            failedActionsRef.current = new Set([...failedActionsRef.current, action.id]);
+          }
+        } else {
+          startExecutionTimeline(action.id, actionType);
+        }
+      }
+    }, AI_THINK_MS);
+  };
+
+  const handleDocChange = (actionId, value) => {
+    setDocContents(prev => ({ ...prev, [actionId]: value }));
+  };
+
+  const handleDownloadDoc = (actionId) => {
+    const text = docContents[actionId] || '';
+    const action = approvedActions.find(a => a.id === actionId);
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${action?.title?.replace(/[^a-z0-9]/gi, '_') || 'Action_Document'}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      a.remove();
+    }, 0);
+  };
+
+  const handleEmailDoc = (actionId) => {
+    const text = docContents[actionId] || '';
+    const action = approvedActions.find(a => a.id === actionId);
+    const subject = encodeURIComponent(`Action Document: ${action?.title || 'Generated Document'}`);
+    const body = encodeURIComponent(`Please find the generated action document below:\n\n${text}`);
+    window.open(`mailto:?subject=${subject}&body=${body}`);
+  };
+
+  const getTypeLabel = (type) => {
+    const normalizedType = normalizeType(type);
+    switch (normalizedType) {
+      case 'meeting': return 'Meeting';
+      case 'wo-permit': return 'WO Permit';
+      case 'round-plan': return 'Round Plan';
+      case 'document': return 'Document';
+      default: return 'Document';
+    }
+  };
+
+  const getTypeIcon = (type) => {
+    const normalizedType = normalizeType(type);
+    switch (normalizedType) {
+      case 'meeting':
+        return (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+          </svg>
+        );
+      case 'wo-permit':
+        return (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10,9 9,9 8,9"/>
+          </svg>
+        );
+      case 'round-plan':
+        return (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        );
+      default:
+        return (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10,9 9,9 8,9"/>
+          </svg>
+        );
+    }
+  };
+
+  // Helper: wait for an action to complete or timeout
+  const waitForActionCompletion = (actionId, timeoutMs = 30000) => {
+    return new Promise((resolve) => {
+      const start = Date.now();
+      const interval = setInterval(() => {
+        const done = executedActionsRef.current?.has(actionId);
+        const failed = failedActionsRef.current?.has(actionId);
+        const elapsed = Date.now() - start;
+        if (done || failed || elapsed >= timeoutMs) {
+          clearInterval(interval);
+          resolve(undefined);
+        }
+      }, 250);
+    });
+  };
+
+  // Execute all approved actions sequentially when executeAllSignal changes
+  useEffect(() => {
+    if (!executeAllSignal) return;
+    if (executingAllRef.current) return;
+    if (!approvedActions || approvedActions.length === 0) return;
+
+    executingAllRef.current = true;
+
+    (async () => {
+      // snapshot to keep order stable
+      const queue = approvedActions.filter(a => !executedActions.has(a.id));
+      for (const action of queue) {
+        if (!executedActions.has(action.id) && !executingActions.has(action.id)) {
+          handleExecuteAction(action);
+        }
+        await waitForActionCompletion(action.id);
+      }
+      executingAllRef.current = false;
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [executeAllSignal]);
+
+  // Execute a single approved action when requested by parent
+  useEffect(() => {
+    if (!executeOneRequest || !executeOneRequest.actionId) return;
+    const action = approvedActions.find(a => a.id === executeOneRequest.actionId);
+    if (!action) return;
+    if (!executedActions.has(action.id) && !executingActions.has(action.id)) {
+      handleExecuteAction(action);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [executeOneRequest?.tick]);
+
+  // Keep ref in sync with state for completion checks
+  useEffect(() => {
+    executedActionsRef.current = executedActions;
+  }, [executedActions]);
+  useEffect(() => {
+    failedActionsRef.current = failedActions;
+  }, [failedActions]);
+
+  return (
+    <section className="report-card" aria-label="Action Execution Report">
+      <div className="report-head">
+        <div className="report-head-left">
+          <span className="report-bullet" aria-hidden="true">
+            <IconBrand32 />
+          </span>
+          <div>
+            <div className="report-title">Action Execution</div>
+            <div className="report-subtitle">
+              {approvedActions.length} action{approvedActions.length !== 1 ? 's' : ''} ready for execution
+            </div>
+          </div>
+        </div>
+        <div className="report-head-actions" aria-hidden="true">
+          <button type="button" className="icon-badge" title="Copy">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <rect
+                x="9"
+                y="9"
+                width="10"
+                height="10"
+                rx="2"
+                stroke="#4B5563"
+                strokeWidth="1.5"
+              />
+              <rect
+                x="5"
+                y="5"
+                width="10"
+                height="10"
+                rx="2"
+                stroke="#4B5563"
+                strokeWidth="1.5"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="icon-badge"
+            title={collapsed ? "Expand" : "Collapse"}
+            onClick={onToggleCollapse}
+          >
+            {collapsed ? <IconChevronDown /> : <IconChevronUp />}
+          </button>
+        </div>
+      </div>
+
+      <div className={`report-body ${collapsed ? "collapsed" : "expanded"}`} aria-hidden={collapsed}>
+        {approvedActions.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" style={{ margin: '0 auto 16px' }}>
+              <path d="M9 12l2 2 4-4" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="12" cy="12" r="9" stroke="#d1d5db" strokeWidth="2"/>
+            </svg>
+            <div style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px' }}>No actions approved yet</div>
+            <div style={{ fontSize: '14px' }}>Approve actions from the Project Plan to see them here</div>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: '1fr' }}>
+            {approvedActions.map((action) => {
+                  const isExecuted = executedActions.has(action.id);
+              const isExecuting = executingActions.has(action.id);
+              const thinkingState = thinkingStates[action.id];
+              const timeline = executionTimelines[action.id];
+              const info = executionInfo[action.id];
+              const actionType = normalizeType(action.type || 'document');
+              const isDocExpanded = expandedDocs[action.id];
+              const aiGenState = aiGenStates[action.id];
+
+                  return (
+                <div key={action.id} style={{
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                  transition: 'all 0.2s ease',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  {/* Header */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    marginBottom: '16px'
+                  }}>
+                    <div>
+                      <div style={{
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: '#111827',
+                        marginBottom: '4px'
+                      }}>
+                        {action.title}
+                      </div>
+                      <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        backgroundColor: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        padding: '4px 12px',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        color: '#475569'
+                      }}>
+                        {getTypeIcon(actionType)}
+                        {getTypeLabel(actionType)}
+                      </div>
+                    </div>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      backgroundColor: isExecuted ? '#d1fae5' : isExecuting ? '#dbeafe' : '#f0fdf4',
+                      border: `1px solid ${isExecuted ? '#10b981' : isExecuting ? '#3b82f6' : '#22c55e'}`,
+                      borderRadius: '20px',
+                      padding: '6px 16px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: isExecuted ? '#047857' : isExecuting ? '#1e40af' : '#22c55e'
+                    }}>
+                        {isExecuted ? (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}>
+                            <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                              Executed
+                        </>
+                      ) : isExecuting ? (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', animation: 'spin 1s linear infinite' }}>
+                            <path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.364-6.364l-2.828 2.828M9.464 14.536l-2.828 2.828M20.364 18.364l-2.828-2.828M9.464 9.464l-2.828-2.828"/>
+                          </svg>
+                          Executing
+                        </>
+                      ) : (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '4px' }}>
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M16.5 9.5l-5.25 5.25L7.5 11"/>
+                            </svg>
+                              Ready
+                        </>
+                      )}
+                        </div>
+                        </div>
+
+                  {/* Description */}
+                  <p style={{
+                    color: '#374151',
+                    fontSize: '15px',
+                    lineHeight: '1.6',
+                    margin: '0 0 20px',
+                    fontWeight: '400'
+                  }}>
+                    {action.description}
+                  </p>
+
+                  {/* Priority and Impact */}
+                  <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                    <span className={action.priority === "High" ? "chip-high" : "chip-med"} style={{ fontSize: '12px', padding: '4px 8px' }}>
+                      {action.priority} Priority
+                    </span>
+                    <span style={{ fontSize: '12px', padding: '4px 8px', backgroundColor: '#f3f4f6', color: '#374151', borderRadius: '6px' }}>
+                          {action.impact}
+                    </span>
+                        </div>
+
+                  {/* Execute Button */}
+                  <div style={{ marginBottom: '16px' }}>
+                    {!isExecuted && !isExecuting ? (
+                          <button
+                        style={{
+                          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '12px',
+                          padding: '12px 24px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                        onClick={() => handleExecuteAction(action)}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                            Execute
+                          </button>
+                        ) : (
+                      <div style={{ fontSize: '14px', color: '#6b7280', fontStyle: 'italic' }}>
+                        {isExecuting ? 'Execution in progress...' : 'Execution completed'}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* AI Thinking State */}
+                  {thinkingState?.isThinking && (
+                    <div style={{
+                      background: '#f0f9ff',
+                      border: '1px solid #bae6fd',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      marginBottom: '16px'
+                    }}>
+                      <div style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#0369a1',
+                        marginBottom: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ animation: 'pulse 2s infinite' }}>
+                          <path d="M12 2l3.09 6.26L22 9l-5.91 3.74L17.45 19 12 16.27 6.55 19l1.36-6.26L2 9l6.91-.74L12 2z"/>
+                        </svg>
+                        AI Planning Execution
+                      </div>
+                      <p style={{
+                        fontStyle: 'italic',
+                        whiteSpace: 'pre-wrap',
+                        margin: '0',
+                        color: '#0c4a6e',
+                        fontSize: '13px',
+                        lineHeight: '1.5'
+                      }}>
+                        {thinkingState.thoughtVisible}
+                        <span style={{ opacity: thinkingState.blinkOn ? 1 : 0 }}>|</span>
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Meeting timeline */}
+                  {actionType === 'meeting' && timeline && !timeline.completed && (
+                    <div style={{
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      marginBottom: '16px'
+                    }}>
+                      <div style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#374151',
+                        marginBottom: '12px'
+                      }}>
+                        Creating Calendar Event
+                      </div>
+                      <div style={{ display: 'grid', gap: '8px' }}>
+                        {timeline.steps.map((label, stepIdx) => {
+                          const isDone = timeline.current > stepIdx;
+                          const isCurrent = timeline.current === stepIdx;
+                          return (
+                            <div key={stepIdx} style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px'
+                            }}>
+                              <div style={{
+                                width: '12px',
+                                height: '12px',
+                                borderRadius: '50%',
+                                background: isDone ? '#10b981' : isCurrent ? '#3b82f6' : '#d1d5db',
+                                boxShadow: isCurrent ? '0 0 0 4px rgba(59, 130, 246, 0.15)' : 'none',
+                                transition: 'all 0.3s ease'
+                              }} />
+                              <span style={{
+                                fontSize: '13px',
+                                color: isDone || isCurrent ? '#374151' : '#9ca3af',
+                                fontWeight: isCurrent ? '600' : '400'
+                              }}>
+                                {label}
+                          </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* WO-PERMIT GIF loader */}
+                  {(actionType === 'wo-permit' || actionType === 'round-plan') && timeline && !timeline.completed && (
+                    <div style={{
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      marginBottom: '16px',
+                      textAlign: 'center'
+                    }}>
+                      {!woGifLoaded && (
+                        <div style={{
+                          width: '100%',
+                          height: '200px',
+                          background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%)',
+                          backgroundSize: '400% 100%',
+                          animation: 'shimmer 1.2s ease-in-out infinite',
+                          borderRadius: '8px',
+                          marginBottom: '16px'
+                        }} />
+                      )}
+                      <img
+                        src={WoPermitGif}
+                        alt={actionType === 'wo-permit' ? "Authoring permit forms" : "Creating round plan"}
+                        style={{
+                          width: '100%',
+                          maxWidth: '320px',
+                          borderRadius: '8px',
+                          display: woGifLoaded ? 'block' : 'none',
+                          margin: '0 auto 16px'
+                        }}
+                        onLoad={() => setWoGifLoaded(true)}
+                      />
+                      <div style={{ display: 'grid', gap: '8px' }}>
+                        {timeline.steps.map((label, stepIdx) => {
+                          const isCurrent = timeline.current === stepIdx;
+                          const isDone = timeline.current > stepIdx;
+                          return (
+                            <div key={stepIdx} style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              justifyContent: 'center'
+                            }}>
+                              <div style={{
+                                width: '10px',
+                                height: '10px',
+                                borderRadius: '50%',
+                                background: isDone ? '#10b981' : isCurrent ? '#3b82f6' : '#d1d5db',
+                                boxShadow: isCurrent ? '0 0 0 4px rgba(59, 130, 246, 0.15)' : 'none'
+                              }} />
+                              <span style={{
+                                fontSize: '13px',
+                                color: isDone || isCurrent ? '#374151' : '#9ca3af',
+                                fontWeight: isCurrent ? '600' : '400'
+                              }}>
+                                {label}
+                              </span>
+                            </div>
+                  );
+                })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Document editor */}
+                  {actionType === 'document' && isDocExpanded && (
+                    <div style={{
+                      background: '#f9fafb',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '12px',
+                      padding: '20px',
+                      marginBottom: '16px'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '16px'
+                      }}>
+                        <div style={{
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#374151',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10,9 9,9 8,9"/>
+                          </svg>
+                          {aiGenState?.isGenerating ? 'AI is writing document...' : 'Document Editor'}
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            style={{
+                              background: '#ffffff',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              color: '#374151',
+                              cursor: 'pointer'
+                            }}
+                            onClick={() => handleDownloadDoc(action.id)}
+                          >
+                            Download
+                          </button>
+                          <button
+                            style={{
+                              background: '#3b82f6',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              color: '#ffffff',
+                              cursor: 'pointer'
+                            }}
+                            onClick={() => handleEmailDoc(action.id)}
+                          >
+                            Email
+                          </button>
+                        </div>
+                      </div>
+                      <textarea
+                        value={docContents[action.id] || ''}
+                        onChange={(e) => handleDocChange(action.id, e.target.value)}
+                        placeholder="Document content will appear here..."
+                        style={{
+                          width: '100%',
+                          minHeight: '300px',
+                          background: '#ffffff',
+                          color: '#1f2937',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          padding: '16px',
+                          fontSize: '14px',
+                          lineHeight: '1.6',
+                          fontFamily: "Georgia, 'Times New Roman', Times, serif",
+                          resize: 'vertical',
+                          outline: 'none',
+                          boxSizing: 'border-box'
+                        }}
+                        readOnly={aiGenState?.isGenerating}
+                      />
+                    </div>
+                  )}
+
+                  {/* Execution Info */}
+                  {info && (
+                    <div style={{
+                      background: '#d1fae5',
+                      border: '1px solid #10b981',
+                      borderRadius: '8px',
+                      padding: '12px',
+                      fontSize: '13px',
+                      color: '#047857',
+                      fontWeight: '500'
+                    }}>
+                      ✓ {info}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -2162,6 +3395,10 @@ export default function Action() {
   const [showActionsPanel, setShowActionsPanel] = useState(false);
   const [reportCollapsed, setReportCollapsed] = useState(false);
   const [actionsCollapsed, setActionsCollapsed] = useState(false);
+  const [executionCollapsed, setExecutionCollapsed] = useState(false);
+  const [showExecutionFromMessage, setShowExecutionFromMessage] = useState(false);
+  const [executeAllSignal, setExecuteAllSignal] = useState(0);
+  const [executeOneSignal, setExecuteOneSignal] = useState({ actionId: null, tick: 0 });
 
   // Stage transitions for right pane
   useEffect(() => {
@@ -2416,6 +3653,47 @@ export default function Action() {
   function handleFollowupClick(nextText) {
     setText(nextText);
     setShowActionsPanel(true);
+    setReportCollapsed(true); // Collapse the Top 2 Causes section by default
+  }
+
+  function handleAddMessage(message) {
+    setMessages(prev => [...prev, message]);
+  }
+
+  function handleMessageClick(message) {
+    if (message.action === "showExecution") {
+      setShowExecutionFromMessage(true);
+      // Scroll to execution panel or show it in some way
+      setTimeout(() => {
+        const executionPanel = document.querySelector('[aria-label="Action Execution Report"]');
+        if (executionPanel) {
+          executionPanel.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }
+
+  function handleExecuteAllApproved() {
+    setShowExecutionFromMessage(true);
+    // trigger sequential execution in ActionExecutionPanel
+    setExecuteAllSignal((x) => x + 1);
+    setTimeout(() => {
+      const executionPanel = document.querySelector('[aria-label="Action Execution Report"]');
+      if (executionPanel) {
+        executionPanel.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  }
+
+  function handleExecuteOneApproved(actionId) {
+    setShowExecutionFromMessage(true);
+    setExecuteOneSignal((prev) => ({ actionId, tick: (prev?.tick || 0) + 1 }));
+    setTimeout(() => {
+      const executionPanel = document.querySelector('[aria-label="Action Execution Report"]');
+      if (executionPanel) {
+        executionPanel.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   }
 
   return (
@@ -2494,13 +3772,22 @@ export default function Action() {
             }`}
           >
             <div className={`chat-body-grid ${twoCol ? "two-col" : ""}`}>
-              <div className={`left-pane ${twoCol ? "shift-left" : ""}`}>
-                <div className={`messages`} role="log" aria-live="polite">
+              <div
+                className={`left-pane ${twoCol ? "shift-left" : ""}`}
+                style={{ display: 'flex', flexDirection: 'column', minHeight: 0, maxHeight: 'calc(100vh - 180px)' }}
+              >
+                <div
+                  className={`messages`}
+                  role="log"
+                  aria-live="polite"
+                  style={{ overflowY: 'auto', flex: 1, paddingRight: 8 }}
+                >
                   {messages.map((m) => (
                     <ChatMessage
                       key={m.id}
                       message={m}
                       onTypedDone={markMessageDone}
+                      onMessageClick={handleMessageClick}
                     />
                   ))}
                 </div>
@@ -2544,6 +3831,23 @@ export default function Action() {
                       >
                         Create a 3-month cost-reduction roadmap →
                       </button>
+                    </div>
+                  </div>
+                )}
+                {twoCol && progressPct >= 100 && approvedActions.length > 0 && (
+                  <div className="followups-card" style={{ marginTop: 12 }}>
+                    <div className="followups-title">Action Execution Engine</div>
+                    <div className="followup-list" style={{ marginTop: 8, display: 'grid', gap: '8px' }}>
+                      {approvedActions.map((a) => (
+                        <button
+                          key={a.id}
+                          type="button"
+                          className="followup-btn"
+                          onClick={() => handleExecuteOneApproved(a.id)}
+                        >
+                          Execute: {a.title} →
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -2607,11 +3911,17 @@ export default function Action() {
                       />
                       {showActionsPanel && (
                         <div className="panel-animate-in">
-                          <RightActionsPanel
-                            collapsed={actionsCollapsed}
-                            onToggleCollapse={() =>
-                              setActionsCollapsed(!actionsCollapsed)
-                            }
+                          <RightActionsPanel collapsed={actionsCollapsed} onToggleCollapse={() => setActionsCollapsed(!actionsCollapsed)} onActionsChange={setApprovedActions} />
+                        </div>
+                      )}
+                      {(approvedActions.length > 0 || showExecutionFromMessage) && (
+                        <div className="panel-animate-in" style={{ marginTop: '16px' }}>
+                          <ActionExecutionPanel
+                            collapsed={executionCollapsed}
+                            onToggleCollapse={() => setExecutionCollapsed(!executionCollapsed)}
+                            approvedActions={approvedActions}
+                            executeAllSignal={executeAllSignal}
+                            executeOneRequest={executeOneSignal}
                           />
                         </div>
                       )}
@@ -2686,6 +3996,7 @@ export default function Action() {
             <CausesList
               onTakeAction={handleTakeActionCause}
               onPlansUpdate={handlePlansUpdate}
+              onAddMessage={handleAddMessage}
             />
             <div className="results-actions">
               {executeReady && (
@@ -2720,6 +4031,22 @@ export default function Action() {
           </div>
         )}
       </div>
+
+      {/* Add CSS animations */}
+      <style jsx>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+        @keyframes shimmer {
+          0% { background-position: -400px 0; }
+          100% { background-position: 400px 0; }
+        }
+      `}</style>
     </div>
   );
 }
