@@ -17,6 +17,11 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 
 function IconBack() {
@@ -185,6 +190,29 @@ function IconPdf() {
   );
 }
 
+function IconCheckCircle() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <circle cx="12" cy="12" r="10" fill="#22c55e" />
+      <path
+        d="M16.5 9.5l-5.25 5.25L7.5 11"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 // Brand icon requested for titles
 function IconBrand32() {
   return (
@@ -273,7 +301,7 @@ function RightShimmerPanel({ showProgress = true }) {
     // Light pulse to keep it alive; caps at 35% for now (slightly faster)
     const id = setInterval(() => {
       setProgress((p) => Math.min(35, p + (2 + Math.floor(Math.random() * 3)))); // +2..+4
-    }, 500);
+    }, 300);
     return () => clearInterval(id);
   }, []);
 
@@ -313,10 +341,9 @@ function RightShimmerPanel({ showProgress = true }) {
 function RightInfoInitialPanel() {
   return (
     <div className="chart-card" aria-live="polite">
-      <div className="info-title">Causes for increased Maintenance Opex</div>
       <div className="info-section">
         <span className="info-bullet" aria-hidden="true">
-          <IconSparkle />
+          <IconBrand32 />
         </span>
         <div className="info-content">
           <div className="info-heading">Collecting real-time data</div>
@@ -337,54 +364,141 @@ function RightInfoInitialPanel() {
 function RightInfoPanel() {
   return (
     <div className="chart-card" aria-live="polite">
-      <div className="info-title">Causes for increased Maintenance Opex</div>
+      {/* Summary */}
       <div className="info-section">
         <span className="info-bullet" aria-hidden="true">
-          <IconSparkle />
+          <IconBrand32 />
         </span>
         <div className="info-content">
-          <div className="info-heading">Collecting References</div>
+          <div className="info-heading">Collected references</div>
           <p className="info-body">
-            I'm starting my research on how to bake a cake. I've broken down the
-            topic into several key areas to ensure a comprehensive understanding
-            for a beginner. This includes finding a simple, reliable recipe,
-            identifying the necessary ingredients and equipment, and outlining
-            the step-by-step process. I'll also be investigating common problems
-            and how to troubleshoot them.
+            Linked relevant work orders and manuals that commonly appear in
+            investigations for increased maintenance spend.
           </p>
         </div>
       </div>
-      <div className="info-group">
-        <div className="info-group-title">
-          <IconFolder />
-          <span>Permits</span>
-        </div>
-        <div className="info-chip-row">
-          <span className="info-chip">Cold Work Permit</span>
-          <span className="info-chip">Hot Work Permit</span>
-        </div>
+
+      {/* Top chips row like screenshot */}
+      <div className="info-chip-row">
+        <span className="info-chip">Repair Booster Pump</span>
+        <span className="info-chip">Repair Booster Pump</span>
+        <span className="info-chip">Repair Booster Pump</span>
       </div>
-      <div className="info-group">
-        <div className="info-group-title">
-          <IconWrench />
-          <span>Work Orders</span>
-        </div>
-        <div className="info-chip-row">
-          <span className="info-chip">Repair Booster Pump</span>
-          <span className="info-chip">Repair Booster Pump</span>
-          <span className="info-chip">Repair Booster Pump</span>
-          <span className="info-chip">Repair Booster Pump</span>
-          <span className="info-chip">Repair Booster Pump</span>
-        </div>
-      </div>
+
+      {/* Manuals and SOPs group (row 1) */}
       <div className="info-group">
         <div className="info-group-title">
           <IconPdf />
           <span>Manuals and SOPs</span>
         </div>
         <div className="info-chip-row">
-          <span className="info-chip">Pump SOP</span>
-          <span className="info-chip">Safety Manual</span>
+          <span className="info-chip">Hydraulic System Installment</span>
+          <span className="info-chip">Hydraulic System Installment</span>
+          <span className="info-chip">Repair Booster Pump</span>
+        </div>
+        <div className="info-chip-row">
+          <span className="info-chip">Hydraulic System Installment</span>
+          <span className="info-chip">Hydraulic System Installment</span>
+          <span className="info-chip">Repair Booster Pump</span>
+        </div>
+      </div>
+
+      {/* Only one Manuals and SOPs group as requested */}
+
+      {/* Checklist */}
+      <div className="checklist">
+        <div className="check-item">
+          <span className="check-icon" aria-hidden="true">
+            <IconCheckCircle />
+          </span>
+          <div>
+            <div className="check-title">Entity Linking</div>
+            <div className="check-desc">
+              Matching data to assets, locations, and teams to avoid duplication
+            </div>
+          </div>
+        </div>
+        <div className="check-item">
+          <span className="check-icon" aria-hidden="true">
+            <IconCheckCircle />
+          </span>
+          <div>
+            <div className="check-title">Time Correlation</div>
+            <div className="check-desc">
+              Aligning events across work orders, permits, and inspections over
+              the same time windows
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RightHypothesisPanel() {
+  return (
+    <div className="chart-card" aria-live="polite">
+      <div className="info-section">
+        <span className="info-bullet" aria-hidden="true">
+          <IconCheckCircle />
+        </span>
+        <div className="info-content">
+          <div className="info-heading">Generating Hypothesis</div>
+          <p className="info-body">
+            Uses RCA logic trees (Ishikawa/Fishbone, 5 Whys) to generate
+            possible causes.
+          </p>
+          <p className="info-body">
+            Categorizes hypotheses into:
+            <br />
+            Equipment-related (e.g., aging pumps, unplanned breakdowns)
+            <br />
+            Process-related (e.g., excessive PM frequency, inefficient
+            workflows)
+            <br />
+            Human-related (e.g., delays in permit approvals, skill gaps)
+            <br />
+            External (e.g., supplier quality issues, raw material variability)
+          </p>
+          <p className="info-body">
+            Assigns probability scores based on data correlation strength.
+          </p>
+        </div>
+      </div>
+
+      <div className="info-section" style={{ marginTop: 12 }}>
+        <span className="info-bullet" aria-hidden="true">
+          <IconCheckCircle />
+        </span>
+        <div className="info-content">
+          <div className="info-heading">Shortlisting Causes for you</div>
+          <div className="mini-caption">Choosing from these</div>
+          <div className="select-grid">
+            <div className="select-chip">
+              <div className="select-title">Cause 1 90%</div>
+              <div className="select-sub">Reason for choosing this cause</div>
+            </div>
+            <div className="select-chip">
+              <div className="select-title">Cause 2 80%</div>
+              <div className="select-sub">Reason for choosing this cause</div>
+            </div>
+            <div className="select-chip">
+              <div className="select-title">Repair Booster Pump</div>
+              <div className="select-sub">Reason for choosing this cause</div>
+            </div>
+            <div className="select-chip">
+              <div className="select-title">Cause 1 90%</div>
+              <div className="select-sub">Reason for choosing this cause</div>
+            </div>
+            <div className="select-chip">
+              <div className="select-title">Cause 2 80%</div>
+              <div className="select-sub">Reason for choosing this cause</div>
+            </div>
+            <div className="select-chip">
+              <div className="select-title">Repair Booster Pump</div>
+              <div className="select-sub">Reason for choosing this cause</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -476,10 +590,17 @@ const MemoChartPanel = React.memo(ChartPanel);
 function AgentProgress({ onCrossThreshold, onProgressChange, threshold = 40 }) {
   const [progress, setProgress] = useState(10);
   const firedRef = useRef(false);
+  const intervalRef = useRef(0);
   useEffect(() => {
-    const id = setInterval(() => {
-      setProgress((p) => Math.min(65, p + (2 + Math.floor(Math.random() * 3)))); // +2..+4 for a bit quicker ramp-up
-    }, 500);
+    let id = 0;
+    id = setInterval(() => {
+      setProgress((p) => {
+        const next = Math.min(100, p + (2 + Math.floor(Math.random() * 3))); // +2..+4
+        if (next >= 100) clearInterval(id);
+        return next;
+      });
+    }, 300);
+    intervalRef.current = id;
     return () => clearInterval(id);
   }, []);
   useEffect(() => {
@@ -488,6 +609,14 @@ function AgentProgress({ onCrossThreshold, onProgressChange, threshold = 40 }) {
       onCrossThreshold?.();
     }
   }, [progress, threshold, onCrossThreshold]);
+  // Safety: if we somehow linger at 99%, finalize to 100
+  useEffect(() => {
+    if (progress >= 99 && progress < 100) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      const t = setTimeout(() => setProgress(100), 600);
+      return () => clearTimeout(t);
+    }
+  }, [progress]);
   useEffect(() => {
     onProgressChange?.(progress);
   }, [progress, onProgressChange]);
@@ -776,6 +905,201 @@ function SubCauses({
         ))}
       </ol>
     </div>
+  );
+}
+
+function CausesReport() {
+  const mini1 = [
+    { month: "Jan", value: 118 },
+    { month: "Feb", value: 131 },
+    { month: "Mar", value: 159 },
+  ];
+  const mini2 = [
+    { month: "Jan", value: 116 },
+    { month: "Feb", value: 129 },
+    { month: "Mar", value: 152 },
+  ];
+  const donut = [
+    { name: "Rapid increase in PM Work Orders", value: 60 },
+    { name: "Increase in MTTR due to waiting for Permits", value: 40 },
+  ];
+  const donutColors = ["#3D5AFE", "#c7d2fe"]; // primary + light
+  return (
+    <section className="report-card" aria-label="Top 2 Causes Report">
+      <div className="report-head">
+        <div className="report-head-left">
+          <span className="report-bullet" aria-hidden="true">
+            <IconSparkle />
+          </span>
+          <div>
+            <div className="report-title">Top 2 Causes</div>
+            <div className="report-subtitle">
+              Contributing to 7% increase in Maintenance Opex trend
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="report-causes-grid">
+        <article className="report-cause">
+          <div className="report-cause-head">
+            <div className="report-cause-index">1.</div>
+            <div className="report-cause-title">
+              Rapid Increase in PM Work Orders
+            </div>
+          </div>
+          <p className="report-cause-desc">
+            Static PMs are not optimised with actual equipment condition and
+            criticality, leading to unnecessary maintenance tasks
+          </p>
+          <div className="report-mini">
+            <div className="report-mini-left">
+              <div className="report-mini-label">Trend</div>
+              <div className="report-mini-chart">
+                <ResponsiveContainer width="100%" height={84}>
+                  <BarChart
+                    data={mini1}
+                    margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
+                  >
+                    <CartesianGrid
+                      vertical={false}
+                      stroke="#eef0f4"
+                      strokeDasharray="4 4"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={11}
+                    />
+                    <YAxis hide domain={[0, "dataMax + 10"]} />
+                    <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
+                    <Bar
+                      dataKey="value"
+                      radius={[4, 4, 0, 0]}
+                      fill="#ef4444"
+                      maxBarSize={18}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="report-mini-stat">
+              <div className="report-mini-stat-val">+ 38%</div>
+              <div className="report-mini-stat-sub">in last 3 months</div>
+            </div>
+          </div>
+        </article>
+
+        <article className="report-cause">
+          <div className="report-cause-head">
+            <div className="report-cause-index">2.</div>
+            <div className="report-cause-title">
+              Increase in MTTR waiting on Permits
+            </div>
+          </div>
+          <p className="report-cause-desc">
+            Permit delays are primarily due to coordination gaps between
+            Operations and Maintenance teams on ground.
+          </p>
+          <div className="report-mini">
+            <div className="report-mini-left">
+              <div className="report-mini-label">Trend</div>
+              <div className="report-mini-chart">
+                <ResponsiveContainer width="100%" height={84}>
+                  <BarChart
+                    data={mini2}
+                    margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
+                  >
+                    <CartesianGrid
+                      vertical={false}
+                      stroke="#eef0f4"
+                      strokeDasharray="4 4"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={11}
+                    />
+                    <YAxis hide domain={[0, "dataMax + 10"]} />
+                    <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
+                    <Bar
+                      dataKey="value"
+                      radius={[4, 4, 0, 0]}
+                      fill="#ef4444"
+                      maxBarSize={18}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="report-mini-stat">
+              <div className="report-mini-stat-val">+ 38%</div>
+              <div className="report-mini-stat-sub">in last 3 months</div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div className="report-attrib">
+        <div className="report-attrib-title">Causes Attribution</div>
+        <div className="report-attrib-grid">
+          <div className="report-donut-wrap">
+            <ResponsiveContainer width="100%" height={240}>
+              <PieChart>
+                <Pie
+                  data={donut}
+                  dataKey="value"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={100}
+                  cornerRadius={6}
+                  paddingAngle={0}
+                >
+                  {donut.map((entry, i) => (
+                    <Cell
+                      key={entry.name}
+                      fill={donutColors[i % donutColors.length]}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="report-donut-center">60%</div>
+          </div>
+          <div className="report-attrib-legend">
+            <span className="legend-pill red">
+              Increase in MTTR due to waiting for Permits
+              <span className="legend-count">3</span>
+            </span>
+            <span className="legend-pill blue">
+              Rapid increase in PM Work Orders
+              <span className="legend-count">5</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="report-sources">
+        <div className="sources-head">Sources go here</div>
+        <div className="sources-chips">
+          {[
+            "Hydraulic System Installment",
+            "Hydraulic System Installment",
+            "Repair Booster Pump",
+            "Hydraulic System Installment",
+            "Hydraulic System Installment",
+            "Repair Booster Pump",
+          ].map((t, i) => (
+            <span key={i} className="chip-soft">
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -1269,7 +1593,9 @@ export default function Action() {
   const [chartReady, setChartReady] = useState(false);
   const [progressAtTop, setProgressAtTop] = useState(false);
   const [progressPct, setProgressPct] = useState(10);
-  const [rightStage, setRightStage] = useState("chart"); // chart → collecting → references
+  const [rightStage, setRightStage] = useState("chart"); // chart → collecting → references → hypothesis
+  const rightFeedRef = useRef(null);
+  const [rightScrollAuto, setRightScrollAuto] = useState(false);
 
   // Stage transitions for right pane
   useEffect(() => {
@@ -1280,14 +1606,69 @@ export default function Action() {
 
   useEffect(() => {
     if (rightStage === "collecting" && progressPct >= 50) {
-      setRightStage("collectingFadeOut");
+      setRightStage("references");
     }
   }, [rightStage, progressPct]);
 
+  // After references appear, show hypothesis shortly after
   useEffect(() => {
-    if (rightStage !== "collectingFadeOut") return;
-    const t = setTimeout(() => setRightStage("references"), 900);
-    return () => clearTimeout(t);
+    if (
+      (rightStage === "references" || rightStage === "collecting") &&
+      progressPct >= 85
+    ) {
+      setRightStage("hypothesis");
+    }
+  }, [rightStage, progressPct]);
+
+  // Smooth, continuous scroll loop synced with progress percentage
+  const scrollStateRef = useRef({ raf: 0, running: false, target: 0 });
+
+  // Start/stop the animation loop when twoCol changes
+  useEffect(() => {
+    if (!twoCol) return;
+    const state = scrollStateRef.current;
+    state.running = true;
+
+    const tick = () => {
+      if (!state.running) return;
+      const el = rightFeedRef.current;
+      if (!el) return;
+      const max = Math.max(0, el.scrollHeight - el.clientHeight);
+      const target = Math.min(max, state.target);
+      const current = el.scrollTop;
+      const delta = target - current;
+      const abs = Math.abs(delta);
+      // Spring-like approach for ultra-smooth motion
+      const stiffness = 0.12; // lower = smoother
+      const minStep = 0.2; // prevents tiny stalls
+      if (abs > 0.5) {
+        el.scrollTop = current + delta * stiffness + Math.sign(delta) * minStep;
+      } else {
+        el.scrollTop = target;
+      }
+      state.raf = requestAnimationFrame(tick);
+    };
+
+    state.raf = requestAnimationFrame(tick);
+    return () => {
+      state.running = false;
+      cancelAnimationFrame(state.raf);
+    };
+  }, [twoCol]);
+
+  // Update target position whenever progress (or content) changes
+  useEffect(() => {
+    const el = rightFeedRef.current;
+    if (!el) return;
+    const max = Math.max(0, el.scrollHeight - el.clientHeight);
+    scrollStateRef.current.target = (progressPct / 100) * max;
+  }, [progressPct, chartReady, rightStage]);
+
+  // Enable scrollbar only after first feed item after shimmer (references stage)
+  useEffect(() => {
+    if (rightStage === "references" || rightStage === "hypothesis") {
+      setRightScrollAuto(true);
+    }
   }, [rightStage]);
 
   useEffect(() => {
@@ -1496,6 +1877,38 @@ export default function Action() {
                     threshold={40}
                   />
                 )}
+                {twoCol && progressPct >= 100 && (
+                  <div className="followups-card">
+                    <div className="followups-title">Suggested Follow-ups</div>
+                    <div className="followup-list">
+                      <button
+                        type="button"
+                        className="followup-btn"
+                        onClick={() => setText("Validate with site data")}
+                      >
+                        Validate with site data →
+                      </button>
+                      <button
+                        type="button"
+                        className="followup-btn"
+                        onClick={() =>
+                          setText("Trace 3 months of permit delays")
+                        }
+                      >
+                        Trace 3 months of permit delays →
+                      </button>
+                      <button
+                        type="button"
+                        className="followup-btn"
+                        onClick={() =>
+                          setText("Create a 3-month cost-reduction roadmap")
+                        }
+                      >
+                        Create a 3-month cost-reduction roadmap →
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <form className="chat-input-form" onSubmit={handleSubmit}>
                   <label className="sr-only" htmlFor="action-textarea">
                     Type your message
@@ -1543,28 +1956,49 @@ export default function Action() {
                   <div className="right-title">
                     Causes for increased Maintenance Opex
                   </div>
-                  {rightStage === "chart" && (
-                    <div className="panel-animate-in">
-                      {chartReady ? (
-                        <MemoChartPanel chart={chartData} />
-                      ) : (
-                        <RightShimmerPanel showProgress={false} />
+                  {progressPct === 100 ? (
+                    <div className="report-scroll panel-animate-in">
+                      <CausesReport />
+                    </div>
+                  ) : (
+                    <div
+                      className="right-feed"
+                      ref={rightFeedRef}
+                      style={{ overflowY: rightScrollAuto ? "auto" : "hidden" }}
+                      aria-live="polite"
+                    >
+                      {/* Chart always first */}
+                      <div className="panel-animate-in">
+                        {chartReady ? (
+                          <MemoChartPanel chart={chartData} />
+                        ) : (
+                          <RightShimmerPanel showProgress={false} />
+                        )}
+                      </div>
+
+                      {/* Collecting stage when reached or later */}
+                      {(rightStage === "collecting" ||
+                        rightStage === "references" ||
+                        rightStage === "hypothesis") && (
+                        <div className="panel-animate-in">
+                          <RightInfoInitialPanel />
+                        </div>
                       )}
-                    </div>
-                  )}
-                  {rightStage === "collecting" && (
-                    <div className="panel-animate-in">
-                      <RightInfoInitialPanel />
-                    </div>
-                  )}
-                  {rightStage === "collectingFadeOut" && (
-                    <div className="panel-animate-out">
-                      <RightInfoInitialPanel />
-                    </div>
-                  )}
-                  {rightStage === "references" && (
-                    <div className="panel-animate-in">
-                      <RightInfoPanel />
+
+                      {/* References stage when reached or later */}
+                      {(rightStage === "references" ||
+                        rightStage === "hypothesis") && (
+                        <div className="panel-animate-in">
+                          <RightInfoPanel />
+                        </div>
+                      )}
+
+                      {/* Hypothesis stage */}
+                      {rightStage === "hypothesis" && (
+                        <div className="panel-animate-in">
+                          <RightHypothesisPanel />
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

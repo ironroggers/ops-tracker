@@ -213,7 +213,7 @@ function InsightPopup({ onClose, actionTo = "/action" }) {
             </Box>
             <Box>
               <Text
-                fontSize={{ base: "md", md: "lg" }}
+                fontSize="16px"
                 fontWeight="500"
                 letterSpacing="-0.01em"
                 lineHeight="1.2"
