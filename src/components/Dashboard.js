@@ -4,11 +4,30 @@ import { Link } from "react-router-dom";
 import { Box, SimpleGrid, HStack, Text, Badge, Button } from "@chakra-ui/react";
 
 function formatCurrency(amount) {
-  return new Intl.NumberFormat(undefined, {
+  const formatter = new Intl.NumberFormat(undefined, {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
-  }).format(amount);
+  });
+
+  const parts = formatter.formatToParts(amount);
+
+  // If currency appears first without an intervening literal (e.g., "US$48,200"),
+  // insert a space between currency and the numeric portion.
+  if (
+    parts.length > 1 &&
+    parts[0].type === "currency" &&
+    parts[1].type !== "literal"
+  ) {
+    return `${parts[0].value} ${parts
+      .slice(1)
+      .map((p) => p.value)
+      .join("")}`;
+  }
+
+  const formatted = parts.map((p) => p.value).join("");
+  // Fallback: add a space after the last non-digit, non-space char when immediately followed by a digit.
+  return formatted.replace(/([^\d\s])(?=\d)/, "$1 ");
 }
 
 function formatHours(hours) {
@@ -140,6 +159,80 @@ function AlertBanner({
         </Button>
       </HStack>
     </HStack>
+  );
+}
+
+function InsightPopup({ onClose, actionTo = "/action" }) {
+  return (
+    <Box position="fixed" right={{ base: 4, md: 8 }} bottom={{ base: 4, md: 8 }} zIndex={50}>
+      {/* Outer white card */}
+      <Box
+        position="relative"
+        bg="white"
+        rounded="3xl"
+        boxShadow="2xl"
+        p={{ base: 2, md: 3 }}
+        width={{ base: "calc(100vw - 32px)", sm: "420px", md: "520px" }}
+        maxW="560px"
+      >
+        {/* Inner panel with dotted border */}
+        <Box
+          bg="#eef2ff"
+          rounded="2xl"
+          borderWidth="2px"
+          borderStyle="dotted"
+          borderColor="#c7d2fe"
+          p={{ base: 4, md: 6 }}
+        >
+          <HStack align="start" spacing={3} mb={2}>
+            <Box color="#4f46e5" aria-hidden="true" mt={1}>
+              <svg width="22" height="22" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M12 2l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z" />
+              </svg>
+            </Box>
+            <Box>
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="900" letterSpacing="-0.02em" lineHeight="1.1">
+                Your maintenance costs are up 7%{' '}
+                <Text as="span" fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="800">
+                  ($450 annualized)
+                </Text>
+              </Text>
+            </Box>
+          </HStack>
+          <Text mt={{ base: 2, md: 3 }} color="gray.600" fontSize={{ base: "lg", md: "xl" }} fontWeight="700">
+            Dive in?
+          </Text>
+          <HStack mt={{ base: 4, md: 6 }} spacing={3}>
+            <Button as={Link} to={actionTo} colorScheme="blue" fontWeight="800" size="lg">
+              Explore Now
+            </Button>
+            <Button variant="outline" bg="white" borderColor="#e5e7eb" onClick={onClose} fontWeight="800" size="lg">
+              Later
+            </Button>
+          </HStack>
+        </Box>
+
+        {/* Decorative sparkle chip on the outer corner */}
+        <Box
+          position="absolute"
+          right={{ base: -3, md: -4 }}
+          bottom={{ base: -3, md: -4 }}
+          w={{ base: 10, md: 12 }}
+          h={{ base: 10, md: 12 }}
+          bg="white"
+          rounded="full"
+          boxShadow="xl"
+          display="grid"
+          placeItems="center"
+        >
+          <Box color="#4f46e5">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M12 2l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z" />
+            </svg>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
@@ -283,6 +376,7 @@ export default function Dashboard() {
   const [product, setProduct] = useState("All");
   const [plant, setPlant] = useState("1000 - Hamburg");
   const [showOpexAlert, setShowOpexAlert] = useState(true);
+  const [showInsightPopup, setShowInsightPopup] = useState(true);
 
   const base = useMemo(
     () => ({
@@ -531,6 +625,9 @@ export default function Dashboard() {
           />
         </SimpleGrid>
       </Box>
+      {showInsightPopup && (
+        <InsightPopup onClose={() => setShowInsightPopup(false)} />
+      )}
     </Box>
   );
 }

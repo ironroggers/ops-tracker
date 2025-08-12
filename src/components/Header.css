@@ -97,7 +97,7 @@ body.sidebar-expanded .header-toolbar {
 .filters-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 .filters-right {
   display: flex;
@@ -106,45 +106,57 @@ body.sidebar-expanded .header-toolbar {
 }
 
 .field {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  position: relative;
+  display: inline-block;
 }
 .field-label {
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  padding: 0 6px; /* create a small white mask over the border */
   font-size: 12px;
-  color: #6b7280;
+  color: #111827; /* black label */
+  background: #ffffff; /* hide the input border under label */
+  border-radius: 6px;
+  z-index: 1;
 }
 .field-select {
   appearance: none;
   background: #ffffff;
   border: 1px solid #e6e8ef;
   color: #111827;
-  padding: 6px 28px 6px 10px;
+  padding: 10px 30px 10px 12px; /* more compact */
   border-radius: 10px;
   font-size: 13px;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%236b7280" d="M7 10l5 5 5-5z"/></svg>');
+  min-width: 200px; /* narrower selects */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="%236b7280" d="M7 10l5 5 5-5z"/></svg>');
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: right 10px center;
 }
 
 .timeframes {
-  display: flex;
-  gap: 8px;
+  display: inline-flex;
+  gap: 6px;
   margin-left: 8px;
+  padding: 6px 8px; /* smaller group */
+  background: #eef2ff;
+  border: 1px solid #dbe2fe;
+  border-radius: 14px;
 }
 .chip {
-  padding: 6px 10px;
+  padding: 6px 10px; /* smaller pills */
   border-radius: 10px;
-  border: 1px solid #e6e8ef;
-  background: #fff;
-  color: #374151;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #6b7280;
   font-weight: 700;
   font-size: 12px;
 }
 .chip-active {
-  background: #eef2ff;
+  background: #c7d2fe;
   border-color: #c7d2fe;
-  color: #3730a3;
+  color: #111827;
 }
 
 .icon-btn {
@@ -169,6 +181,9 @@ body.sidebar-expanded .header-toolbar {
   }
   .filters-left {
     flex-wrap: wrap;
+  }
+  .field-select {
+    min-width: 260px;
   }
   .header-title {
     font-size: 18px;
