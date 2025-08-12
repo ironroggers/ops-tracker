@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../screens/Action.css';
+import WoPermitGif from '../assets/Create using AI (3).gif';
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
 const EXEC_TIMEOUT_MS = 15000; // safety fallback
@@ -12,6 +13,13 @@ const HARDCODED_ATTENDEES = [
 ];
 const TIMELINE_STEPS = ['Creating EHS Meet', 'Inviting People', 'Finding Time', 'Blocking Calendar'];
 const TIMELINE_STEP_MS = 1500;
+const AI_THINK_MS = 5000;
+const THINK_TYPE_INTERVAL_MS = 18;
+const THINK_CURSOR_BLINK_MS = 500;
+
+// WO-PERMIT specific loader steps
+const WOP_STEPS = ['Authoring Permit Forms', 'Attaching it with Workorders', 'Saving Edits', 'Done'];
+const WOP_STEP_MS = 1500;
 
 export default function ExecuteActions() {
   const navigate = useNavigate();
@@ -20,6 +28,7 @@ export default function ExecuteActions() {
     const s = String(t ?? '').toLowerCase().trim();
     if (s === 'meeting') return 'meeting';
     if (s === 'wo-permit' || s === 'wo permit' || s === 'permit' || s === 'wo' || s === 'wo_permit' || s === 'wopermit') return 'wo-permit';
+    if (s === 'round-plan' || s === 'round plan' || s === 'roundplan' || s === 'round_plan') return 'round-plan';
     if (s === 'document' || s === 'documents' || s === 'doc') return 'document';
     return 'document';
   }
@@ -40,13 +49,19 @@ export default function ExecuteActions() {
   const defaultDocContentFor = useCallback((index, text) => {
     return `Action ${index + 1} Document\n\n${text || ''}\n\nWrite your notes here...`;
   }, []);
-  const aiGenRef = useRef({}); // { [index:number]: { id:number, cursor:number, fullText:string } }
+  // aiGenRef entry shape:
+  // thinking: { phase:'thinking', thoughtFull:string, thoughtVisible:string, thoughtCursor:number, thoughtTypingId?:number, blinkId?:number, blinkOn:boolean, writeTimeoutId:number }
+  // writing:  { phase:'writing', fullText:string, cursor:number, typingId:number }
+  const aiGenRef = useRef({});
   const isGenerating = useCallback((index) => Boolean(aiGenRef.current[index]), []);
   const stopAIGeneration = useCallback((index) => {
     const entry = aiGenRef.current[index];
-    if (entry?.id) {
-      clearInterval(entry.id);
-    }
+    if (!entry) return;
+    if (entry.typingId) clearInterval(entry.typingId);
+    if (entry.thoughtTypingId) clearInterval(entry.thoughtTypingId);
+    if (entry.blinkId) clearInterval(entry.blinkId);
+    if (entry.timeoutId) clearTimeout(entry.timeoutId);
+    if (entry.writeTimeoutId) clearTimeout(entry.writeTimeoutId);
     delete aiGenRef.current[index];
   }, []);
   const buildAIDocument = useCallback((index, actionText) => {
@@ -75,6 +90,10 @@ export default function ExecuteActions() {
       `Add any additional observations, links, or open questions.`
     );
   }, []);
+  const buildAIThought = useCallback((index, actionText) => {
+    const subject = actionText || 'this action';
+    return `Planning outline for ${subject}: Objective → Scope → Outcome → Context → Analysis → Plan (Tasks, Owners, Timeline, Dependencies) → Acceptance Criteria.`;
+  }, []);
   const startAIGeneration = useCallback((index, actionText) => {
     stopAIGeneration(index);
     const fullText = buildAIDocument(index, actionText);
@@ -93,14 +112,121 @@ export default function ExecuteActions() {
       cursor += chunkLen;
       setDocContents((prev) => ({ ...prev, [index]: (prev[index] || '') + nextChunk }));
     };
-    const id = setInterval(tick, 18); // typing cadence
-    aiGenRef.current[index] = { id, cursor: 0, fullText };
+    const typingId = setInterval(tick, 18); // typing cadence
+    aiGenRef.current[index] = { typingId, cursor: 0, fullText, phase: 'writing' };
   }, [buildAIDocument, stopAIGeneration]);
   useEffect(() => () => {
     // Cleanup all generators on unmount
-    Object.values(aiGenRef.current).forEach((entry) => entry?.id && clearInterval(entry.id));
+    Object.values(aiGenRef.current).forEach((entry) => {
+      if (entry?.typingId) clearInterval(entry.typingId);
+      if (entry?.thoughtTypingId) clearInterval(entry.thoughtTypingId);
+      if (entry?.blinkId) clearInterval(entry.blinkId);
+      if (entry?.timeoutId) clearTimeout(entry.timeoutId);
+      if (entry?.writeTimeoutId) clearTimeout(entry.writeTimeoutId);
+    });
     aiGenRef.current = {};
   }, []);
+  const startAIThinking = useCallback((index, actionText) => {
+    stopAIGeneration(index);
+    const thoughtFull = buildAIThought(index, actionText);
+    // Trigger UI to show thinking state
+    setDocContents((prev) => ({ ...prev, [index]: '' }));
+
+    // Create entry now so intervals can reference it
+    aiGenRef.current[index] = {
+      phase: 'thinking',
+      thoughtFull,
+      thoughtVisible: '',
+      thoughtCursor: 0,
+      blinkOn: true,
+    };
+
+    // Typing effect for the thought
+    const thoughtTypingId = setInterval(() => {
+      const entry = aiGenRef.current[index];
+      if (!entry || entry.phase !== 'thinking') return;
+      const remaining = entry.thoughtFull.length - entry.thoughtCursor;
+      if (remaining <= 0) {
+        clearInterval(entry.thoughtTypingId);
+        delete entry.thoughtTypingId;
+        return;
+      }
+      const chunkLen = Math.min(remaining, Math.floor(Math.random() * 3) + 1); // 1-3 chars
+      const nextChunk = entry.thoughtFull.slice(entry.thoughtCursor, entry.thoughtCursor + chunkLen);
+      entry.thoughtCursor += chunkLen;
+      entry.thoughtVisible = (entry.thoughtVisible || '') + nextChunk;
+      setExecInfoVersion((v) => v + 1);
+    }, THINK_TYPE_INTERVAL_MS);
+
+    // Blinking cursor while thinking
+    const blinkId = setInterval(() => {
+      const entry = aiGenRef.current[index];
+      if (!entry || entry.phase !== 'thinking') return;
+      entry.blinkOn = !entry.blinkOn;
+      setExecInfoVersion((v) => v + 1);
+    }, THINK_CURSOR_BLINK_MS);
+
+    // Switch to writing after fixed think duration
+    const writeTimeoutId = setTimeout(() => {
+      const entry = aiGenRef.current[index];
+      if (!entry || entry.phase !== 'thinking') return;
+      if (entry.thoughtTypingId) clearInterval(entry.thoughtTypingId);
+      if (entry.blinkId) clearInterval(entry.blinkId);
+      startAIGeneration(index, actionText);
+    }, AI_THINK_MS);
+
+    // Store timer handles
+    aiGenRef.current[index].thoughtTypingId = thoughtTypingId;
+    aiGenRef.current[index].blinkId = blinkId;
+    aiGenRef.current[index].writeTimeoutId = writeTimeoutId;
+  }, [stopAIGeneration, startAIGeneration, buildAIThought]);
+
+  // Generic pre-execution thinking that runs for AI_THINK_MS, then invokes onFinish()
+  const startPreExecuteThinking = useCallback((index, actionText, onFinish) => {
+    stopAIGeneration(index);
+    const thoughtFull = buildAIThought(index, actionText);
+    aiGenRef.current[index] = {
+      phase: 'thinking',
+      thoughtFull,
+      thoughtVisible: '',
+      thoughtCursor: 0,
+      blinkOn: true,
+    };
+    const thoughtTypingId = setInterval(() => {
+      const entry = aiGenRef.current[index];
+      if (!entry || entry.phase !== 'thinking') return;
+      const remaining = entry.thoughtFull.length - entry.thoughtCursor;
+      if (remaining <= 0) {
+        clearInterval(entry.thoughtTypingId);
+        delete entry.thoughtTypingId;
+        return;
+      }
+      const chunkLen = Math.min(remaining, Math.floor(Math.random() * 3) + 1);
+      const nextChunk = entry.thoughtFull.slice(entry.thoughtCursor, entry.thoughtCursor + chunkLen);
+      entry.thoughtCursor += chunkLen;
+      entry.thoughtVisible = (entry.thoughtVisible || '') + nextChunk;
+      setExecInfoVersion((v) => v + 1);
+    }, THINK_TYPE_INTERVAL_MS);
+    const blinkId = setInterval(() => {
+      const entry = aiGenRef.current[index];
+      if (!entry || entry.phase !== 'thinking') return;
+      entry.blinkOn = !entry.blinkOn;
+      setExecInfoVersion((v) => v + 1);
+    }, THINK_CURSOR_BLINK_MS);
+    const writeTimeoutId = setTimeout(() => {
+      const entry = aiGenRef.current[index];
+      if (!entry || entry.phase !== 'thinking') return;
+      if (entry.thoughtTypingId) clearInterval(entry.thoughtTypingId);
+      if (entry.blinkId) clearInterval(entry.blinkId);
+      if (entry.writeTimeoutId) clearTimeout(entry.writeTimeoutId);
+      delete aiGenRef.current[index];
+      setExecInfoVersion((v) => v + 1);
+      onFinish?.();
+    }, AI_THINK_MS);
+    aiGenRef.current[index].thoughtTypingId = thoughtTypingId;
+    aiGenRef.current[index].blinkId = blinkId;
+    aiGenRef.current[index].writeTimeoutId = writeTimeoutId;
+  }, [stopAIGeneration, buildAIThought]);
   const toggleDocExpanded = useCallback((index, actionText) => {
     setExpandedDocs((prev) => {
       const wasExpanded = !!prev[index];
@@ -152,6 +278,15 @@ export default function ExecuteActions() {
   const pendingExecuteIndexRef = useRef(null);
   const [authStatus, setAuthStatus] = useState('unknown'); // 'unknown' | 'authorized' | 'unauthorized'
   const authAttemptRef = useRef('idle'); // 'idle' | 'silent' | 'user' | 'exec'
+
+  // Quick preload for WO-permit GIF to minimize jank on first use
+  const [woGifLoaded, setWoGifLoaded] = useState(false);
+  const woGifUrl = WoPermitGif;
+  useEffect(() => {
+    const img = new Image();
+    img.src = woGifUrl;
+    img.onload = () => setWoGifLoaded(true);
+  }, [woGifUrl]);
 
   const clientId = useMemo(() => process.env.REACT_APP_GOOGLE_CLIENT_ID || '', []);
 
@@ -465,41 +600,49 @@ export default function ExecuteActions() {
       if (type === 'document') {
         setExpandedDocs((prev) => ({ ...prev, [index]: true }));
         setStatusAt(index, 'executing');
-        startAIGeneration(index, action?.text);
+        startAIThinking(index, action?.text);
         return;
       }
-      // For other non-meeting types, keep instant execute behavior
-      setStatusAt(index, 'executed');
-      clearExecInfo(index);
-      clearTimeline(index);
-      clearExecTimeout(index);
-      return;
-    }
-
-    // If Google token client isn't ready yet, avoid triggering popup outside user gesture
-    if (!tokenClient && !accessToken) {
-      setExecInfo(index, 'Initializing Google… Please wait a moment and try again.');
-      return;
-    }
-
-    // Start timeline loader for this item
-    startTimeline(index);
-
-    // If we don't yet have a token, request consent within this click (user gesture)
-    if (!accessToken) {
-      pendingExecuteIndexRef.current = index;
+      // For wo-permit/round-plan: run thinking first, then start loader timeline
+      if (type === 'wo-permit' || type === 'round-plan') {
+        setStatusAt(index, 'executing');
+        startPreExecuteThinking(index, action?.text, () => startWoPermitTimeline(index));
+        return;
+      }
+      // For other non-meeting types: thinking then instant execute
       setStatusAt(index, 'executing');
-      startExecTimeout(index);
-      // @ts-ignore
-      authAttemptRef.current = 'exec';
-      tokenClient.requestAccessToken({ prompt: 'consent' });
+      startPreExecuteThinking(index, action?.text, () => {
+        setStatusAt(index, 'executed');
+        clearExecInfo(index);
+        clearTimeline(index);
+        clearExecTimeout(index);
+      });
       return;
     }
 
-    // Have token, create event immediately
+    // Meeting flow: always show thinking first, then proceed with calendar steps
     setStatusAt(index, 'executing');
-    startExecTimeout(index);
-    handleCreateEventForIndex(index);
+    startPreExecuteThinking(index, action?.text, () => {
+      // If Google token client isn't ready yet, avoid triggering popup outside user gesture
+      if (!tokenClient && !accessToken) {
+        setExecInfo(index, 'Initializing Google… Please wait a moment and try again.');
+        return;
+      }
+      // Start timeline loader for this item
+      startTimeline(index);
+      // If we don't yet have a token, request consent within this click (user gesture)
+      if (!accessToken) {
+        pendingExecuteIndexRef.current = index;
+        startExecTimeout(index);
+        // @ts-ignore
+        authAttemptRef.current = 'exec';
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+        return;
+      }
+      // Have token, create event immediately
+      startExecTimeout(index);
+      handleCreateEventForIndex(index);
+    });
   }
 
   function pillLabel(status) {
@@ -514,7 +657,31 @@ export default function ExecuteActions() {
       meeting: actions.map((a, idx) => ({ a, idx })).filter(({ a }) => a.type === 'meeting'),
       document: actions.map((a, idx) => ({ a, idx })).filter(({ a }) => a.type === 'document'),
       woPermit: actions.map((a, idx) => ({ a, idx })).filter(({ a }) => a.type === 'wo-permit'),
+      roundPlan: actions.map((a, idx) => ({ a, idx })).filter(({ a }) => a.type === 'round-plan'),
     };
+  }
+
+  // Start WO-PERMIT loader timeline
+  function startWoPermitTimeline(index) {
+    clearTimeline(index);
+    const timers = [];
+    execTimelineRef.current[index] = { current: -1, timers, timelineComplete: false, apiDone: true };
+    WOP_STEPS.forEach((_, stepIdx) => {
+      const id = setTimeout(() => {
+        const tl = execTimelineRef.current[index];
+        if (!tl) return;
+        tl.current = stepIdx;
+        setExecInfoVersion((v) => v + 1);
+      }, stepIdx * WOP_STEP_MS);
+      timers.push(id);
+    });
+    const doneId = setTimeout(() => {
+      // Mark executed and show final message; loader collapses since status changes
+      setStatusAt(index, 'executed');
+      clearTimeline(index);
+      setExecInfo(index, 'Edited 4 Workorder and added Permits.');
+    }, WOP_STEPS.length * WOP_STEP_MS);
+    timers.push(doneId);
   }
 
   function renderGroup(title, items) {
@@ -526,10 +693,15 @@ export default function ExecuteActions() {
           {items.map(({ a, idx }) => {
             const tl = execTimelineRef.current[idx];
             const currentStep = tl?.current ?? -1;
-            const typeLabel = a.type === 'meeting' ? 'Meeting' : a.type === 'wo-permit' ? 'WO Permit' : 'Document';
+            const typeLabel = a.type === 'meeting' ? 'Meeting' : a.type === 'wo-permit' ? 'WO Permit' : a.type === 'round-plan' ? 'Round Plan' : 'Document';
             const isDoc = a.type === 'document';
             const isDocExpanded = !!expandedDocs[idx];
             const generating = isGenerating(idx);
+            const entry = aiGenRef.current[idx];
+            const phase = entry?.phase;
+            const thinking = phase === 'thinking';
+            const thoughtVisible = entry?.thoughtVisible || '';
+            const blinkOn = entry?.blinkOn;
             const docPageStyle = {
               width: '100%',
               maxWidth: 760,
@@ -599,11 +771,46 @@ export default function ExecuteActions() {
                   </div>
                 )}
 
+                {/* WO-PERMIT GIF loader */}
+                {(a.type === 'wo-permit' || a.type === 'round-plan') && statuses[idx] === 'executing' && (
+                  <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    {!woGifLoaded && (
+                      <div style={{ width: 320, maxWidth: '100%', height: 180, borderRadius: 8, background: 'linear-gradient(90deg,#f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%)', animation: 'shimmer 1.2s infinite', position: 'relative', overflow: 'hidden' }} />
+                    )}
+                    <img
+                      src={woGifUrl}
+                      alt="Authoring permit forms"
+                      style={{ width: 320, maxWidth: '100%', borderRadius: 8, display: woGifLoaded ? 'block' : 'none' }}
+                      onLoad={() => setWoGifLoaded(true)}
+                    />
+                    <ol style={{ listStyle: 'none', padding: 0, margin: '8px 0 0 0', width: '100%', maxWidth: 420 }}>
+                      {WOP_STEPS.map((label, sIdx) => {
+                        const isCurrent = currentStep === sIdx;
+                        const isDone = currentStep > sIdx;
+                        return (
+                          <li key={sIdx} style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '4px 0', opacity: isDone ? 0.7 : 1 }}>
+                            <span style={{ width: 10, height: 10, borderRadius: '50%', background: isDone ? '#10b981' : isCurrent ? '#3b82f6' : '#d1d5db', display: 'inline-block' }} />
+                            <span className="cause-desc" style={{ fontSize: 13 }}>{label}</span>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </div>
+                )}
+
+                {/* Generic thinking text for non-document actions */}
+                {!isDoc && statuses[idx] === 'executing' && thinking && (
+                  <p className="cause-desc" style={{ fontSize: 13, marginTop: 8, fontStyle: 'italic', whiteSpace: 'pre-wrap' }}>
+                    {thoughtVisible}
+                    <span style={{ opacity: blinkOn ? 1 : 0 }}>|</span>
+                  </p>
+                )}
+
                 {/* Document editor */}
                 {isDoc && isDocExpanded && (
                   <div style={{ marginTop: 12 }}>
                     <div style={toolbarStyle}>
-                      <span style={leftStatusStyle}>{generating ? 'AI is writing…' : 'Editor ready'}</span>
+                      <span style={leftStatusStyle}>{thinking ? 'AI is thinking…' : generating ? 'AI is writing…' : 'Editor ready'}</span>
                       <div style={rightActionsStyle}>
                         <button
                           className="btn-outline sm"
@@ -632,6 +839,12 @@ export default function ExecuteActions() {
                         </button>
                       </div>
                     </div>
+                    {thinking && (
+                      <p className="cause-desc" style={{ fontSize: 13, margin: '4px 0 8px', fontStyle: 'italic', whiteSpace: 'pre-wrap' }}>
+                        {thoughtVisible}
+                        <span style={{ opacity: blinkOn ? 1 : 0 }}>|</span>
+                      </p>
+                    )}
                     <textarea
                       value={docContents[idx] ?? defaultDocContentFor(idx, a.text)}
                       onChange={(e) => handleDocChange(idx, e.target.value)}
@@ -679,6 +892,7 @@ export default function ExecuteActions() {
               {renderGroup('Meetings', groupedActions().meeting)}
               {renderGroup('Documents', groupedActions().document)}
               {renderGroup('WO Permits', groupedActions().woPermit)}
+              {renderGroup('Round Plans', groupedActions().roundPlan)}
             </div>
           )}
           <div className="results-actions" style={{ marginTop: 12 }}>

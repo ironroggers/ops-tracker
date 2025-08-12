@@ -488,11 +488,7 @@ function ActionPlanCards({
   }
 
   function typeChip(type) {
-    const labelMap = {
-      meeting: "Meeting",
-      document: "Document",
-      "wo-permit": "WO Permit",
-    };
+    const labelMap = { meeting: 'Meeting', document: 'Document', 'wo-permit': 'WO Permit', 'round-plan': 'Round Plan' };
     const label = labelMap[type] ?? type;
     return <span className="type-chip">{label}</span>;
   }
@@ -578,41 +574,19 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
     const topic = sub?.title ?? cause.title;
     if (cause.rank === 1) {
       return [
-        {
-          text: `Audit PM library to eliminate non-critical tasks for ${topic}`,
-          type: "document",
-        },
-        {
-          text: "Risk-rank assets and adjust PM frequencies using criticality + condition data",
-          type: "document",
-        },
-        {
-          text: "30-min sync between Ops, Maintenance, and EHS to review upcoming permit needs.",
-          type: "meeting",
-        },
-        {
-          text: "Set weekly review with planners to remove redundant inspections",
-          type: "document",
-        },
+        { text: `Audit PM library to eliminate non-critical tasks for ${topic}`, type: 'document' },
+        { text: 'Risk-rank assets and adjust PM frequencies using criticality + condition data', type: 'document' },
+        { text: '30-min sync between Ops, Maintenance, and EHS to review upcoming permit needs.', type: 'meeting' },
+        { text: 'Set weekly review with planners to remove redundant inspections', type: 'document' },
+        { text: `Introduce an operator round plan for early anomaly detection around ${topic}`, type: 'round-plan' },
       ];
     }
     return [
-      {
-        text: `Implement early permit pre-checks specifically for ${topic}`,
-        type: "wo-permit",
-      },
-      {
-        text: "Introduce shift handover checklist including pending permits",
-        type: "document",
-      },
-      {
-        text: "Create SLA with Operations for isolation/LOTO readiness",
-        type: "wo-permit",
-      },
-      {
-        text: "Track MTTR by permit wait reason and publish weekly dashboard",
-        type: "document",
-      },
+      { text: `Implement early permit pre-checks specifically for ${topic}`, type: 'wo-permit' },
+      { text: 'Introduce shift handover checklist including pending permits', type: 'document' },
+      { text: 'Create SLA with Operations for isolation/LOTO readiness', type: 'wo-permit' },
+      { text: `Pilot a focused round plan to validate permit prerequisites during preceding shift for ${topic}`, type: 'round-plan' },
+      { text: 'Track MTTR by permit wait reason and publish weekly dashboard', type: 'document' },
     ];
   }
 
@@ -726,7 +700,7 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
           total > 0 && allActions.every((a) => a.status !== "proposed");
         const approved = allActions
           .filter((a) => a.status === "approved")
-          .map((a) => a.text);
+          .map((a) => ({ text: a.text, type: a.type }));
         onPlansUpdate?.({ allResolved, approved });
         return next;
       });
