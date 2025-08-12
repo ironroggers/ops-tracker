@@ -1,47 +1,115 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import './Action.css';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import "./Action.css";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function IconBack() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M15 18l-6-6 6-6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 function IconMic() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 14a4 4 0 004-4V7a4 4 0 10-8 0v3a4 4 0 004 4z" stroke="currentColor" strokeWidth="2"/>
-      <path d="M19 11a7 7 0 01-14 0M12 18v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M12 14a4 4 0 004-4V7a4 4 0 10-8 0v3a4 4 0 004 4z"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <path
+        d="M19 11a7 7 0 01-14 0M12 18v4"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
 function IconSend() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-      <path d="M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" fill="none"/>
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M22 2L11 13"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M22 2l-7 20-4-9-9-4 20-7z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+        fill="none"
+      />
     </svg>
   );
 }
 
 function IconTarget() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/>
-      <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.5"/>
-      <circle cx="12" cy="12" r="2" fill="currentColor"/>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
     </svg>
   );
 }
 
 function IconTrend() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M3 16l4-4 4 4 6-6 4 4" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M3 16l4-4 4 4 6-6 4 4"
+        stroke="#ef4444"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -85,10 +153,11 @@ function OpexChart({ animate, onDone }) {
       const y = padding + (1 - (v - min) / range) * (height - padding * 2);
       return `${x},${y}`;
     })
-    .join(' ');
+    .join(" ");
 
   const firstX = padding + (0 / (base.length - 1)) * (width - padding * 2);
-  const lastX = padding + ((data.length - 1) / (base.length - 1)) * (width - padding * 2);
+  const lastX =
+    padding + ((data.length - 1) / (base.length - 1)) * (width - padding * 2);
   const areaPoints = `${firstX},${bottom} ${points} ${lastX},${bottom}`;
   const ticks = [0.2, 0.4, 0.6, 0.8];
 
@@ -97,11 +166,19 @@ function OpexChart({ animate, onDone }) {
       <div className="chart-header">
         <div>
           <div className="chart-title">OPEX Trend</div>
-          <div className="chart-subtitle">Increasing operational expenditure</div>
+          <div className="chart-subtitle">
+            Increasing operational expenditure
+          </div>
         </div>
         <div className="chart-legend">USD × 1000</div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} width="100%" height={height} className="opex-chart" aria-label="OPEX increasing chart">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        width="100%"
+        height={height}
+        className="opex-chart"
+        aria-label="OPEX increasing chart"
+      >
         <defs>
           <linearGradient id="areaFill" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
@@ -111,10 +188,25 @@ function OpexChart({ animate, onDone }) {
         <rect x="0" y="0" width={width} height={height} fill="#ffffff" />
         {ticks.map((t) => {
           const y = padding + t * (height - padding * 2);
-          return <line key={t} x1={padding} x2={width - padding} y1={y} y2={y} stroke="#e5e7eb" strokeDasharray="4 4" />;
+          return (
+            <line
+              key={t}
+              x1={padding}
+              x2={width - padding}
+              y1={y}
+              y2={y}
+              stroke="#e5e7eb"
+              strokeDasharray="4 4"
+            />
+          );
         })}
         <polyline fill="url(#areaFill)" stroke="none" points={areaPoints} />
-        <polyline fill="none" stroke="#2563eb" strokeWidth="3" points={points} />
+        <polyline
+          fill="none"
+          stroke="#2563eb"
+          strokeWidth="3"
+          points={points}
+        />
         {data.map((v, i) => {
           const x = padding + (i / (base.length - 1)) * (width - padding * 2);
           const y = padding + (1 - (v - min) / range) * (height - padding * 2);
@@ -127,13 +219,13 @@ function OpexChart({ animate, onDone }) {
 
 function TimelineLoader({ onDone }) {
   const steps = [
-    { label: 'Workorders Operations', ms: 2000 },
-    { label: 'Spare Parts', ms: 2000 },
-    { label: 'Permits', ms: 2000 },
-    { label: 'Issues', ms: 2000 },
-    { label: 'Inventory', ms: 2000 },
-    { label: 'Round Plans', ms: 2000 },
-    { label: 'Summarizing insights', ms: 7000 },
+    { label: "Workorders Operations", ms: 2000 },
+    { label: "Spare Parts", ms: 2000 },
+    { label: "Permits", ms: 2000 },
+    { label: "Issues", ms: 2000 },
+    { label: "Inventory", ms: 2000 },
+    { label: "Round Plans", ms: 2000 },
+    { label: "Summarizing insights", ms: 7000 },
   ];
   const [index, setIndex] = useState(0);
   const [done, setDone] = useState(false);
@@ -155,10 +247,13 @@ function TimelineLoader({ onDone }) {
   return (
     <div className="timeline">
       <div className="timeline-title">Fetching required data</div>
-      <div className="timeline-progress"><div className="timeline-fill" style={{ width: `${progress}%` }} /></div>
+      <div className="timeline-progress">
+        <div className="timeline-fill" style={{ width: `${progress}%` }} />
+      </div>
       <ol className="timeline-list">
         {steps.map((s, i) => {
-          const status = i < index ? 'done' : i === index ? 'active' : 'pending';
+          const status =
+            i < index ? "done" : i === index ? "active" : "pending";
           return (
             <li key={s.label} className={`timeline-item ${status}`}>
               <span className="timeline-bullet" aria-hidden="true" />
@@ -174,11 +269,11 @@ function TimelineLoader({ onDone }) {
 
 function MiniTimelineLoader({ onDone }) {
   const steps = [
-    { label: 'Workorders', ms: 1200 },
-    { label: 'History', ms: 1200 },
-    { label: 'Sensors', ms: 1200 },
-    { label: 'Permits', ms: 1200 },
-    { label: 'Inventory', ms: 1200 },
+    { label: "Workorders", ms: 1200 },
+    { label: "History", ms: 1200 },
+    { label: "Sensors", ms: 1200 },
+    { label: "Permits", ms: 1200 },
+    { label: "Inventory", ms: 1200 },
   ];
   const [index, setIndex] = useState(0);
 
@@ -195,7 +290,12 @@ function MiniTimelineLoader({ onDone }) {
     <div className="mini-timeline">
       <div className="mini-steps">
         {steps.map((s, i) => (
-          <div key={s.label} className={`mini-step ${i < index ? 'done' : i === index ? 'active' : ''}`}>
+          <div
+            key={s.label}
+            className={`mini-step ${
+              i < index ? "done" : i === index ? "active" : ""
+            }`}
+          >
             <span className="mini-dot" />
             <span className="mini-label">{s.label}</span>
             <span className="mini-time">{s.ms / 1000}s</span>
@@ -206,7 +306,14 @@ function MiniTimelineLoader({ onDone }) {
   );
 }
 
-function SubCauses({ items, parentCause, onGeneratePlan, planStateFor, onPlanDone, onPlanStatusesChange }) {
+function SubCauses({
+  items,
+  parentCause,
+  onGeneratePlan,
+  planStateFor,
+  onPlanDone,
+  onPlanStatusesChange,
+}) {
   if (!items || items.length === 0) return null;
   return (
     <div className="sub-causes">
@@ -218,33 +325,49 @@ function SubCauses({ items, parentCause, onGeneratePlan, planStateFor, onPlanDon
               <div className="sub-cause-title">{sc.title}</div>
               <span className="sub-cause-chip">{sc.percent}%</span>
             </div>
-            {sc.description ? <p className="sub-cause-desc">{sc.description}</p> : null}
-            {sc.metric?.type === 'trendPercent' && (
+            {sc.description ? (
+              <p className="sub-cause-desc">{sc.description}</p>
+            ) : null}
+            {sc.metric?.type === "trendPercent" && (
               <div className="metric-box" style={{ marginTop: 8 }}>
                 <div className="metric-box-head">
-                  <span className="metric-head-icon"><IconTrend /></span>
+                  <span className="metric-head-icon">
+                    <IconTrend />
+                  </span>
                   <span className="metric-head-title">Trend</span>
                 </div>
-                <div className="metric-hero metric-danger">{sc.metric.change}</div>
+                <div className="metric-hero metric-danger">
+                  {sc.metric.change}
+                </div>
                 <div className="metric-caption">{sc.metric.caption}</div>
               </div>
             )}
             <div className="sub-cause-actions">
-              <button type="button" className="btn sm" onClick={() => onGeneratePlan?.(parentCause, sc)}>
+              <button
+                type="button"
+                className="btn sm"
+                onClick={() => onGeneratePlan?.(parentCause, sc)}
+              >
                 Generate Plan
               </button>
             </div>
             {(() => {
               const state = planStateFor?.(parentCause, sc);
-              if (state?.status === 'loading') {
-                return <PlanAgentLoader onDone={() => onPlanDone?.(parentCause, sc)} />;
+              if (state?.status === "loading") {
+                return (
+                  <PlanAgentLoader
+                    onDone={() => onPlanDone?.(parentCause, sc)}
+                  />
+                );
               }
-              if (state?.status === 'ready') {
+              if (state?.status === "ready") {
                 return (
                   <ActionPlanCards
                     title={`Plan for ${sc.title}`}
                     items={state.items}
-                    onStatusesChange={(actions) => onPlanStatusesChange?.(parentCause, sc, actions)}
+                    onStatusesChange={(actions) =>
+                      onPlanStatusesChange?.(parentCause, sc, actions)
+                    }
                   />
                 );
               }
@@ -259,15 +382,18 @@ function SubCauses({ items, parentCause, onGeneratePlan, planStateFor, onPlanDon
 
 function PlanAgentLoader({ onDone }) {
   const steps = [
-    { label: 'Collecting recent workorders', ms: 900 },
-    { label: 'Analyzing trends and bottlenecks', ms: 1100 },
-    { label: 'Cross-checking inventory and permits', ms: 900 },
-    { label: 'Synthesizing optimal actions', ms: 1100 },
-    { label: 'Drafting plan', ms: 900 },
+    { label: "Collecting recent workorders", ms: 900 },
+    { label: "Analyzing trends and bottlenecks", ms: 1100 },
+    { label: "Cross-checking inventory and permits", ms: 900 },
+    { label: "Synthesizing optimal actions", ms: 1100 },
+    { label: "Drafting plan", ms: 900 },
   ];
   const [i, setI] = useState(0);
   useEffect(() => {
-    if (i >= steps.length) { onDone?.(); return; }
+    if (i >= steps.length) {
+      onDone?.();
+      return;
+    }
     const t = setTimeout(() => setI((x) => x + 1), steps[i].ms);
     return () => clearTimeout(t);
   }, [i, steps, onDone]);
@@ -276,10 +402,15 @@ function PlanAgentLoader({ onDone }) {
       <div className="agent-title">Generating plan…</div>
       <div className="agent-steps">
         {steps.map((s, idx) => (
-          <div key={s.label} className={`agent-step ${idx < i ? 'done' : idx === i ? 'active' : ''}`}>
+          <div
+            key={s.label}
+            className={`agent-step ${
+              idx < i ? "done" : idx === i ? "active" : ""
+            }`}
+          >
             <span className="mini-dot" />
             <span className="mini-label">{s.label}</span>
-            <span className="mini-time">{Math.round(s.ms/100)/10}s</span>
+            <span className="mini-time">{Math.round(s.ms / 100) / 10}s</span>
           </div>
         ))}
       </div>
@@ -287,8 +418,14 @@ function PlanAgentLoader({ onDone }) {
   );
 }
 
-function ActionPlanCards({ title = 'Recommended Action Plan', items = [], onStatusesChange }) {
-  const [actions, setActions] = useState(() => items.map((text, i) => ({ id: i, text, status: 'proposed' })));
+function ActionPlanCards({
+  title = "Recommended Action Plan",
+  items = [],
+  onStatusesChange,
+}) {
+  const [actions, setActions] = useState(() =>
+    items.map((text, i) => ({ id: i, text, status: "proposed" }))
+  );
   const onStatusesChangeRef = useRef(onStatusesChange);
 
   useEffect(() => {
@@ -296,7 +433,7 @@ function ActionPlanCards({ title = 'Recommended Action Plan', items = [], onStat
   }, [onStatusesChange]);
 
   useEffect(() => {
-    setActions(items.map((text, i) => ({ id: i, text, status: 'proposed' })));
+    setActions(items.map((text, i) => ({ id: i, text, status: "proposed" })));
   }, [items]);
 
   useEffect(() => {
@@ -307,11 +444,19 @@ function ActionPlanCards({ title = 'Recommended Action Plan', items = [], onStat
     setActions((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
   }
 
-  function approve(id) { updateStatus(id, 'approved'); }
-  function reject(id) { updateStatus(id, 'rejected'); }
+  function approve(id) {
+    updateStatus(id, "approved");
+  }
+  function reject(id) {
+    updateStatus(id, "rejected");
+  }
 
   function pill(status) {
-    const map = { proposed: 'Proposed', approved: 'Approved', rejected: 'Rejected' };
+    const map = {
+      proposed: "Proposed",
+      approved: "Approved",
+      rejected: "Rejected",
+    };
     return map[status] ?? status;
   }
 
@@ -323,12 +468,28 @@ function ActionPlanCards({ title = 'Recommended Action Plan', items = [], onStat
           <article key={a.id} className={`action-card ${a.status}`}>
             <div className="action-card-head">
               <div className="action-card-title">Action {idx + 1}</div>
-              <span className={`status-pill ${a.status}`}>{pill(a.status)}</span>
+              <span className={`status-pill ${a.status}`}>
+                {pill(a.status)}
+              </span>
             </div>
             <p className="action-card-text">{a.text}</p>
             <div className="action-card-foot">
-              <button className="btn sm" type="button" onClick={() => approve(a.id)} disabled={a.status === 'approved'}>Approve</button>
-              <button className="btn-outline sm" type="button" onClick={() => reject(a.id)} disabled={a.status === 'rejected'}>Reject</button>
+              <button
+                className="btn sm"
+                type="button"
+                onClick={() => approve(a.id)}
+                disabled={a.status === "approved"}
+              >
+                Approve
+              </button>
+              <button
+                className="btn-outline sm"
+                type="button"
+                onClick={() => reject(a.id)}
+                disabled={a.status === "rejected"}
+              >
+                Reject
+              </button>
             </div>
           </article>
         ))}
@@ -341,19 +502,28 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
   const causes = [
     {
       rank: 1,
-      title: 'Rapid Increase in PM Work Orders',
+      title: "Rapid Increase in PM Work Orders",
       percent: 70,
       description:
-        'Static PMs are not optimized with actual equipment condition and criticality, leading to unnecessary maintenance tasks.',
-      metric: { type: 'trendPercent', change: '+38%', caption: 'in the last 2 months' },
+        "Static PMs are not optimized with actual equipment condition and criticality, leading to unnecessary maintenance tasks.",
+      metric: {
+        type: "trendPercent",
+        change: "+38%",
+        caption: "in the last 2 months",
+      },
     },
     {
       rank: 2,
-      title: 'Increase in MTTR due to Waiting for Permits',
+      title: "Increase in MTTR due to Waiting for Permits",
       percent: 30,
       description:
-        'Permit delays are primarily due to coordination gaps between Operations and Maintenance teams.',
-      metric: { type: 'mttr', from: '7.8h', to: '10.4h', caption: 'Average MTTR over 3 months' },
+        "Permit delays are primarily due to coordination gaps between Operations and Maintenance teams.",
+      metric: {
+        type: "mttr",
+        from: "7.8h",
+        to: "10.4h",
+        caption: "Average MTTR over 3 months",
+      },
     },
   ];
 
@@ -370,80 +540,145 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
     if (cause.rank === 1) {
       return [
         `Audit PM library to eliminate non-critical tasks for ${topic}`,
-        'Risk-rank assets and adjust PM frequencies using criticality + condition data',
-        'Pilot dynamic PM intervals on low-risk equipment for 2 weeks',
-        'Set weekly review with planners to remove redundant inspections',
+        "Risk-rank assets and adjust PM frequencies using criticality + condition data",
+        "Pilot dynamic PM intervals on low-risk equipment for 2 weeks",
+        "Set weekly review with planners to remove redundant inspections",
       ];
     }
     return [
       `Implement early permit pre-checks specifically for ${topic}`,
-      'Introduce shift handover checklist including pending permits',
-      'Create SLA with Operations for isolation/LOTO readiness',
-      'Track MTTR by permit wait reason and publish weekly dashboard',
+      "Introduce shift handover checklist including pending permits",
+      "Create SLA with Operations for isolation/LOTO readiness",
+      "Track MTTR by permit wait reason and publish weekly dashboard",
     ];
   }
 
   function handleGeneratePlan(cause, sub) {
     const key = planKey(cause, sub);
-    setPlanning((p) => ({ ...p, [key]: { status: 'loading' } }));
+    setPlanning((p) => ({ ...p, [key]: { status: "loading" } }));
   }
 
   function handlePlanDone(cause, sub) {
     const key = planKey(cause, sub);
-    setPlanning((p) => ({ ...p, [key]: { status: 'ready', items: generatePlanFor(cause, sub) } }));
+    setPlanning((p) => ({
+      ...p,
+      [key]: { status: "ready", items: generatePlanFor(cause, sub) },
+    }));
   }
 
   function getSubCausesFor(cause) {
     if (cause.rank === 1) {
       return [
-        { title: 'Overly frequent PM intervals', percent: 45, description: 'Intervals not adjusted for low-risk assets.', metric: { type: 'trendPercent', change: '+18%', caption: 'in the last 2 months' } },
-        { title: 'Template-based PM tasks', percent: 35, description: 'Non-critical tasks executed across all equipment.', metric: { type: 'trendPercent', change: '+11%', caption: 'in the last 2 months' } },
-        { title: 'Redundant inspections', percent: 20, description: 'Duplicate checks across successive PMs.', metric: { type: 'trendPercent', change: '+6%', caption: 'in the last 2 months' } },
+        {
+          title: "Overly frequent PM intervals",
+          percent: 45,
+          description: "Intervals not adjusted for low-risk assets.",
+          metric: {
+            type: "trendPercent",
+            change: "+18%",
+            caption: "in the last 2 months",
+          },
+        },
+        {
+          title: "Template-based PM tasks",
+          percent: 35,
+          description: "Non-critical tasks executed across all equipment.",
+          metric: {
+            type: "trendPercent",
+            change: "+11%",
+            caption: "in the last 2 months",
+          },
+        },
+        {
+          title: "Redundant inspections",
+          percent: 20,
+          description: "Duplicate checks across successive PMs.",
+          metric: {
+            type: "trendPercent",
+            change: "+6%",
+            caption: "in the last 2 months",
+          },
+        },
       ];
     }
     return [
-      { title: 'Permit approvals after shift start', percent: 40, description: 'Delays in approvals due to shift overlap.', metric: { type: 'trendPercent', change: '+9%', caption: 'over 3 months' } },
-      { title: 'Missing prerequisite checks', percent: 35, description: 'Work paused to gather missing documentation.', metric: { type: 'trendPercent', change: '+7%', caption: 'over 3 months' } },
-      { title: 'Coordination with operations', percent: 25, description: 'Waiting for asset isolation and LOTO.', metric: { type: 'trendPercent', change: '+5%', caption: 'over 3 months' } },
+      {
+        title: "Permit approvals after shift start",
+        percent: 40,
+        description: "Delays in approvals due to shift overlap.",
+        metric: {
+          type: "trendPercent",
+          change: "+9%",
+          caption: "over 3 months",
+        },
+      },
+      {
+        title: "Missing prerequisite checks",
+        percent: 35,
+        description: "Work paused to gather missing documentation.",
+        metric: {
+          type: "trendPercent",
+          change: "+7%",
+          caption: "over 3 months",
+        },
+      },
+      {
+        title: "Coordination with operations",
+        percent: 25,
+        description: "Waiting for asset isolation and LOTO.",
+        metric: {
+          type: "trendPercent",
+          change: "+5%",
+          caption: "over 3 months",
+        },
+      },
     ];
   }
 
   function handleMitigate(cause) {
-    setMitigation((prev) => ({ ...prev, [cause.rank]: { status: 'loading' } }));
+    setMitigation((prev) => ({ ...prev, [cause.rank]: { status: "loading" } }));
   }
 
   function handleMiniDone(cause) {
     setMitigation((prev) => ({
       ...prev,
-      [cause.rank]: { status: 'ready', subCauses: getSubCausesFor(cause) },
+      [cause.rank]: { status: "ready", subCauses: getSubCausesFor(cause) },
     }));
   }
 
   function chipClass(p) {
-    if (p >= 50) return 'chip-high';
-    if (p >= 20) return 'chip-med';
-    return 'chip-low';
+    if (p >= 50) return "chip-high";
+    if (p >= 20) return "chip-med";
+    return "chip-low";
   }
 
-  const handlePlanStatusesChange = useCallback((parent, sub, actions) => {
-    const key = planKey(parent, sub);
-    setPlansActionsMap((prev) => {
-      const next = { ...prev, [key]: actions };
-      const allActions = Object.values(next).flat();
-      const total = allActions.length;
-      const allResolved = total > 0 && allActions.every((a) => a.status !== 'proposed');
-      const approved = allActions.filter((a) => a.status === 'approved').map((a) => a.text);
-      onPlansUpdate?.({ allResolved, approved });
-      return next;
-    });
-  }, [onPlansUpdate]);
+  const handlePlanStatusesChange = useCallback(
+    (parent, sub, actions) => {
+      const key = planKey(parent, sub);
+      setPlansActionsMap((prev) => {
+        const next = { ...prev, [key]: actions };
+        const allActions = Object.values(next).flat();
+        const total = allActions.length;
+        const allResolved =
+          total > 0 && allActions.every((a) => a.status !== "proposed");
+        const approved = allActions
+          .filter((a) => a.status === "approved")
+          .map((a) => a.text);
+        onPlansUpdate?.({ allResolved, approved });
+        return next;
+      });
+    },
+    [onPlansUpdate]
+  );
 
   return (
     <section className="causes-card" aria-label="Top 2 Causes">
       <div className="causes-header">
         <div>
           <div className="section-title">Top 2 Causes</div>
-          <div className="causes-subtitle">Contributing to 7% increase in Maintenance Opex trend</div>
+          <div className="causes-subtitle">
+            Contributing to 7% increase in Maintenance Opex trend
+          </div>
         </div>
         <div className="causes-stat">
           <div className="stat-value">+7%</div>
@@ -457,67 +692,89 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
             <div className="cause-title-row">
               <span className="cause-rank-dark">{c.rank}</span>
               <div className="cause-title">{c.title}</div>
-              <span className={`cause-chip ${chipClass(c.percent)}`}>{c.percent}%</span>
+              <span className={`cause-chip ${chipClass(c.percent)}`}>
+                {c.percent}%
+              </span>
             </div>
             <p className="cause-desc">{c.description}</p>
 
-            {c.metric?.type === 'trendPercent' && (
+            {c.metric?.type === "trendPercent" && (
               <div className="metric-box">
                 <div className="metric-box-head">
-                  <span className="metric-head-icon"><IconTrend /></span>
+                  <span className="metric-head-icon">
+                    <IconTrend />
+                  </span>
                   <span className="metric-head-title">Trend</span>
                 </div>
-                <div className="metric-hero metric-danger">{c.metric.change}</div>
+                <div className="metric-hero metric-danger">
+                  {c.metric.change}
+                </div>
                 <div className="metric-caption">{c.metric.caption}</div>
               </div>
             )}
 
-            {c.metric?.type === 'mttr' && (
+            {c.metric?.type === "mttr" && (
               <div className="metric-box">
                 <div className="metric-box-head">
-                  <span className="metric-head-icon"><IconTarget /></span>
+                  <span className="metric-head-icon">
+                    <IconTarget />
+                  </span>
                   <span className="metric-head-title">Trend</span>
                 </div>
                 <div className="metric-hero">
                   <span className="metric-hero-value">{c.metric.from}</span>
                   <span className="metric-arrow">→</span>
-                  <span className="metric-hero-value metric-danger">{c.metric.to}</span>
+                  <span className="metric-hero-value metric-danger">
+                    {c.metric.to}
+                  </span>
                 </div>
                 <div className="metric-caption">{c.metric.caption}</div>
               </div>
             )}
 
             <div className="cause-footer">
-              <button type="button" className="btn sm" onClick={() => handleGeneratePlan(c)}>Generate Plan</button>
+              <button
+                type="button"
+                className="btn sm"
+                onClick={() => handleGeneratePlan(c)}
+              >
+                Generate Plan
+              </button>
               <button
                 type="button"
                 className="btn-outline sm"
                 onClick={() => handleMitigate(c)}
-                disabled={mitigation[c.rank]?.status === 'loading'}
+                disabled={mitigation[c.rank]?.status === "loading"}
               >
-                {mitigation[c.rank]?.status === 'loading' ? 'Mitigating…' : 'Mitigate'}
+                {mitigation[c.rank]?.status === "loading"
+                  ? "Mitigating…"
+                  : "Mitigate"}
               </button>
             </div>
 
-            {planning[planKey(c)]?.status === 'loading' && (
+            {planning[planKey(c)]?.status === "loading" && (
               <PlanAgentLoader onDone={() => handlePlanDone(c)} />
             )}
-            {planning[planKey(c)]?.status === 'ready' && (
+            {planning[planKey(c)]?.status === "ready" && (
               <ActionPlanCards
                 items={planning[planKey(c)].items}
-                onStatusesChange={(actions) => handlePlanStatusesChange(c, undefined, actions)}
+                onStatusesChange={(actions) =>
+                  handlePlanStatusesChange(c, undefined, actions)
+                }
               />
             )}
 
-            {mitigation[c.rank]?.status === 'loading' && (
+            {mitigation[c.rank]?.status === "loading" && (
               <MiniTimelineLoader onDone={() => handleMiniDone(c)} />
             )}
 
-            {mitigation[c.rank]?.status === 'ready' && (
+            {mitigation[c.rank]?.status === "ready" && (
               <SubCauses
                 items={mitigation[c.rank].subCauses}
                 parentCause={c}
-                onGeneratePlan={(parent, sub) => handleGeneratePlan(parent, sub)}
+                onGeneratePlan={(parent, sub) =>
+                  handleGeneratePlan(parent, sub)
+                }
                 planStateFor={(parent, sub) => planning[planKey(parent, sub)]}
                 onPlanDone={(parent, sub) => handlePlanDone(parent, sub)}
                 onPlanStatusesChange={handlePlanStatusesChange}
@@ -533,11 +790,11 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
 export default function Action() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const initialTextFromState = useMemo(() => state?.initialText ?? '', [state]);
+  const initialTextFromState = useMemo(() => state?.initialText ?? "", [state]);
   const [text, setText] = useState(initialTextFromState);
   const textareaRef = useRef(null);
 
-  const [phase, setPhase] = useState('input');
+  const [phase, setPhase] = useState("input");
   const [executeReady, setExecuteReady] = useState(false);
   const [approvedActions, setApprovedActions] = useState([]);
 
@@ -547,12 +804,12 @@ export default function Action() {
 
   function autoSizeTextArea(el) {
     if (!el) return;
-    el.style.height = 'auto';
+    el.style.height = "auto";
     el.style.height = `${Math.min(220, el.scrollHeight)}px`;
   }
 
   useEffect(() => {
-    if (textareaRef.current && phase === 'input') {
+    if (textareaRef.current && phase === "input") {
       textareaRef.current.focus();
       textareaRef.current.setSelectionRange(text.length, text.length);
       autoSizeTextArea(textareaRef.current);
@@ -562,14 +819,14 @@ export default function Action() {
   function handleSubmit(event) {
     event.preventDefault();
     if (!text.trim()) return;
-    setPhase('shimmer');
-    setTimeout(() => setPhase('graph'), 3000);
+    setPhase("shimmer");
+    setTimeout(() => setPhase("graph"), 3000);
   }
 
   function handleTakeActionCause(cause, subCause) {
     const label = subCause ? `${cause.title} → ${subCause.title}` : cause.title;
     alert(`Action created for: ${label}`);
-    navigate('/');
+    navigate("/");
   }
 
   function handlePlansUpdate({ allResolved, approved }) {
@@ -581,13 +838,17 @@ export default function Action() {
     <div className="action-page">
       <Header />
       <div className="action-content">
-        {phase === 'input' && (
+        {phase === "input" && (
           <div className="action-card" role="region" aria-label="Assistant">
             <h1 className="action-title">What's on your mind today?</h1>
             <form className="action-form" onSubmit={handleSubmit}>
-              <label className="sr-only" htmlFor="action-textarea">Describe your task</label>
+              <label className="sr-only" htmlFor="action-textarea">
+                Describe your task
+              </label>
               <div className="input-row">
-                <span className="input-plus" aria-hidden="true">+</span>
+                <span className="input-plus" aria-hidden="true">
+                  +
+                </span>
                 <textarea
                   id="action-textarea"
                   ref={textareaRef}
@@ -595,13 +856,27 @@ export default function Action() {
                   placeholder="Ask anything"
                   rows={3}
                   value={text}
-                  onChange={(e) => { setText(e.target.value); autoSizeTextArea(textareaRef.current); }}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                    autoSizeTextArea(textareaRef.current);
+                  }}
                 />
                 <div className="action-controls">
-                  <button type="button" className="icon-button" title="Voice input" aria-label="Voice input">
+                  <button
+                    type="button"
+                    className="icon-button"
+                    title="Voice input"
+                    aria-label="Voice input"
+                  >
                     <IconMic />
                   </button>
-                  <button type="submit" className="icon-button primary" title="Send" aria-label="Send" disabled={!text.trim()}>
+                  <button
+                    type="submit"
+                    className="icon-button primary"
+                    title="Send"
+                    aria-label="Send"
+                    disabled={!text.trim()}
+                  >
                     <IconSend />
                   </button>
                 </div>
@@ -610,7 +885,7 @@ export default function Action() {
           </div>
         )}
 
-        {phase === 'shimmer' && (
+        {phase === "shimmer" && (
           <div className="loading-card" aria-busy="true">
             <div className="shimmer-line w-40" />
             <div className="shimmer-line w-80" />
@@ -620,36 +895,55 @@ export default function Action() {
           </div>
         )}
 
-        {phase === 'graph' && (
+        {phase === "graph" && (
           <div className="stack">
-            <OpexChart animate onDone={() => setPhase('timeline')} />
+            <OpexChart animate onDone={() => setPhase("timeline")} />
           </div>
         )}
 
-        {phase === 'timeline' && (
+        {phase === "timeline" && (
           <div className="stack">
             <OpexChart animate={false} />
-            <TimelineLoader onDone={() => setPhase('results')} />
+            <TimelineLoader onDone={() => setPhase("results")} />
           </div>
         )}
 
-        {phase === 'results' && (
+        {phase === "results" && (
           <div className="results-stack">
             <OpexChart animate={false} />
-            <CausesList onTakeAction={handleTakeActionCause} onPlansUpdate={handlePlansUpdate} />
+            <CausesList
+              onTakeAction={handleTakeActionCause}
+              onPlansUpdate={handlePlansUpdate}
+            />
             <div className="results-actions">
               {executeReady && (
                 <button
                   className="btn"
                   type="button"
-                  onClick={() => navigate('/execute', { state: { actions: approvedActions } })}
+                  onClick={() =>
+                    navigate("/execute", {
+                      state: { actions: approvedActions },
+                    })
+                  }
                   disabled={approvedActions.length === 0}
                 >
                   Execute actions
                 </button>
               )}
-              <button className="btn-outline" type="button" onClick={() => setPhase('input')}>Ask another</button>
-              <button className="btn-outline" type="button" onClick={() => navigate('/')}>Back to Dashboard</button>
+              <button
+                className="btn-outline"
+                type="button"
+                onClick={() => setPhase("input")}
+              >
+                Ask another
+              </button>
+              <button
+                className="btn-outline"
+                type="button"
+                onClick={() => navigate("/")}
+              >
+                Back to Dashboard
+              </button>
             </div>
           </div>
         )}
@@ -662,7 +956,11 @@ function Header() {
   const navigate = useNavigate();
   return (
     <header className="action-header">
-      <button className="header-back" onClick={() => navigate(-1)} aria-label="Back">
+      <button
+        className="header-back"
+        onClick={() => navigate(-1)}
+        aria-label="Back"
+      >
         <IconBack />
       </button>
       <div className="header-title">Ops Assistant</div>

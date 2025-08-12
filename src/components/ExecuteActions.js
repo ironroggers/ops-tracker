@@ -1,6 +1,6 @@
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import '../screens/Action.css';
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import "../screens/Action.css";
 
 export default function ExecuteActions() {
   const navigate = useNavigate();
@@ -10,7 +10,13 @@ export default function ExecuteActions() {
   return (
     <div className="action-page">
       <header className="action-header">
-        <button className="header-back" onClick={() => navigate(-1)} aria-label="Back">←</button>
+        <button
+          className="header-back"
+          onClick={() => navigate(-1)}
+          aria-label="Back"
+        >
+          ←
+        </button>
         <div className="header-title">Execute Actions</div>
         <div className="header-spacer" />
       </header>
@@ -33,10 +39,16 @@ export default function ExecuteActions() {
             </ol>
           )}
           <div className="results-actions" style={{ marginTop: 12 }}>
-            <button className="btn-outline" type="button" onClick={() => navigate('/')}>Back to Dashboard</button>
+            <button
+              className="btn-outline"
+              type="button"
+              onClick={() => navigate("/")}
+            >
+              Back to Dashboard
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
-} 
+}

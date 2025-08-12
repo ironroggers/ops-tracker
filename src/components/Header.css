@@ -1,0 +1,179 @@
+.header-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #ffffff;
+  border-bottom: 1px solid #e6e8ef;
+  box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.02);
+}
+
+/* Ensure header respects sidebar width */
+.header-toolbar {
+  margin-left: 280px;
+}
+body.sidebar-collapsed .header-toolbar {
+  margin-left: 75px;
+}
+body.sidebar-expanded .header-toolbar {
+  margin-left: 280px;
+}
+
+.header-top,
+.header-filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px; /* sleeker spacing */
+}
+
+.header-filters {
+  padding-top: 8px;
+  padding-bottom: 12px;
+  /* border-top: 1px solid #f0f2f8; */
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-title {
+  margin-left: -65px;
+  font-size: 18px; /* smaller title */
+  font-weight: 700; /* slightly lighter for a sleeker feel */
+  color: #1a1f36;
+}
+
+.breadcrumbs {
+  margin-top: 2px;
+  color: #727caf;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px; /* slightly smaller */
+}
+
+.crumb.active {
+  color: #2a3eb1;
+  font-weight: 600;
+}
+
+.crumb-sep {
+  color: #9aa1c5;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* tighter */
+}
+
+.profile-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px; /* smaller button */
+  border: 1px solid #e6e8ef;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.profile-badge {
+  width: 22px;
+  height: 22px; /* smaller avatar */
+  border-radius: 50%;
+  background: #f2f3fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5aa6; /* icon color */
+}
+
+.inn-logo {
+  height: 22px; /* smaller Innovapptive logo */
+}
+
+/* Filters row */
+.filters-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.filters-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.field-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+.field-select {
+  appearance: none;
+  background: #ffffff;
+  border: 1px solid #e6e8ef;
+  color: #111827;
+  padding: 6px 28px 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%236b7280" d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.timeframes {
+  display: flex;
+  gap: 8px;
+  margin-left: 8px;
+}
+.chip {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid #e6e8ef;
+  background: #fff;
+  color: #374151;
+  font-weight: 700;
+  font-size: 12px;
+}
+.chip-active {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #3730a3;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; /* smaller action buttons */
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e6e8ef;
+  background: #ffffff;
+  color: #4b5563;
+}
+.icon-btn:hover {
+  filter: brightness(0.98);
+}
+
+@media (max-width: 768px) {
+  .header-top,
+  .header-filters {
+    padding: 10px 12px;
+  }
+  .filters-left {
+    flex-wrap: wrap;
+  }
+  .header-title {
+    font-size: 18px;
+  }
+  .header-toolbar {
+    margin-left: 0;
+  }
+}
