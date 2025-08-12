@@ -447,15 +447,17 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse }) {
           priority: "High",
           impact: "Loss < $1M",
           title: "PM Optimization",
-          description: "Identify & deactivate unnecessary PM based on failure history and execution data"
+          description:
+            "Identify & deactivate unnecessary PM based on failure history and execution data",
         },
         {
           priority: "Medium",
           impact: "Loss < $500K",
           title: "Risk-based PM Scheduling",
-          description: "Risk-rank assets and adjust PM frequencies using criticality + condition data"
-        }
-      ]
+          description:
+            "Risk-rank assets and adjust PM frequencies using criticality + condition data",
+        },
+      ],
     },
     {
       causeTitle: "Increase in MTTR due to Waiting for Permits",
@@ -465,22 +467,25 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse }) {
           priority: "High",
           impact: "Loss < $800K",
           title: "Permit Pre-check System",
-          description: "Implement early permit pre-checks to reduce waiting time"
+          description:
+            "Implement early permit pre-checks to reduce waiting time",
         },
         {
           priority: "High",
           impact: "Loss < $600K",
           title: "Shift Handover Enhancement",
-          description: "Introduce shift handover checklist including pending permits"
+          description:
+            "Introduce shift handover checklist including pending permits",
         },
         {
           priority: "Medium",
           impact: "Loss < $400K",
           title: "Operations SLA",
-          description: "Create SLA with Operations for isolation/LOTO readiness"
-        }
-      ]
-    }
+          description:
+            "Create SLA with Operations for isolation/LOTO readiness",
+        },
+      ],
+    },
   ];
 
   return (
@@ -491,8 +496,12 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse }) {
             <IconBrand32 />
           </span>
           <div>
-            <div className="report-title">Project Plan for Maintenance Cost Reduction</div>
-            <div className="report-subtitle">Contributing to 7% increase in Maintenance Opex trend</div>
+            <div className="report-title">
+              Project Plan for Maintenance Cost Reduction
+            </div>
+            <div className="report-subtitle">
+              Contributing to 7% increase in Maintenance Opex trend
+            </div>
           </div>
         </div>
         <div className="report-head-actions" aria-hidden="true">
@@ -518,9 +527,9 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse }) {
               />
             </svg>
           </button>
-          <button 
-            type="button" 
-            className="icon-badge" 
+          <button
+            type="button"
+            className="icon-badge"
             title={collapsed ? "Expand" : "Collapse"}
             onClick={onToggleCollapse}
           >
@@ -529,82 +538,208 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse }) {
         </div>
       </div>
 
-      <div className={`report-body ${collapsed ? "collapsed" : "expanded"}`} aria-hidden={collapsed}>
+      <div
+        className={`report-body ${collapsed ? "collapsed" : "expanded"}`}
+        aria-hidden={collapsed}
+      >
         {causeActions.map((cause, causeIdx) => (
-          <div key={causeIdx} className="cause-actions-section" style={{ marginBottom: '24px' }}>
-            <div className="cause-actions-header" style={{ marginBottom: '16px' }}>
-              <div className="cause-actions-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span className="cause-rank-dark" style={{ 
-                    backgroundColor: '#3D5AFE', 
-                    color: 'white', 
-                    borderRadius: '8px', 
-                    padding: '6px 10px', 
-                    fontSize: '14px', 
-                    fontWeight: '600' 
-                  }}>
+          <div
+            key={causeIdx}
+            className="cause-actions-section"
+            style={{ marginBottom: "24px" }}
+          >
+            <div
+              className="cause-actions-header"
+              style={{ marginBottom: "16px" }}
+            >
+              <div
+                className="cause-actions-title"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
+                >
+                  <span
+                    className="cause-rank-dark"
+                    style={{
+                      backgroundColor: "#3D5AFE",
+                      color: "white",
+                      borderRadius: "8px",
+                      padding: "6px 10px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                    }}
+                  >
                     {causeIdx + 1}
                   </span>
                   <div>
-                    <div className="cause-title" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '2px' }}>
+                    <div
+                      className="cause-title"
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        marginBottom: "2px",
+                      }}
+                    >
                       {cause.causeTitle}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                      {cause.actions.length} action{cause.actions.length > 1 ? 's' : ''} planned
+                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                      {cause.actions.length} action
+                      {cause.actions.length > 1 ? "s" : ""} planned
                     </div>
                   </div>
                 </div>
-                <span className="cause-chip chip-high" style={{ fontSize: '14px', fontWeight: '600' }}>
+                <span
+                  className="cause-chip chip-high"
+                  style={{ fontSize: "14px", fontWeight: "600" }}
+                >
                   {cause.causePercent}%
                 </span>
               </div>
             </div>
-            
-            <div style={{ display: 'grid', gap: '12px' }}>
+
+            <div style={{ display: "grid", gap: "12px" }}>
               {cause.actions.map((action, actionIdx) => (
-                <div key={actionIdx} className="chart-card" style={{ 
-                  padding: '16px', 
-                  border: '1px solid #e5e7eb', 
-                  borderRadius: '8px',
-                  backgroundColor: '#ffffff'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500' }}>
+                <div
+                  key={actionIdx}
+                  className="chart-card"
+                  style={{
+                    padding: "16px",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    backgroundColor: "#ffffff",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        color: "#6b7280",
+                        fontWeight: "500",
+                      }}
+                    >
                       Action {actionIdx + 1}
                     </span>
-                    <span className={action.priority === "High" ? "chip-high" : "chip-med"} style={{ fontSize: '12px' }}>
+                    <span
+                      className={
+                        action.priority === "High" ? "chip-high" : "chip-med"
+                      }
+                      style={{ fontSize: "12px" }}
+                    >
                       {action.priority}
                     </span>
                   </div>
-                  
-                  <div style={{ marginBottom: '12px' }}>
-                    <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '6px', color: '#111827' }}>
+
+                  <div style={{ marginBottom: "12px" }}>
+                    <h4
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        marginBottom: "6px",
+                        color: "#111827",
+                      }}
+                    >
                       {action.title}
                     </h4>
-                    <p style={{ fontSize: '13px', color: '#6b7280', lineHeight: '1.4', margin: '0' }}>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        color: "#6b7280",
+                        lineHeight: "1.4",
+                        margin: "0",
+                      }}
+                    >
                       {action.description}
                     </p>
                   </div>
-                  
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
                     <div>
-                      <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '2px' }}>
+                      <div
+                        style={{
+                          fontSize: "11px",
+                          color: "#9ca3af",
+                          marginBottom: "2px",
+                        }}
+                      >
                         Potential Impact
                       </div>
-                      <div style={{ fontSize: '13px', fontWeight: '500', color: '#111827' }}>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: "500",
+                          color: "#111827",
+                        }}
+                      >
                         {action.impact}
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button className="btn-outline sm" type="button" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                          <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button
+                        className="btn-outline sm"
+                        type="button"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          fontSize: "12px",
+                        }}
+                      >
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <path
+                            d="M6 18L18 6M6 6l12 12"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
                         </svg>
                         Dismiss
                       </button>
-                      <button className="btn sm" type="button" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                          <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <button
+                        className="btn sm"
+                        type="button"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          fontSize: "12px",
+                        }}
+                      >
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <path
+                            d="M20 6L9 17l-5-5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                         Approve
                       </button>
@@ -613,19 +748,39 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse }) {
                 </div>
               ))}
             </div>
-            
+
             {causeIdx < causeActions.length - 1 && (
-              <div style={{ margin: '24px 0', textAlign: 'center' }}>
-                <div style={{ height: '1px', backgroundColor: '#e5e7eb', width: '100%' }}></div>
+              <div style={{ margin: "24px 0", textAlign: "center" }}>
+                <div
+                  style={{
+                    height: "1px",
+                    backgroundColor: "#e5e7eb",
+                    width: "100%",
+                  }}
+                ></div>
               </div>
             )}
           </div>
         ))}
 
-        <div style={{ marginTop: '20px', textAlign: 'center' }}>
-          <button type="button" className="btn-outline sm" style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '0 auto' }}>
+        <div style={{ marginTop: "20px", textAlign: "center" }}>
+          <button
+            type="button"
+            className="btn-outline sm"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              margin: "0 auto",
+            }}
+          >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path
+                d="M12 5v14M5 12h14"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
             Add New Action
           </button>
@@ -1205,9 +1360,9 @@ function CausesReport({ collapsed = false, onToggleCollapse }) {
               />
             </svg>
           </button>
-          <button 
-            type="button" 
-            className="icon-badge" 
+          <button
+            type="button"
+            className="icon-badge"
             title={collapsed ? "Expand" : "Collapse"}
             onClick={onToggleCollapse}
           >
@@ -1216,165 +1371,168 @@ function CausesReport({ collapsed = false, onToggleCollapse }) {
         </div>
       </div>
 
-      <div className={`report-body ${collapsed ? "collapsed" : "expanded"}`} aria-hidden={collapsed}>
+      <div
+        className={`report-body ${collapsed ? "collapsed" : "expanded"}`}
+        aria-hidden={collapsed}
+      >
         <div className="report-causes-grid">
-        <article className="report-cause">
-          <div className="report-cause-head">
-            <div className="report-cause-index">1.</div>
-            <div className="report-cause-title">
-              Rapid Increase in PM Work Orders
-            </div>
-          </div>
-          <p className="report-cause-desc">
-            Static PMs are not optimised with actual equipment condition and
-            criticality, leading to unnecessary maintenance tasks
-          </p>
-          <div className="report-mini">
-            <div className="report-mini-left">
-              <div className="report-mini-label">Trend</div>
-              <div className="report-mini-chart">
-                <ResponsiveContainer width="100%" height={84}>
-                  <BarChart
-                    data={mini1}
-                    margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
-                  >
-                    <CartesianGrid
-                      vertical={false}
-                      stroke="#eef0f4"
-                      strokeDasharray="4 4"
-                    />
-                    <XAxis
-                      dataKey="month"
-                      tickLine={false}
-                      axisLine={false}
-                      fontSize={11}
-                    />
-                    <YAxis
-                      domain={[115, 160]}
-                      ticks={[115, 160]}
-                      width={28}
-                      tickLine={false}
-                      axisLine={{ stroke: "#e5e7eb" }}
-                      fontSize={10}
-                    />
-                    <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
-                    <Bar
-                      dataKey="value"
-                      radius={[4, 4, 0, 0]}
-                      fill="#ef4444"
-                      maxBarSize={18}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+          <article className="report-cause">
+            <div className="report-cause-head">
+              <div className="report-cause-index">1.</div>
+              <div className="report-cause-title">
+                Rapid Increase in PM Work Orders
               </div>
             </div>
-            <div className="report-mini-stat">
-              <div className="report-mini-stat-val">+ 38%</div>
-              <div className="report-mini-stat-sub">in last 3 months</div>
-            </div>
-          </div>
-        </article>
-
-        <article className="report-cause">
-          <div className="report-cause-head">
-            <div className="report-cause-index">2.</div>
-            <div className="report-cause-title">
-              Increase in MTTR waiting on Permits
-            </div>
-          </div>
-          <p className="report-cause-desc">
-            Permit delays are primarily due to coordination gaps between
-            Operations and Maintenance teams on ground.
-          </p>
-          <div className="report-mini">
-            <div className="report-mini-left">
-              <div className="report-mini-label">Trend</div>
-              <div className="report-mini-chart">
-                <ResponsiveContainer width="100%" height={84}>
-                  <BarChart
-                    data={mini2}
-                    margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
-                  >
-                    <CartesianGrid
-                      vertical={false}
-                      stroke="#eef0f4"
-                      strokeDasharray="4 4"
-                    />
-                    <XAxis
-                      dataKey="month"
-                      tickLine={false}
-                      axisLine={false}
-                      fontSize={11}
-                    />
-                    <YAxis
-                      domain={[115, 160]}
-                      ticks={[115, 160]}
-                      width={28}
-                      tickLine={false}
-                      axisLine={{ stroke: "#e5e7eb" }}
-                      fontSize={10}
-                    />
-                    <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
-                    <Bar
-                      dataKey="value"
-                      radius={[4, 4, 0, 0]}
-                      fill="#ef4444"
-                      maxBarSize={18}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+            <p className="report-cause-desc">
+              Static PMs are not optimised with actual equipment condition and
+              criticality, leading to unnecessary maintenance tasks
+            </p>
+            <div className="report-mini">
+              <div className="report-mini-left">
+                <div className="report-mini-label">Trend</div>
+                <div className="report-mini-chart">
+                  <ResponsiveContainer width="100%" height={84}>
+                    <BarChart
+                      data={mini1}
+                      margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
+                    >
+                      <CartesianGrid
+                        vertical={false}
+                        stroke="#eef0f4"
+                        strokeDasharray="4 4"
+                      />
+                      <XAxis
+                        dataKey="month"
+                        tickLine={false}
+                        axisLine={false}
+                        fontSize={11}
+                      />
+                      <YAxis
+                        domain={[115, 160]}
+                        ticks={[115, 160]}
+                        width={28}
+                        tickLine={false}
+                        axisLine={{ stroke: "#e5e7eb" }}
+                        fontSize={10}
+                      />
+                      <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
+                      <Bar
+                        dataKey="value"
+                        radius={[4, 4, 0, 0]}
+                        fill="#ef4444"
+                        maxBarSize={18}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <div className="report-mini-stat">
+                <div className="report-mini-stat-val">+ 38%</div>
+                <div className="report-mini-stat-sub">in last 3 months</div>
               </div>
             </div>
-            <div className="report-mini-stat">
-              <div className="report-mini-stat-val">+ 38%</div>
-              <div className="report-mini-stat-sub">in last 3 months</div>
-            </div>
-          </div>
-        </article>
-      </div>
+          </article>
 
-      <div className="report-attrib">
-        <div className="report-attrib-title">Causes Attribution</div>
-        <div className="report-attrib-grid">
-          <div className="report-donut-wrap">
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie
-                  data={donut}
-                  dataKey="value"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={64}
-                  outerRadius={100}
-                  cornerRadius={6}
-                  paddingAngle={0}
-                >
-                  {donut.map((entry, i) => (
-                    <Cell
-                      key={entry.name}
-                      fill={donutColors[i % donutColors.length]}
-                    />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="report-donut-center">60%</div>
-            {/* <div className="report-callout">
+          <article className="report-cause">
+            <div className="report-cause-head">
+              <div className="report-cause-index">2.</div>
+              <div className="report-cause-title">
+                Increase in MTTR waiting on Permits
+              </div>
+            </div>
+            <p className="report-cause-desc">
+              Permit delays are primarily due to coordination gaps between
+              Operations and Maintenance teams on ground.
+            </p>
+            <div className="report-mini">
+              <div className="report-mini-left">
+                <div className="report-mini-label">Trend</div>
+                <div className="report-mini-chart">
+                  <ResponsiveContainer width="100%" height={84}>
+                    <BarChart
+                      data={mini2}
+                      margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
+                    >
+                      <CartesianGrid
+                        vertical={false}
+                        stroke="#eef0f4"
+                        strokeDasharray="4 4"
+                      />
+                      <XAxis
+                        dataKey="month"
+                        tickLine={false}
+                        axisLine={false}
+                        fontSize={11}
+                      />
+                      <YAxis
+                        domain={[115, 160]}
+                        ticks={[115, 160]}
+                        width={28}
+                        tickLine={false}
+                        axisLine={{ stroke: "#e5e7eb" }}
+                        fontSize={10}
+                      />
+                      <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
+                      <Bar
+                        dataKey="value"
+                        radius={[4, 4, 0, 0]}
+                        fill="#ef4444"
+                        maxBarSize={18}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <div className="report-mini-stat">
+                <div className="report-mini-stat-val">+ 38%</div>
+                <div className="report-mini-stat-sub">in last 3 months</div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div className="report-attrib">
+          <div className="report-attrib-title">Causes Attribution</div>
+          <div className="report-attrib-grid">
+            <div className="report-donut-wrap">
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie
+                    data={donut}
+                    dataKey="value"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={64}
+                    outerRadius={100}
+                    cornerRadius={6}
+                    paddingAngle={0}
+                  >
+                    {donut.map((entry, i) => (
+                      <Cell
+                        key={entry.name}
+                        fill={donutColors[i % donutColors.length]}
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="report-donut-center">60%</div>
+              {/* <div className="report-callout">
               Rapid increase in PM Work Orders
             </div> */}
-          </div>
-          <div className="report-attrib-legend">
-            <span className="legend-pill red">
-              Increase in MTTR due to waiting for Permits
-              <span className="legend-count">3</span>
-            </span>
-            <span className="legend-pill blue">
-              Rapid increase in PM Work Orders
-              <span className="legend-count">5</span>
-            </span>
+            </div>
+            <div className="report-attrib-legend">
+              <span className="legend-pill red">
+                Increase in MTTR due to waiting for Permits
+                <span className="legend-count">3</span>
+              </span>
+              <span className="legend-pill blue">
+                Rapid increase in PM Work Orders
+                <span className="legend-count">5</span>
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
         <div className="report-sources">
           <div className="sources-head">Sources go here</div>
@@ -1999,6 +2157,8 @@ export default function Action() {
   const rightFeedRef = useRef(null);
   const reportScrollRef = useRef(null);
   const [rightScrollAuto, setRightScrollAuto] = useState(false);
+  const stageEnterMsRef = useRef(performance.now());
+  const stageTimerRef = useRef(0);
   const [showActionsPanel, setShowActionsPanel] = useState(false);
   const [reportCollapsed, setReportCollapsed] = useState(false);
   const [actionsCollapsed, setActionsCollapsed] = useState(false);
@@ -2010,20 +2170,51 @@ export default function Action() {
     }
   }, [progressAtTop, rightStage]);
 
+  // Record stage entry time
   useEffect(() => {
-    if (rightStage === "collecting" && progressPct >= 50) {
-      setRightStage("references");
-    }
-  }, [rightStage, progressPct]);
+    stageEnterMsRef.current = performance.now();
+  }, [rightStage]);
 
-  // After references appear, show hypothesis shortly after
+  // Enforce minimum dwell times for stages before 100%
   useEffect(() => {
-    if (
-      (rightStage === "references" || rightStage === "collecting") &&
-      progressPct >= 85
-    ) {
-      setRightStage("hypothesis");
+    // Clear any previous scheduled transition
+    if (stageTimerRef.current) {
+      clearTimeout(stageTimerRef.current);
+      stageTimerRef.current = 0;
     }
+    const MIN_DWELL_MS = {
+      collecting: 2200,
+      references: 2200,
+      hypothesis: 2200,
+    };
+    const now = performance.now();
+    const elapsed = now - stageEnterMsRef.current;
+
+    if (rightStage === "collecting") {
+      if (progressPct >= 50) {
+        const remain = Math.max(0, MIN_DWELL_MS.collecting - elapsed);
+        stageTimerRef.current = window.setTimeout(
+          () => setRightStage("references"),
+          remain
+        );
+      }
+    } else if (rightStage === "references") {
+      if (progressPct >= 85) {
+        const remain = Math.max(0, MIN_DWELL_MS.references - elapsed);
+        stageTimerRef.current = window.setTimeout(
+          () => setRightStage("hypothesis"),
+          remain
+        );
+      }
+    } else if (rightStage === "hypothesis") {
+      // No auto-advance beyond hypothesis here; final switch happens at 100%
+    }
+    return () => {
+      if (stageTimerRef.current) {
+        clearTimeout(stageTimerRef.current);
+        stageTimerRef.current = 0;
+      }
+    };
   }, [rightStage, progressPct]);
 
   // Smooth, continuous scroll loop synced with progress percentage
@@ -2297,7 +2488,11 @@ export default function Action() {
         )}
 
         {phase === "chat" && (
-          <div className={`chat-container embedded ${showActionsPanel ? "wide" : ""}`}>
+          <div
+            className={`chat-container embedded ${
+              showActionsPanel ? "wide" : ""
+            }`}
+          >
             <div className={`chat-body-grid ${twoCol ? "two-col" : ""}`}>
               <div className={`left-pane ${twoCol ? "shift-left" : ""}`}>
                 <div className={`messages`} role="log" aria-live="polite">
@@ -2323,21 +2518,29 @@ export default function Action() {
                       <button
                         type="button"
                         className="followup-btn"
-                        onClick={() => handleFollowupClick("Validate with site data")}
+                        onClick={() =>
+                          handleFollowupClick("Validate with site data")
+                        }
                       >
                         Validate with site data →
                       </button>
                       <button
                         type="button"
                         className="followup-btn"
-                        onClick={() => handleFollowupClick("Trace 3 months of permit delays")}
+                        onClick={() =>
+                          handleFollowupClick("Trace 3 months of permit delays")
+                        }
                       >
                         Trace 3 months of permit delays →
                       </button>
                       <button
                         type="button"
                         className="followup-btn"
-                        onClick={() => handleFollowupClick("Create a 3-month cost-reduction roadmap")}
+                        onClick={() =>
+                          handleFollowupClick(
+                            "Create a 3-month cost-reduction roadmap"
+                          )
+                        }
                       >
                         Create a 3-month cost-reduction roadmap →
                       </button>
@@ -2396,10 +2599,20 @@ export default function Action() {
                       className="report-scroll panel-animate-in"
                       ref={reportScrollRef}
                     >
-                      <CausesReport collapsed={reportCollapsed} onToggleCollapse={() => setReportCollapsed(!reportCollapsed)} />
+                      <CausesReport
+                        collapsed={reportCollapsed}
+                        onToggleCollapse={() =>
+                          setReportCollapsed(!reportCollapsed)
+                        }
+                      />
                       {showActionsPanel && (
                         <div className="panel-animate-in">
-                          <RightActionsPanel collapsed={actionsCollapsed} onToggleCollapse={() => setActionsCollapsed(!actionsCollapsed)} />
+                          <RightActionsPanel
+                            collapsed={actionsCollapsed}
+                            onToggleCollapse={() =>
+                              setActionsCollapsed(!actionsCollapsed)
+                            }
+                          />
                         </div>
                       )}
                     </div>
