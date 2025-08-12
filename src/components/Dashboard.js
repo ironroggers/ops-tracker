@@ -165,7 +165,7 @@ function AlertBanner({
 function InsightPopup({ onClose, actionTo = "/action" }) {
   const navigate = useNavigate();
   const message =
-    "I can see increase in Maintenenace cost from last 3 months. Let's analyse this issue";
+    "I can see increase in Maintenance Cost from last 3 months. Let's analyse this issue";
   return (
     <Box
       position="fixed"
@@ -511,7 +511,7 @@ export default function Dashboard() {
       },
       cost: {
         usd: 48200,
-        trendPercent: 4,
+        trendPercent: 17,
         trendDirection: "up",
         spark: [30, 32, 34, 35, 36, 38, 40],
       },
