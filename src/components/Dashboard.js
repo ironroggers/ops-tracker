@@ -547,15 +547,10 @@ export default function Dashboard() {
             <option>Month</option>
             <option>Quarter</option>
           </select>
-          <Button
-            className="btn"
-            onClick={() => window.location.reload()}
-            size="sm"
-          >
-            Refresh
-          </Button>
-        </HStack> */}
-      {/* </HStack> */}
+          <button className="btn" type="button" onClick={() => window.location.reload()}>Refresh</button>
+            <Link className="btn" to="/calendar">Calendar</Link>
+        </div>
+      </section>
 
       {/* {showOpexAlert && (
         <Box className="dashboard-alerts" maxW={maxW} mx="auto" mb={4}>

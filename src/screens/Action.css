@@ -1,6 +1,9 @@
 /* Page scaffold */
 .action-page {
   min-height: 100vh;
+  height: 100vh; /* make this the scroll container */
+  overflow-y: auto; /* allow vertical scrolling inside the screen */
+  -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
 }
 
 .action-header {

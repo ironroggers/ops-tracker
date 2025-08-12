@@ -27,7 +27,7 @@
 body {
   background: linear-gradient(180deg, var(--bg-start), var(--bg-end));
   color: var(--text-primary);
-  overflow: hidden; /* prevent page scroll; let main content areas manage their own */
+  /* Remove global overflow lock; let pages manage their own scrolling */
 }
 
 /* Screen headers unify (keep each layout specifics in their own files) */

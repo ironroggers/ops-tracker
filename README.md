@@ -68,3 +68,15 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Google Calendar Integration
+
+To enable creating Google Calendar events from the Calendar screen, set the following environment variables in a `.env` file at the project root and restart `npm start`:
+
+```
+REACT_APP_GOOGLE_CLIENT_ID=your_oauth_client_id.apps.googleusercontent.com
+REACT_APP_GOOGLE_API_KEY=your_google_api_key
+```
+
+- Enable the Google Calendar API in your Google Cloud project.
+- Add `http://localhost:3000` as an authorized JavaScript origin for local development.

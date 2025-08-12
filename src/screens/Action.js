@@ -418,14 +418,11 @@ function PlanAgentLoader({ onDone }) {
   );
 }
 
-function ActionPlanCards({
-  title = "Recommended Action Plan",
-  items = [],
-  onStatusesChange,
-}) {
-  const [actions, setActions] = useState(() =>
-    items.map((text, i) => ({ id: i, text, status: "proposed" }))
-  );
+function ActionPlanCards({ title = 'Recommended Action Plan', items = [], onStatusesChange }) {
+  const [actions, setActions] = useState(() => items.map((item, i) => {
+    const obj = typeof item === 'string' ? { text: item, type: 'document' } : item;
+    return { id: i, text: obj.text, type: obj.type ?? 'document', status: 'proposed' };
+  }));
   const onStatusesChangeRef = useRef(onStatusesChange);
 
   useEffect(() => {
@@ -433,7 +430,10 @@ function ActionPlanCards({
   }, [onStatusesChange]);
 
   useEffect(() => {
-    setActions(items.map((text, i) => ({ id: i, text, status: "proposed" })));
+    setActions(items.map((item, i) => {
+      const obj = typeof item === 'string' ? { text: item, type: 'document' } : item;
+      return { id: i, text: obj.text, type: obj.type ?? 'document', status: 'proposed' };
+    }));
   }, [items]);
 
   useEffect(() => {
@@ -460,6 +460,12 @@ function ActionPlanCards({
     return map[status] ?? status;
   }
 
+  function typeChip(type) {
+    const labelMap = { meeting: 'Meeting', document: 'Document', 'wo-permit': 'WO Permit' };
+    const label = labelMap[type] ?? type;
+    return <span className="type-chip">{label}</span>;
+  }
+
   return (
     <div className="plan-card">
       <div className="plan-title">{title}</div>
@@ -474,22 +480,10 @@ function ActionPlanCards({
             </div>
             <p className="action-card-text">{a.text}</p>
             <div className="action-card-foot">
-              <button
-                className="btn sm"
-                type="button"
-                onClick={() => approve(a.id)}
-                disabled={a.status === "approved"}
-              >
-                Approve
-              </button>
-              <button
-                className="btn-outline sm"
-                type="button"
-                onClick={() => reject(a.id)}
-                disabled={a.status === "rejected"}
-              >
-                Reject
-              </button>
+              {typeChip(a.type)}
+              <div className="spacer" />
+              <button className="btn sm" type="button" onClick={() => approve(a.id)} disabled={a.status === 'approved'}>Approve</button>
+              <button className="btn-outline sm" type="button" onClick={() => reject(a.id)} disabled={a.status === 'rejected'}>Reject</button>
             </div>
           </article>
         ))}
@@ -539,17 +533,17 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
     const topic = sub?.title ?? cause.title;
     if (cause.rank === 1) {
       return [
-        `Audit PM library to eliminate non-critical tasks for ${topic}`,
-        "Risk-rank assets and adjust PM frequencies using criticality + condition data",
-        "Pilot dynamic PM intervals on low-risk equipment for 2 weeks",
-        "Set weekly review with planners to remove redundant inspections",
+        { text: `Audit PM library to eliminate non-critical tasks for ${topic}`, type: 'document' },
+        { text: 'Risk-rank assets and adjust PM frequencies using criticality + condition data', type: 'document' },
+        { text: '30-min sync between Ops, Maintenance, and EHS to review upcoming permit needs.', type: 'meeting' },
+        { text: 'Set weekly review with planners to remove redundant inspections', type: 'document' },
       ];
     }
     return [
-      `Implement early permit pre-checks specifically for ${topic}`,
-      "Introduce shift handover checklist including pending permits",
-      "Create SLA with Operations for isolation/LOTO readiness",
-      "Track MTTR by permit wait reason and publish weekly dashboard",
+      { text: `Implement early permit pre-checks specifically for ${topic}`, type: 'wo-permit' },
+      { text: 'Introduce shift handover checklist including pending permits', type: 'document' },
+      { text: 'Create SLA with Operations for isolation/LOTO readiness', type: 'wo-permit' },
+      { text: 'Track MTTR by permit wait reason and publish weekly dashboard', type: 'document' },
     ];
   }
 
@@ -836,7 +830,17 @@ export default function Action() {
 
   return (
     <div className="action-page">
-      <Header />
+      <header className="action-header">
+        <button
+          className="header-back"
+          onClick={() => navigate(-1)}
+          aria-label="Back"
+        >
+          <IconBack />
+        </button>
+        <div className="header-title">Ops Assistant</div>
+        <div className="header-spacer" />
+      </header>
       <div className="action-content">
         {phase === "input" && (
           <div className="action-card" role="region" aria-label="Assistant">
@@ -949,22 +953,5 @@ export default function Action() {
         )}
       </div>
     </div>
-  );
-}
-
-function Header() {
-  const navigate = useNavigate();
-  return (
-    <header className="action-header">
-      <button
-        className="header-back"
-        onClick={() => navigate(-1)}
-        aria-label="Back"
-      >
-        <IconBack />
-      </button>
-      <div className="header-title">Ops Assistant</div>
-      <div className="header-spacer" />
-    </header>
   );
 }
