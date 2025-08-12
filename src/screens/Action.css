@@ -88,6 +88,9 @@
   grid-template-rows: 1fr auto;
   gap: 12px;
 }
+.chat-container.embedded {
+  grid-template-rows: 1fr; /* input embedded in left pane */
+}
 .messages {
   background: #3d5afe14;
   border: 1px solid var(--card-border);
@@ -99,18 +102,28 @@
 /* Two-column layout when we have at least one reply */
 .chat-body-grid {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 1fr; /* start as single column */
   gap: 20px;
 }
-
-/* Animate the left column entering/snap left */
-.messages.slide-left {
-  animation: slideLeft 320ms ease forwards;
+.chat-body-grid.two-col {
+  grid-template-columns: 420px 1fr; /* switch to two columns after first reply */
 }
-@keyframes slideLeft {
+
+/* Left pane containing messages + input */
+.left-pane {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: 100%;
+}
+
+/* Slow, smooth slide-in for the whole left pane */
+.left-pane.shift-left {
+  animation: leftPaneIn 1100ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes leftPaneIn {
   from {
-    transform: translateX(8px);
-    opacity: 0.96;
+    transform: translateX(-22px);
+    opacity: 0;
   }
   to {
     transform: translateX(0);
@@ -350,8 +363,12 @@
   }
 }
 @keyframes shimmer {
-  0% { background-position: -468px 0; }
-  100% { background-position: 468px 0; }
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
 }
 
 /* Chart */

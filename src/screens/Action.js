@@ -154,7 +154,7 @@ function IconInnovaSmall() {
   );
 }
 
-function RightShimmerPanel() {
+function RightShimmerPanel({ showProgress = true }) {
   const [progress, setProgress] = useState(10);
   useEffect(() => {
     // Light pulse to keep it alive; caps at 35% for now
@@ -174,22 +174,50 @@ function RightShimmerPanel() {
         <div className="shimmer-line w-85" />
         <div className="shimmer-line w-60" />
       </div>
-
-      <div className="agent-progress-card">
-        <div className="agent-progress-head">
-          <div className="agent-progress-title">
-            Finding Causes for increased Maintenance Opex
+      {showProgress && (
+        <div className="agent-progress-card">
+          <div className="agent-progress-head">
+            <div className="agent-progress-title">
+              Finding Causes for increased Maintenance Opex
+            </div>
+            <div className="agent-progress-sub">Deep Analysis Agent</div>
           </div>
-          <div className="agent-progress-sub">Deep Analysis Agent</div>
+          <div className="agent-progress-track">
+            <div
+              className="agent-progress-fill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="agent-progress-percent">{progress}%</div>
         </div>
-        <div className="agent-progress-track">
-          <div
-            className="agent-progress-fill"
-            style={{ width: `${progress}%` }}
-          />
+      )}
+    </div>
+  );
+}
+
+function AgentProgress() {
+  const [progress, setProgress] = useState(10);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setProgress((p) => Math.min(35, p + Math.round(Math.random() * 3)));
+    }, 900);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="agent-progress-card" aria-live="polite">
+      <div className="agent-progress-head">
+        <div className="agent-progress-title">
+          Finding Causes for increased Maintenance Opex
         </div>
-        <div className="agent-progress-percent">{progress}%</div>
+        <div className="agent-progress-sub">Deep Analysis Agent</div>
       </div>
+      <div className="agent-progress-track">
+        <div
+          className="agent-progress-fill"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      <div className="agent-progress-percent">{progress}%</div>
     </div>
   );
 }
@@ -561,7 +589,12 @@ function ActionPlanCards({
   }
 
   function typeChip(type) {
-    const labelMap = { meeting: 'Meeting', document: 'Document', 'wo-permit': 'WO Permit', 'round-plan': 'Round Plan' };
+    const labelMap = {
+      meeting: "Meeting",
+      document: "Document",
+      "wo-permit": "WO Permit",
+      "round-plan": "Round Plan",
+    };
     const label = labelMap[type] ?? type;
     return <span className="type-chip">{label}</span>;
   }
@@ -647,19 +680,49 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
     const topic = sub?.title ?? cause.title;
     if (cause.rank === 1) {
       return [
-        { text: `Audit PM library to eliminate non-critical tasks for ${topic}`, type: 'document' },
-        { text: 'Risk-rank assets and adjust PM frequencies using criticality + condition data', type: 'document' },
-        { text: '30-min sync between Ops, Maintenance, and EHS to review upcoming permit needs.', type: 'meeting' },
-        { text: 'Set weekly review with planners to remove redundant inspections', type: 'document' },
-        { text: `Introduce an operator round plan for early anomaly detection around ${topic}`, type: 'round-plan' },
+        {
+          text: `Audit PM library to eliminate non-critical tasks for ${topic}`,
+          type: "document",
+        },
+        {
+          text: "Risk-rank assets and adjust PM frequencies using criticality + condition data",
+          type: "document",
+        },
+        {
+          text: "30-min sync between Ops, Maintenance, and EHS to review upcoming permit needs.",
+          type: "meeting",
+        },
+        {
+          text: "Set weekly review with planners to remove redundant inspections",
+          type: "document",
+        },
+        {
+          text: `Introduce an operator round plan for early anomaly detection around ${topic}`,
+          type: "round-plan",
+        },
       ];
     }
     return [
-      { text: `Implement early permit pre-checks specifically for ${topic}`, type: 'wo-permit' },
-      { text: 'Introduce shift handover checklist including pending permits', type: 'document' },
-      { text: 'Create SLA with Operations for isolation/LOTO readiness', type: 'wo-permit' },
-      { text: `Pilot a focused round plan to validate permit prerequisites during preceding shift for ${topic}`, type: 'round-plan' },
-      { text: 'Track MTTR by permit wait reason and publish weekly dashboard', type: 'document' },
+      {
+        text: `Implement early permit pre-checks specifically for ${topic}`,
+        type: "wo-permit",
+      },
+      {
+        text: "Introduce shift handover checklist including pending permits",
+        type: "document",
+      },
+      {
+        text: "Create SLA with Operations for isolation/LOTO readiness",
+        type: "wo-permit",
+      },
+      {
+        text: `Pilot a focused round plan to validate permit prerequisites during preceding shift for ${topic}`,
+        type: "round-plan",
+      },
+      {
+        text: "Track MTTR by permit wait reason and publish weekly dashboard",
+        type: "document",
+      },
     ];
   }
 
@@ -907,8 +970,10 @@ export default function Action() {
 
   const [phase, setPhase] = useState("input");
   const [messages, setMessages] = useState([]);
+  const [twoCol, setTwoCol] = useState(false);
   const [executeReady, setExecuteReady] = useState(false);
   const [approvedActions, setApprovedActions] = useState([]);
+  const hasRequestedShiftRef = useRef(false);
 
   useEffect(() => {
     setText(initialTextFromState);
@@ -959,6 +1024,14 @@ export default function Action() {
       }));
       if (assistantMessages.length) {
         setMessages((prev) => [...prev, ...assistantMessages]);
+        // After the very first assistant response renders, wait briefly,
+        // then shift to the two-column layout smoothly. Run only once.
+        if (!hasRequestedShiftRef.current) {
+          hasRequestedShiftRef.current = true;
+          requestAnimationFrame(() => {
+            setTimeout(() => setTwoCol(true), 1200);
+          });
+        }
       }
     } catch (err) {
       if (err?.name === "AbortError") return;
@@ -978,6 +1051,8 @@ export default function Action() {
     ]);
     setText("");
     setPhase("chat");
+    setTwoCol(false); // start in single column; shift after first assistant reply
+    hasRequestedShiftRef.current = false; // allow shift scheduling for this round
     // Ask assistant (backend shim)
     sendPromptToAssistant(prompt);
   }
@@ -1080,67 +1155,70 @@ export default function Action() {
         )}
 
         {phase === "chat" && (
-          <div className="chat-container">
-            <div className={`chat-body-grid`}>
-              <div className={`messages slide-left`} role="log" aria-live="polite">
-              {messages.map((m) => (
-                <div key={m.id} className={`bubble-row ${m.role}`}>
-                  {m.role === "assistant" ? (
-                    <>
-                      <span className="assistant-avatar" aria-hidden="true">
-                        <IconInnovaSmall />
-                      </span>
-                      <div className={`bubble ${m.role}`}>{m.text}</div>
-                    </>
-                  ) : (
-                    <div className={`bubble ${m.role}`}>{m.text}</div>
-                  )}
+          <div className="chat-container embedded">
+            <div className={`chat-body-grid ${twoCol ? "two-col" : ""}`}>
+              <div className={`left-pane ${twoCol ? "shift-left" : ""}`}>
+                <div className={`messages`} role="log" aria-live="polite">
+                  {messages.map((m) => (
+                    <div key={m.id} className={`bubble-row ${m.role}`}>
+                      {m.role === "assistant" ? (
+                        <>
+                          <span className="assistant-avatar" aria-hidden="true">
+                            <IconInnovaSmall />
+                          </span>
+                          <div className={`bubble ${m.role}`}>{m.text}</div>
+                        </>
+                      ) : (
+                        <div className={`bubble ${m.role}`}>{m.text}</div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
+                {twoCol && <AgentProgress />}
+                <form className="chat-input-form" onSubmit={handleSubmit}>
+                  <label className="sr-only" htmlFor="action-textarea">
+                    Type your message
+                  </label>
+                  <div className="input-row">
+                    <span className="input-plus" aria-hidden="true">
+                      📎
+                    </span>
+                    <textarea
+                      id="action-textarea"
+                      ref={textareaRef}
+                      className="action-textarea"
+                      placeholder="Type your next instruction…"
+                      rows={1}
+                      value={text}
+                      onChange={(e) => {
+                        setText(e.target.value);
+                        autoSizeTextArea(textareaRef.current);
+                      }}
+                    />
+                    <div className="action-controls">
+                      <button
+                        type="button"
+                        className="icon-button"
+                        title="Voice input"
+                        aria-label="Voice input"
+                      >
+                        <IconMic />
+                      </button>
+                      <button
+                        type="submit"
+                        className="icon-button primary"
+                        title="Send"
+                        aria-label="Send"
+                        disabled={!text.trim()}
+                      >
+                        <IconSend />
+                      </button>
+                    </div>
+                  </div>
+                </form>
               </div>
-              <RightShimmerPanel />
+              {twoCol && <RightShimmerPanel showProgress={false} />}
             </div>
-            <form className="chat-input-form" onSubmit={handleSubmit}>
-              <label className="sr-only" htmlFor="action-textarea">
-                Type your message
-              </label>
-              <div className="input-row">
-                <span className="input-plus" aria-hidden="true">
-                  📎
-                </span>
-                <textarea
-                  id="action-textarea"
-                  ref={textareaRef}
-                  className="action-textarea"
-                  placeholder="Type your next instruction…"
-                  rows={1}
-                  value={text}
-                  onChange={(e) => {
-                    setText(e.target.value);
-                    autoSizeTextArea(textareaRef.current);
-                  }}
-                />
-                <div className="action-controls">
-                  <button
-                    type="button"
-                    className="icon-button"
-                    title="Voice input"
-                    aria-label="Voice input"
-                  >
-                    <IconMic />
-                  </button>
-                  <button
-                    type="submit"
-                    className="icon-button primary"
-                    title="Send"
-                    aria-label="Send"
-                    disabled={!text.trim()}
-                  >
-                    <IconSend />
-                  </button>
-                </div>
-              </div>
-            </form>
           </div>
         )}
 
