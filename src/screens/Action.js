@@ -457,7 +457,7 @@ function RightInfoPanel() {
 }
 
 // New: Static actions chart-card (now enabled)
-function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChange }) {
+function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChange, onAnyApprove, hideDismiss }) {
   const [actionStatuses, setActionStatuses] = useState({});
 
   const causeActions = [
@@ -516,6 +516,7 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
   ];
 
   const handleApprove = (actionId) => {
+    onAnyApprove?.();
     setActionStatuses(prev => ({
       ...prev,
       [actionId]: 'approved'
@@ -684,14 +685,15 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
                         </td>
                         <td className="col cta" role="cell">
                           <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                            {!hideDismiss && (
                             <button
                               className="btn-outline sm"
                               type="button"
                               onClick={() => handleDismiss(action.id)}
                               disabled={isApproved}
                               style={{
-                                background: '#EFF1F5',
-                                color: '#525560',
+                                background: isApproved ? '#f9f9f9' : '#EFF1F5',
+                                color: isApproved ? '#9ca3af' : '#525560',
                                 border: '1px solid #e5e7eb',
                                 borderRadius: '8px',
                                 // padding: '10px 14px',
@@ -699,12 +701,14 @@ function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChang
                                 fontWeight: '500',
                                 width: '85px',
                                 height: '40px',
-                                cursor: 'pointer',
-                                transition: 'background 160ms ease, border-color 160ms ease, transform 80ms ease'
+                                cursor: isApproved ? 'not-allowed' : 'pointer',
+                                opacity: isApproved ? 0.5 : 1,
+                                transition: 'background 160ms ease, border-color 160ms ease, transform 80ms ease, opacity 160ms ease'
                               }}
                             >
                               Dismiss
                             </button>
+                            )}
                             <button
                               className="btn sm"
                               type="button"
@@ -1729,7 +1733,7 @@ function ActionPlanCards({
   );
 }
 
-function CausesList({ onTakeAction, onPlansUpdate, onAddMessage }) {
+function CausesList({ onTakeAction, onPlansUpdate, onAddMessage, onAnyApprove }) {
   const causes = [
     {
       rank: 1,
@@ -1930,8 +1934,11 @@ function CausesList({ onTakeAction, onPlansUpdate, onAddMessage }) {
         onPlansUpdate?.({ allResolved, approved });
         return next;
       });
+      if (actions?.some?.((a) => a.status === "approved")) {
+        onAnyApprove?.();
+      }
     },
-    [onPlansUpdate]
+    [onPlansUpdate, onAnyApprove]
   );
 
   return (
@@ -2177,7 +2184,7 @@ function ChatMessage({ message, onTypedDone, onMessageClick }) {
 }
 
 // Action Execution Panel
-function ActionExecutionPanel({ collapsed = false, onToggleCollapse, approvedActions = [], executeAllSignal = 0, executeOneRequest = null }) {
+function ActionExecutionPanel({ collapsed = false, onToggleCollapse, approvedActions = [], executeAllSignal = 0, executeOneRequest = null, onAddMessage, onActionComplete }) {
   const [executedActions, setExecutedActions] = useState(new Set());
   const [executingActions, setExecutingActions] = useState(new Set());
   const [executionTimelines, setExecutionTimelines] = useState({});
@@ -2310,7 +2317,6 @@ function ActionExecutionPanel({ collapsed = false, onToggleCollapse, approvedAct
     if (s === 'meeting') return 'meeting';
     if (s === 'wo-permit' || s === 'wo permit' || s === 'permit' || s === 'wo' || s === 'wo_permit' || s === 'wopermit') return 'wo-permit';
     if (s === 'round-plan' || s === 'round plan' || s === 'roundplan' || s === 'round_plan') return 'round-plan';
-    if (s === 'document' || s === 'documents' || s === 'doc') return 'document';
     return 'document';
   };
 
@@ -2360,13 +2366,7 @@ function ActionExecutionPanel({ collapsed = false, onToggleCollapse, approvedAct
           delete next[actionId];
           return next;
         });
-    setExecutedActions(prev => new Set([...prev, actionId]));
-        executedActionsRef.current = new Set([...executedActionsRef.current, actionId]);
-        setExecutingActions(prev => {
-          const next = new Set(prev);
-          next.delete(actionId);
-          return next;
-        });
+        completeAction(actionId);
         setExecutionInfo(prev => ({
           ...prev,
           [actionId]: 'Document generated and ready for download.'
@@ -2422,13 +2422,7 @@ function ActionExecutionPanel({ collapsed = false, onToggleCollapse, approvedAct
 
       if (resp.status === 200 || resp.status === 201) {
         // Meeting creation successful
-        setExecutedActions(prev => new Set([...prev, actionId]));
-        executedActionsRef.current = new Set([...executedActionsRef.current, actionId]);
-        setExecutingActions(prev => {
-          const next = new Set(prev);
-          next.delete(actionId);
-          return next;
-        });
+        completeAction(actionId);
         setExecutionInfo(prev => ({
           ...prev,
           [actionId]: 'Meeting scheduled and invites sent successfully.'
@@ -2661,10 +2655,21 @@ function ActionExecutionPanel({ collapsed = false, onToggleCollapse, approvedAct
     }
 
     const actionType = normalizeType(action.type || 'document');
+    const actionTitle = action.title || action.description;
+
+    // Add chat message when action starts executing
+    if (onAddMessage) {
+      onAddMessage({
+        id: Date.now(),
+        role: "assistant",
+        text: `Executing ${actionTitle}`,
+        animated: true
+      });
+    }
 
     setExecutingActions(prev => new Set([...prev, action.id]));
 
-    startThinking(action.id, action.title || action.description);
+    startThinking(action.id, actionTitle);
 
     setTimeout(() => {
       if (!executedActions.has(action.id)) {
@@ -2831,6 +2836,23 @@ function ActionExecutionPanel({ collapsed = false, onToggleCollapse, approvedAct
     failedActionsRef.current = failedActions;
   }, [failedActions]);
 
+  const renderStatusPill = (isExecuted, isExecuting) => {
+    if (isExecuted) return <span className="status-pill approved">Executed</span>;
+    if (isExecuting) return <span className="status-pill proposed">Executing</span>;
+    return <span className="status-pill proposed">Ready</span>;
+  };
+
+  const completeAction = (actionId) => {
+    setExecutedActions(prev => new Set([...prev, actionId]));
+    executedActionsRef.current = new Set([...executedActionsRef.current, actionId]);
+    onActionComplete?.(actionId);
+    setExecutingActions(prev => {
+      const next = new Set(prev);
+      next.delete(actionId);
+      return next;
+    });
+  };
+
   return (
     <section className="report-card" aria-label="Action Execution Report">
       <div className="report-head">
@@ -2890,407 +2912,312 @@ function ActionExecutionPanel({ collapsed = false, onToggleCollapse, approvedAct
             <div style={{ fontSize: '14px' }}>Approve actions from the Project Plan to see them here</div>
           </div>
         ) : (
-          <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: '1fr' }}>
-            {approvedActions.map((action) => {
+          <div className="table-wrapper">
+            <table className="actions-table" role="table" aria-label="Execution actions list">
+              <thead>
+                <tr role="row" className="actions-row header">
+                  <th className="col priority" role="columnheader">Priority</th>
+                  <th className="col action" role="columnheader">Action</th>
+                  <th className="col impact" role="columnheader">Impact</th>
+                  <th className="col cta" role="columnheader">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {approvedActions.map((action) => {
                   const isExecuted = executedActions.has(action.id);
-              const isExecuting = executingActions.has(action.id);
-              const thinkingState = thinkingStates[action.id];
-              const timeline = executionTimelines[action.id];
-              const info = executionInfo[action.id];
-              const actionType = normalizeType(action.type || 'document');
-              const isDocExpanded = expandedDocs[action.id];
-              const aiGenState = aiGenStates[action.id];
+                  const isExecuting = executingActions.has(action.id);
+                  const thinkingState = thinkingStates[action.id];
+                  const timeline = executionTimelines[action.id];
+                  const info = executionInfo[action.id];
+                  const actionType = normalizeType(action.type || 'document');
+                  const isDocExpanded = expandedDocs[action.id];
+                  const aiGenState = aiGenStates[action.id];
 
                   return (
-                <div key={action.id} style={{
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                  transition: 'all 0.2s ease',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                  {/* Header */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    marginBottom: '16px'
-                  }}>
-                    <div>
-                      <div style={{
-                        fontSize: '18px',
-                        fontWeight: '600',
-                        color: '#111827',
-                        marginBottom: '4px'
-                      }}>
-                        {action.title}
-                      </div>
-                      <div style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        backgroundColor: '#f8fafc',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '8px',
-                        padding: '4px 12px',
-                        fontSize: '13px',
-                        fontWeight: '500',
-                        color: '#475569'
-                      }}>
-                        {getTypeIcon(actionType)}
-                        {getTypeLabel(actionType)}
-                      </div>
-                    </div>
-                    <div style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      backgroundColor: isExecuted ? '#d1fae5' : isExecuting ? '#dbeafe' : '#f0fdf4',
-                      border: `1px solid ${isExecuted ? '#10b981' : isExecuting ? '#3b82f6' : '#22c55e'}`,
-                      borderRadius: '20px',
-                      padding: '6px 16px',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      color: isExecuted ? '#047857' : isExecuting ? '#1e40af' : '#22c55e'
-                    }}>
-                        {isExecuted ? (
-                        <>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}>
-                            <path d="M20 6L9 17l-5-5"/>
-                            </svg>
-                              Executed
-                        </>
-                      ) : isExecuting ? (
-                        <>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', animation: 'spin 1s linear infinite' }}>
-                            <path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.364-6.364l-2.828 2.828M9.464 14.536l-2.828 2.828M20.364 18.364l-2.828-2.828M9.464 9.464l-2.828-2.828"/>
-                          </svg>
-                          Executing
-                        </>
-                      ) : (
-                        <>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '4px' }}>
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M16.5 9.5l-5.25 5.25L7.5 11"/>
-                            </svg>
-                              Ready
-                        </>
-                      )}
-                        </div>
-                        </div>
+                    <React.Fragment key={action.id}>
+                      <tr role="row" className="actions-row">
+                        <td className="col priority" role="cell">
+                          <span className={`${((action.priority||'').toLowerCase()==='high')?'chip-high':((action.priority||'').toLowerCase()==='low')?'chip-low':'chip-med'}`}>{action.priority}</span>
+                        </td>
+                        <td className="col action" role="cell">
+                          <div className="action-main" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span className="type-chip" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                              {getTypeIcon(actionType)} {getTypeLabel(actionType)}
+                            </span>
+                            {action.title}
+                          </div>
+                          <div className="action-sub">{action.description}</div>
+                        </td>
+                        <td className="col impact" role="cell">
+                          <span>{action.impact}</span>
+                        </td>
+                        <td className="col cta" role="cell">
+                          {renderStatusPill(isExecuted, isExecuting)}
+                        </td>
+                      </tr>
 
-                  {/* Description */}
-                  <p style={{
-                    color: '#374151',
-                    fontSize: '15px',
-                    lineHeight: '1.6',
-                    margin: '0 0 20px',
-                    fontWeight: '400'
-                  }}>
-                    {action.description}
-                  </p>
+                      {(thinkingState?.isThinking || (actionType === 'meeting' && timeline && !timeline.completed) || ((actionType === 'wo-permit' || actionType === 'round-plan') && timeline && !timeline.completed) || (actionType === 'document' && isDocExpanded) || info) && (
+                        <tr>
+                          <td colSpan={4} style={{ background: '#fafafa' }}>
+                            <div style={{ padding: '12px 16px', display: 'grid', gap: 12 }}>
+                              {thinkingState?.isThinking && (
+                                <div style={{
+                                  background: '#f0f9ff',
+                                  border: '1px solid #bae6fd',
+                                  borderRadius: '12px',
+                                  padding: '16px'
+                                }}>
+                                  <div style={{
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    color: '#0369a1',
+                                    marginBottom: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px'
+                                  }}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ animation: 'pulse 2s infinite' }}>
+                                      <path d="M12 2l3.09 6.26L22 9l-5.91 3.74L17.45 19 12 16.27 6.55 19l1.36-6.26L2 9l6.91-.74L12 2z"/>
+                                    </svg>
+                                    AI Planning Execution
+                                  </div>
+                                  <p style={{
+                                    fontStyle: 'italic',
+                                    whiteSpace: 'pre-wrap',
+                                    margin: 0,
+                                    color: '#0c4a6e',
+                                    fontSize: '13px',
+                                    lineHeight: '1.5'
+                                  }}>
+                                    {thinkingState.thoughtVisible}
+                                    <span style={{ opacity: thinkingState.blinkOn ? 1 : 0 }}>|</span>
+                                  </p>
+                                </div>
+                              )}
 
-                  {/* Priority and Impact */}
-                  <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                    <span className={action.priority === "High" ? "chip-high" : "chip-med"} style={{ fontSize: '12px', padding: '4px 8px' }}>
-                      {action.priority} Priority
-                    </span>
-                    <span style={{ fontSize: '12px', padding: '4px 8px', backgroundColor: '#f3f4f6', color: '#374151', borderRadius: '6px' }}>
-                          {action.impact}
-                    </span>
-                        </div>
+                              {/* Meeting timeline */}
+                              {actionType === 'meeting' && timeline && !timeline.completed && (
+                                <div style={{
+                                  background: '#f8fafc',
+                                  border: '1px solid #e2e8f0',
+                                  borderRadius: '12px',
+                                  padding: '16px'
+                                }}>
+                                  <div style={{
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    color: '#374151',
+                                    marginBottom: '12px'
+                                  }}>
+                                    Creating Calendar Event
+                                  </div>
+                                  <div style={{ display: 'grid', gap: '8px' }}>
+                                    {timeline.steps.map((label, stepIdx) => {
+                                      const isDone = timeline.current > stepIdx;
+                                      const isCurrent = timeline.current === stepIdx;
+                                      return (
+                                        <div key={stepIdx} style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '12px'
+                                        }}>
+                                          <div style={{
+                                            width: '12px',
+                                            height: '12px',
+                                            borderRadius: '50%',
+                                            background: isDone ? '#10b981' : isCurrent ? '#3b82f6' : '#d1d5db',
+                                            boxShadow: isCurrent ? '0 0 0 4px rgba(59, 130, 246, 0.15)' : 'none',
+                                            transition: 'all 0.3s ease'
+                                          }} />
+                                          <span style={{
+                                            fontSize: '13px',
+                                            color: isDone || isCurrent ? '#374151' : '#9ca3af',
+                                            fontWeight: isCurrent ? '600' : '400'
+                                          }}>
+                                            {label}
+                                          </span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
 
-                  {/* Execute Button */}
-                  <div style={{ marginBottom: '16px' }}>
-                    {!isExecuted && !isExecuting ? (
-                          <button
-                        style={{
-                          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                          color: '#ffffff',
-                          border: 'none',
-                          borderRadius: '12px',
-                          padding: '12px 24px',
-                          fontSize: '14px',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '8px'
-                        }}
-                        onClick={() => handleExecuteAction(action)}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M8 5v14l11-7z"/>
-                        </svg>
-                            Execute
-                          </button>
-                        ) : (
-                      <div style={{ fontSize: '14px', color: '#6b7280', fontStyle: 'italic' }}>
-                        {isExecuting ? 'Execution in progress...' : 'Execution completed'}
-                      </div>
-                    )}
-                  </div>
+                              {/* WO-PERMIT / Round-plan timeline */}
+                              {(actionType === 'wo-permit' || actionType === 'round-plan') && timeline && !timeline.completed && (
+                                <div style={{
+                                  background: '#f8fafc',
+                                  border: '1px solid #e2e8f0',
+                                  borderRadius: '12px',
+                                  padding: '16px',
+                                  textAlign: 'center'
+                                }}>
+                                  {!woGifLoaded && (
+                                    <div style={{
+                                      width: '100%',
+                                      height: '200px',
+                                      background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%)',
+                                      backgroundSize: '400% 100%',
+                                      animation: 'shimmer 1.2s ease-in-out infinite',
+                                      borderRadius: '8px',
+                                      marginBottom: '16px'
+                                    }} />
+                                  )}
+                                  <img
+                                    src={WoPermitGif}
+                                    alt={actionType === 'wo-permit' ? "Authoring permit forms" : "Creating round plan"}
+                                    style={{
+                                      width: '100%',
+                                      maxWidth: '320px',
+                                      borderRadius: '8px',
+                                      display: woGifLoaded ? 'block' : 'none',
+                                      margin: '0 auto 16px'
+                                    }}
+                                    onLoad={() => setWoGifLoaded(true)}
+                                  />
+                                  <div style={{ display: 'grid', gap: '8px' }}>
+                                    {timeline.steps.map((label, stepIdx) => {
+                                      const isCurrent = timeline.current === stepIdx;
+                                      const isDone = timeline.current > stepIdx;
+                                      return (
+                                        <div key={stepIdx} style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '12px',
+                                          justifyContent: 'center'
+                                        }}>
+                                          <div style={{
+                                            width: '10px',
+                                            height: '10px',
+                                            borderRadius: '50%',
+                                            background: isDone ? '#10b981' : isCurrent ? '#3b82f6' : '#d1d5db',
+                                            boxShadow: isCurrent ? '0 0 0 4px rgba(59, 130, 246, 0.15)' : 'none'
+                                          }} />
+                                          <span style={{
+                                            fontSize: '13px',
+                                            color: isDone || isCurrent ? '#374151' : '#9ca3af',
+                                            fontWeight: isCurrent ? '600' : '400'
+                                          }}>
+                                            {label}
+                                          </span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
 
-                  {/* AI Thinking State */}
-                  {thinkingState?.isThinking && (
-                    <div style={{
-                      background: '#f0f9ff',
-                      border: '1px solid #bae6fd',
-                      borderRadius: '12px',
-                      padding: '16px',
-                      marginBottom: '16px'
-                    }}>
-                      <div style={{
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#0369a1',
-                        marginBottom: '8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ animation: 'pulse 2s infinite' }}>
-                          <path d="M12 2l3.09 6.26L22 9l-5.91 3.74L17.45 19 12 16.27 6.55 19l1.36-6.26L2 9l6.91-.74L12 2z"/>
-                        </svg>
-                        AI Planning Execution
-                      </div>
-                      <p style={{
-                        fontStyle: 'italic',
-                        whiteSpace: 'pre-wrap',
-                        margin: '0',
-                        color: '#0c4a6e',
-                        fontSize: '13px',
-                        lineHeight: '1.5'
-                      }}>
-                        {thinkingState.thoughtVisible}
-                        <span style={{ opacity: thinkingState.blinkOn ? 1 : 0 }}>|</span>
-                      </p>
-                    </div>
-                  )}
+                              {/* Document editor */}
+                              {actionType === 'document' && isDocExpanded && (
+                                <div style={{
+                                  background: '#f9fafb',
+                                  border: '1px solid #e5e7eb',
+                                  borderRadius: '12px',
+                                  padding: '20px'
+                                }}>
+                                  <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginBottom: '16px'
+                                  }}>
+                                    <div style={{
+                                      fontSize: '14px',
+                                      fontWeight: '600',
+                                      color: '#374151',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px'
+                                    }}>
+                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14,2 14,8 20,8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <polyline points="10,9 9,9 8,9"/>
+                                      </svg>
+                                      {aiGenState?.isGenerating ? 'AI is writing document...' : 'Document Editor'}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                      <button
+                                        style={{
+                                          background: '#ffffff',
+                                          border: '1px solid #d1d5db',
+                                          borderRadius: '8px',
+                                          padding: '6px 12px',
+                                          fontSize: '12px',
+                                          fontWeight: '500',
+                                          color: '#374151',
+                                          cursor: 'pointer'
+                                        }}
+                                        onClick={() => handleDownloadDoc(action.id)}
+                                      >
+                                        Download
+                                      </button>
+                                      <button
+                                        style={{
+                                          background: '#3b82f6',
+                                          border: 'none',
+                                          borderRadius: '8px',
+                                          padding: '6px 12px',
+                                          fontSize: '12px',
+                                          fontWeight: '500',
+                                          color: '#ffffff',
+                                          cursor: 'pointer'
+                                        }}
+                                        onClick={() => handleEmailDoc(action.id)}
+                                      >
+                                        Email
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <textarea
+                                    value={docContents[action.id] || ''}
+                                    onChange={(e) => handleDocChange(action.id, e.target.value)}
+                                    placeholder="Document content will appear here..."
+                                    style={{
+                                      width: '100%',
+                                      minHeight: '300px',
+                                      background: '#ffffff',
+                                      color: '#1f2937',
+                                      border: '1px solid #d1d5db',
+                                      borderRadius: '8px',
+                                      padding: '16px',
+                                      fontSize: '14px',
+                                      lineHeight: '1.6',
+                                      fontFamily: "Georgia, 'Times New Roman', Times, serif",
+                                      resize: 'vertical',
+                                      outline: 'none',
+                                      boxSizing: 'border-box'
+                                    }}
+                                    readOnly={aiGenState?.isGenerating}
+                                  />
+                                </div>
+                              )}
 
-                  {/* Meeting timeline */}
-                  {actionType === 'meeting' && timeline && !timeline.completed && (
-                    <div style={{
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '12px',
-                      padding: '16px',
-                      marginBottom: '16px'
-                    }}>
-                      <div style={{
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#374151',
-                        marginBottom: '12px'
-                      }}>
-                        Creating Calendar Event
-                      </div>
-                      <div style={{ display: 'grid', gap: '8px' }}>
-                        {timeline.steps.map((label, stepIdx) => {
-                          const isDone = timeline.current > stepIdx;
-                          const isCurrent = timeline.current === stepIdx;
-                          return (
-                            <div key={stepIdx} style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '12px'
-                            }}>
-                              <div style={{
-                                width: '12px',
-                                height: '12px',
-                                borderRadius: '50%',
-                                background: isDone ? '#10b981' : isCurrent ? '#3b82f6' : '#d1d5db',
-                                boxShadow: isCurrent ? '0 0 0 4px rgba(59, 130, 246, 0.15)' : 'none',
-                                transition: 'all 0.3s ease'
-                              }} />
-                              <span style={{
-                                fontSize: '13px',
-                                color: isDone || isCurrent ? '#374151' : '#9ca3af',
-                                fontWeight: isCurrent ? '600' : '400'
-                              }}>
-                                {label}
-                          </span>
+                              {/* Execution Info */}
+                              {info && (
+                                <div style={{
+                                  background: '#d1fae5',
+                                  border: '1px solid #10b981',
+                                  borderRadius: '8px',
+                                  padding: '12px',
+                                  fontSize: '13px',
+                                  color: '#047857',
+                                  fontWeight: '500'
+                                }}>
+                                  ✓ {info}
+                                </div>
+                              )}
                             </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* WO-PERMIT GIF loader */}
-                  {(actionType === 'wo-permit' || actionType === 'round-plan') && timeline && !timeline.completed && (
-                    <div style={{
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '12px',
-                      padding: '16px',
-                      marginBottom: '16px',
-                      textAlign: 'center'
-                    }}>
-                      {!woGifLoaded && (
-                        <div style={{
-                          width: '100%',
-                          height: '200px',
-                          background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%)',
-                          backgroundSize: '400% 100%',
-                          animation: 'shimmer 1.2s ease-in-out infinite',
-                          borderRadius: '8px',
-                          marginBottom: '16px'
-                        }} />
+                          </td>
+                        </tr>
                       )}
-                      <img
-                        src={WoPermitGif}
-                        alt={actionType === 'wo-permit' ? "Authoring permit forms" : "Creating round plan"}
-                        style={{
-                          width: '100%',
-                          maxWidth: '320px',
-                          borderRadius: '8px',
-                          display: woGifLoaded ? 'block' : 'none',
-                          margin: '0 auto 16px'
-                        }}
-                        onLoad={() => setWoGifLoaded(true)}
-                      />
-                      <div style={{ display: 'grid', gap: '8px' }}>
-                        {timeline.steps.map((label, stepIdx) => {
-                          const isCurrent = timeline.current === stepIdx;
-                          const isDone = timeline.current > stepIdx;
-                          return (
-                            <div key={stepIdx} style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '12px',
-                              justifyContent: 'center'
-                            }}>
-                              <div style={{
-                                width: '10px',
-                                height: '10px',
-                                borderRadius: '50%',
-                                background: isDone ? '#10b981' : isCurrent ? '#3b82f6' : '#d1d5db',
-                                boxShadow: isCurrent ? '0 0 0 4px rgba(59, 130, 246, 0.15)' : 'none'
-                              }} />
-                              <span style={{
-                                fontSize: '13px',
-                                color: isDone || isCurrent ? '#374151' : '#9ca3af',
-                                fontWeight: isCurrent ? '600' : '400'
-                              }}>
-                                {label}
-                              </span>
-                            </div>
+                    </React.Fragment>
                   );
                 })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Document editor */}
-                  {actionType === 'document' && isDocExpanded && (
-                    <div style={{
-                      background: '#f9fafb',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '12px',
-                      padding: '20px',
-                      marginBottom: '16px'
-                    }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginBottom: '16px'
-                      }}>
-                        <div style={{
-                          fontSize: '14px',
-                          fontWeight: '600',
-                          color: '#374151',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px'
-                        }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14,2 14,8 20,8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10,9 9,9 8,9"/>
-                          </svg>
-                          {aiGenState?.isGenerating ? 'AI is writing document...' : 'Document Editor'}
-                        </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <button
-                            style={{
-                              background: '#ffffff',
-                              border: '1px solid #d1d5db',
-                              borderRadius: '8px',
-                              padding: '6px 12px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              color: '#374151',
-                              cursor: 'pointer'
-                            }}
-                            onClick={() => handleDownloadDoc(action.id)}
-                          >
-                            Download
-                          </button>
-                          <button
-                            style={{
-                              background: '#3b82f6',
-                              border: 'none',
-                              borderRadius: '8px',
-                              padding: '6px 12px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              color: '#ffffff',
-                              cursor: 'pointer'
-                            }}
-                            onClick={() => handleEmailDoc(action.id)}
-                          >
-                            Email
-                          </button>
-                        </div>
-                      </div>
-                      <textarea
-                        value={docContents[action.id] || ''}
-                        onChange={(e) => handleDocChange(action.id, e.target.value)}
-                        placeholder="Document content will appear here..."
-                        style={{
-                          width: '100%',
-                          minHeight: '300px',
-                          background: '#ffffff',
-                          color: '#1f2937',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '8px',
-                          padding: '16px',
-                          fontSize: '14px',
-                          lineHeight: '1.6',
-                          fontFamily: "Georgia, 'Times New Roman', Times, serif",
-                          resize: 'vertical',
-                          outline: 'none',
-                          boxSizing: 'border-box'
-                        }}
-                        readOnly={aiGenState?.isGenerating}
-                      />
-                    </div>
-                  )}
-
-                  {/* Execution Info */}
-                  {info && (
-                    <div style={{
-                      background: '#d1fae5',
-                      border: '1px solid #10b981',
-                      borderRadius: '8px',
-                      padding: '12px',
-                      fontSize: '13px',
-                      color: '#047857',
-                      fontWeight: '500'
-                    }}>
-                      ✓ {info}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
@@ -3332,6 +3259,8 @@ export default function Action() {
   const [showAgentProgress, setShowAgentProgress] = useState(true);
   const [assistantCompleted, setAssistantCompleted] = useState(false);
   const [dismissedFollowups, setDismissedFollowups] = useState(new Set());
+  const [followupsVisible, setFollowupsVisible] = useState(true);
+  const [hideDismissButtons, setHideDismissButtons] = useState(false);
 
   // Stage transitions for right pane
   useEffect(() => {
@@ -3572,6 +3501,8 @@ export default function Action() {
     setShowAgentProgress(true); // show progress again for new round
     setAssistantCompleted(false); // reset wide state until assistant finishes
     setDismissedFollowups(new Set()); // reset follow-ups visibility for new round
+    setFollowupsVisible(true); // show follow-ups for new round
+    setHideDismissButtons(false); // reset dismiss visibility
     // Ask assistant (backend shim)
     sendPromptToAssistant(prompt);
   }
@@ -3660,6 +3591,17 @@ export default function Action() {
   }
 
   function handleExecuteOneApproved(actionId) {
+    // Find the action to get its title
+    const action = approvedActions.find(a => a.id === actionId);
+    const actionTitle = action?.title || action?.description || 'Action';
+    
+    // Add user message first
+    handleAddMessage({
+      id: Date.now(),
+      role: "user",
+      text: actionTitle
+    });
+    
     setShowExecutionFromMessage(true);
     setExecuteOneSignal((prev) => ({ actionId, tick: (prev?.tick || 0) + 1 }));
     setTimeout(() => {
@@ -3685,6 +3627,17 @@ export default function Action() {
       return () => clearTimeout(t);
     }
   }, [assistantCompleted, showActionsPanel]);
+
+  function handleAnyActionApprove() {
+    setFollowupsVisible(false);
+    // Remove the line that hides all dismiss buttons globally
+    // Individual dismiss buttons are already disabled per action via isApproved state
+  }
+
+  function handleActionComplete(actionId) {
+    // Remove the completed action from approvedActions (left checklist)
+    setApprovedActions(prev => prev.filter(action => action.id !== actionId));
+  }
 
   return (
     <div className="action-overlay">
@@ -3792,7 +3745,7 @@ export default function Action() {
                     </div>
                   )
                 )}
-                {twoCol && progressPct >= 100 && (
+                {twoCol && progressPct >= 100 && followupsVisible && (
                   <div className="followups-card">
                     <div className="followups-title">Suggested Follow-ups</div>
                     <div className="followup-list">
@@ -3917,6 +3870,8 @@ export default function Action() {
                               collapsed={actionsCollapsed}
                               onToggleCollapse={() => setActionsCollapsed(!actionsCollapsed)}
                               onActionsChange={setApprovedActions}
+                              onAnyApprove={handleAnyActionApprove}
+                              hideDismiss={hideDismissButtons}
                             />
                           ) : (
                             <RightShimmerPanel showProgress={false} />
@@ -3931,6 +3886,8 @@ export default function Action() {
                             approvedActions={approvedActions}
                             executeAllSignal={executeAllSignal}
                             executeOneRequest={executeOneSignal}
+                            onAddMessage={handleAddMessage}
+                            onActionComplete={handleActionComplete}
                           />
                         </div>
                       )}
@@ -4006,6 +3963,7 @@ export default function Action() {
               onTakeAction={handleTakeActionCause}
               onPlansUpdate={handlePlansUpdate}
               onAddMessage={handleAddMessage}
+              onAnyApprove={handleAnyActionApprove}
             />
             <div className="results-actions">
               {executeReady && (
