@@ -95,6 +95,86 @@
   padding: 16px;
   overflow-y: auto;
 }
+
+/* Two-column layout when we have at least one reply */
+.chat-body-grid {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 20px;
+}
+
+/* Animate the left column entering/snap left */
+.messages.slide-left {
+  animation: slideLeft 320ms ease forwards;
+}
+@keyframes slideLeft {
+  from {
+    transform: translateX(8px);
+    opacity: 0.96;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Right shimmer panel */
+.right-panel {
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 16px;
+  background: var(--card-bg);
+  align-self: start;
+}
+.right-title {
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+.skeleton-stack {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.agent-progress-card {
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 12px;
+  background: #ffffff;
+}
+.agent-progress-head {
+  margin-bottom: 8px;
+}
+.agent-progress-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.agent-progress-sub {
+  font-size: 12px;
+  color: #6b7280;
+}
+.agent-progress-track {
+  position: relative;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.agent-progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: linear-gradient(90deg, #60a5fa, #2563eb);
+  transition: width 500ms ease;
+}
+.agent-progress-percent {
+  text-align: right;
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
 .bubble-row {
   display: flex;
   margin: 8px 0;
@@ -115,6 +195,7 @@
   background: #ffffff;
   border: 1px solid var(--card-border);
 }
+.assistant-avatar svg,
 .assistant-avatar img {
   width: 100%;
   height: 100%;

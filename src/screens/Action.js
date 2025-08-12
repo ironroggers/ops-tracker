@@ -121,6 +121,79 @@ function IconTrend() {
   );
 }
 
+function IconInnovaSmall() {
+  return (
+    <svg
+      className="innova-small-img"
+      viewBox="0 0 45 32"
+      preserveAspectRatio="xMinYMid meet"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        fill="#05366d"
+        style={{ fill: "var(--color1, #05366d)" }}
+        d="M4.571 9.546l17.729-9.576 17.42 9.406-4.232 2.298-13.192-7.299-17.725 9.406v-4.234z"
+      />
+      <path
+        fill="#05366d"
+        style={{ fill: "var(--color1, #05366d)" }}
+        d="M4.571 17.069l17.729-9.56 10.334 5.707-4.042 2.182-6.296-3.48-17.725 9.402v-4.251z"
+      />
+      <path
+        fill="#05366d"
+        style={{ fill: "var(--color1, #05366d)" }}
+        d="M39.721 22.619l-17.42 9.381-17.729-9.369 4.462-2.368 13.267 7.42 17.42-9.224v4.16z"
+      />
+      <path
+        fill="#5db6e6"
+        style={{ fill: "var(--color2, #5db6e6)" }}
+        d="M39.72 15.103l-17.438 9.522-10.493-5.823 4.073-2.161 6.432 3.579 17.424-9.406v4.288z"
+      />
+    </svg>
+  );
+}
+
+function RightShimmerPanel() {
+  const [progress, setProgress] = useState(10);
+  useEffect(() => {
+    // Light pulse to keep it alive; caps at 35% for now
+    const id = setInterval(() => {
+      setProgress((p) => Math.min(35, p + Math.round(Math.random() * 3)));
+    }, 900);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="right-panel" aria-live="polite" aria-busy="true">
+      <div className="right-title">Causes for increased Maintenance Opex</div>
+      <div className="skeleton-stack">
+        <div className="shimmer-line w-90" />
+        <div className="shimmer-line w-80" />
+        <div className="shimmer-line w-70" />
+        <div className="shimmer-line w-85" />
+        <div className="shimmer-line w-60" />
+      </div>
+
+      <div className="agent-progress-card">
+        <div className="agent-progress-head">
+          <div className="agent-progress-title">
+            Finding Causes for increased Maintenance Opex
+          </div>
+          <div className="agent-progress-sub">Deep Analysis Agent</div>
+        </div>
+        <div className="agent-progress-track">
+          <div
+            className="agent-progress-fill"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="agent-progress-percent">{progress}%</div>
+      </div>
+    </div>
+  );
+}
+
 function useAnimatedProgress(durationMs, isActive, onDone) {
   const [progress, setProgress] = useState(0);
   useEffect(() => {
@@ -1008,13 +1081,14 @@ export default function Action() {
 
         {phase === "chat" && (
           <div className="chat-container">
-            <div className="messages" role="log" aria-live="polite">
+            <div className={`chat-body-grid`}>
+              <div className={`messages slide-left`} role="log" aria-live="polite">
               {messages.map((m) => (
                 <div key={m.id} className={`bubble-row ${m.role}`}>
                   {m.role === "assistant" ? (
                     <>
                       <span className="assistant-avatar" aria-hidden="true">
-                        <img src="/inn_logo.svg" alt="" />
+                        <IconInnovaSmall />
                       </span>
                       <div className={`bubble ${m.role}`}>{m.text}</div>
                     </>
@@ -1023,6 +1097,8 @@ export default function Action() {
                   )}
                 </div>
               ))}
+              </div>
+              <RightShimmerPanel />
             </div>
             <form className="chat-input-form" onSubmit={handleSubmit}>
               <label className="sr-only" htmlFor="action-textarea">
