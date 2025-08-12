@@ -165,7 +165,7 @@ function AlertBanner({
 function InsightPopup({ onClose, actionTo = "/action" }) {
   const navigate = useNavigate();
   const message =
-    "I can see increase in Maintenance Cost from last 3 months. Let's analyse this issue";
+    "I can seen 17% increase in Maintenance Cost in the last 6 months!";
   return (
     <Box
       position="fixed"
@@ -219,7 +219,11 @@ function InsightPopup({ onClose, actionTo = "/action" }) {
                 lineHeight="1.2"
                 color="#0b1220"
               >
-                {message}
+                I can seen{" "}
+                <Text as="span" fontWeight="800">
+                  17% increase
+                </Text>{" "}
+                in Maintenance Cost in the last 6 months!
               </Text>
             </Box>
           </HStack>
