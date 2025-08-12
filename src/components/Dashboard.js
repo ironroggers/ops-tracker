@@ -163,8 +163,15 @@ function AlertBanner({
 }
 
 function InsightPopup({ onClose, actionTo = "/action" }) {
+  const message =
+    "I can see increase in OPEX from last 3 months. Lets find RCA and resolve this issue.";
   return (
-    <Box position="fixed" right={{ base: 4, md: 8 }} bottom={{ base: 4, md: 8 }} zIndex={50}>
+    <Box
+      position="fixed"
+      right={{ base: 4, md: 8 }}
+      bottom={{ base: 4, md: 8 }}
+      zIndex={50}
+    >
       {/* Outer white card */}
       <Box
         position="relative"
@@ -172,8 +179,8 @@ function InsightPopup({ onClose, actionTo = "/action" }) {
         rounded="3xl"
         boxShadow="2xl"
         p={{ base: 2, md: 3 }}
-        width={{ base: "calc(100vw - 32px)", sm: "420px", md: "520px" }}
-        maxW="560px"
+        width={{ base: "calc(100vw - 40px)", sm: "360px", md: "420px" }}
+        maxW="440px"
       >
         {/* Inner panel with dotted border */}
         <Box
@@ -182,55 +189,160 @@ function InsightPopup({ onClose, actionTo = "/action" }) {
           borderWidth="2px"
           borderStyle="dotted"
           borderColor="#c7d2fe"
-          p={{ base: 4, md: 6 }}
+          p={{ base: 4, md: 5 }}
         >
           <HStack align="start" spacing={3} mb={2}>
             <Box color="#4f46e5" aria-hidden="true" mt={1}>
-              <svg width="22" height="22" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M12 2l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+              >
+                <path
+                  d="M9.05059 16.1617C10.4292 17.4452 11.5413 19.7215 12.2154 21.3532C12.4567 21.9372 13.402 21.9372 13.6433 21.3532C14.3175 19.7215 15.4296 17.4452 16.8082 16.1617C18.0338 15.0206 20.0807 14.0957 21.5429 13.5322C22.112 13.3129 22.1549 12.4372 21.6073 12.1687C20.1446 11.4517 18.0602 10.3027 16.8082 9.05059C15.4888 7.73122 14.2839 5.48771 13.5782 4.0213C13.3275 3.5003 12.5312 3.5003 12.2805 4.0213C11.5749 5.48771 10.3699 7.73122 9.05059 9.05059C7.79851 10.3027 5.71412 11.4517 4.25148 12.1687C3.70382 12.4372 3.74677 13.3129 4.31589 13.5322C5.77809 14.0957 7.82494 15.0206 9.05059 16.1617Z"
+                  fill="#3D5AFE"
+                />
+                <path
+                  d="M21.3329 24.889C22.0222 25.5307 22.5783 26.6689 22.9153 27.4847C23.036 27.7767 23.5086 27.7767 23.6293 27.4847C23.9664 26.6689 24.5224 25.5307 25.2117 24.889C25.8245 24.3184 26.8479 23.856 27.579 23.5742C27.8636 23.4645 27.8851 23.0267 27.6113 22.8925C26.8799 22.534 25.8377 21.9594 25.2117 21.3334C24.552 20.6737 23.9495 19.552 23.5967 18.8188C23.4714 18.5583 23.0732 18.5583 22.9479 18.8188C22.5951 19.552 21.9926 20.6737 21.3329 21.3334C20.7069 21.9594 19.6647 22.534 18.9334 22.8925C18.6595 23.0267 18.681 23.4645 18.9656 23.5742C19.6967 23.856 20.7201 24.3184 21.3329 24.889Z"
+                  fill="#3D5AFE"
+                />
               </svg>
             </Box>
             <Box>
-              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="900" letterSpacing="-0.02em" lineHeight="1.1">
-                Your maintenance costs are up 7%{' '}
-                <Text as="span" fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="800">
-                  ($450 annualized)
-                </Text>
+              <Text
+                fontSize={{ base: "md", md: "lg" }}
+                fontWeight="500"
+                letterSpacing="-0.01em"
+                lineHeight="1.2"
+                color="#0b1220"
+              >
+                {message}
               </Text>
             </Box>
           </HStack>
-          <Text mt={{ base: 2, md: 3 }} color="gray.600" fontSize={{ base: "lg", md: "xl" }} fontWeight="700">
+          <Text
+            mt={{ base: 2, md: 3 }}
+            color="#475569"
+            fontSize={{ base: "sm", md: "md" }}
+            fontWeight="500"
+            style={{ marginLeft: "11%" }}
+          >
             Dive in?
           </Text>
-          <HStack mt={{ base: 4, md: 6 }} spacing={3}>
-            <Button as={Link} to={actionTo} colorScheme="blue" fontWeight="800" size="lg">
+          <HStack
+            mt={{ base: 4, md: 5 }}
+            spacing={3}
+            style={{ marginLeft: "11%" }}
+          >
+            <Button
+              as={Link}
+              to={actionTo}
+              state={{ initialText: message }}
+              bg="#3d5afe"
+              color="white"
+              _hover={{ bg: "#2f49ff" }}
+              fontWeight="800"
+              size="md"
+              borderRadius="12px"
+            >
               Explore Now
             </Button>
-            <Button variant="outline" bg="white" borderColor="#e5e7eb" onClick={onClose} fontWeight="800" size="lg">
+            <Button
+              variant="outline"
+              bg="white"
+              borderColor="#e5e7eb"
+              onClick={onClose}
+              fontWeight="650"
+              size="md"
+              borderRadius="12px"
+            >
               Later
             </Button>
           </HStack>
         </Box>
 
-        {/* Decorative sparkle chip on the outer corner */}
-        <Box
-          position="absolute"
-          right={{ base: -3, md: -4 }}
-          bottom={{ base: -3, md: -4 }}
-          w={{ base: 10, md: 12 }}
-          h={{ base: 10, md: 12 }}
-          bg="white"
-          rounded="full"
-          boxShadow="xl"
-          display="grid"
-          placeItems="center"
+        {/* Decorative icon moved to a persistent component to avoid position jumping */}
+      </Box>
+    </Box>
+  );
+}
+
+function InsightCornerIcon({ onOpen }) {
+  return (
+    <Box
+      position="fixed"
+      right={{ base: 4, md: 8 }}
+      bottom={{ base: 4, md: 8 }}
+      zIndex={40}
+    >
+      <Box
+        role="button"
+        tabIndex={0}
+        onClick={onOpen}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") onOpen?.();
+        }}
+        cursor="pointer"
+        title="View insight"
+      >
+        <svg
+          width="88"
+          height="88"
+          viewBox="0 0 116 116"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <Box color="#4f46e5">
-            <svg width="18" height="18" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M12 2l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z" />
-            </svg>
-          </Box>
-        </Box>
+          <g filter="url(#insightIconShadowSolo)">
+            <circle cx="58.2383" cy="58.2381" r="36.4551" fill="white" />
+            <path
+              d="M51.2272 58.9393C52.7222 60.3312 53.9282 62.7997 54.6593 64.5692C54.921 65.2025 55.9461 65.2025 56.2078 64.5692C56.9389 62.7997 58.1449 60.3312 59.6399 58.9393C60.9691 57.7018 63.1888 56.6988 64.7745 56.0877C65.3916 55.8498 65.4382 54.9002 64.8443 54.6091C63.2581 53.8315 60.9977 52.5854 59.6399 51.2276C58.2091 49.7968 56.9024 47.3638 56.1372 45.7736C55.8653 45.2086 55.0018 45.2086 54.7299 45.7736C53.9647 47.3638 52.658 49.7968 51.2272 51.2276C49.8694 52.5854 47.609 53.8315 46.0228 54.6091C45.4289 54.9002 45.4755 55.8498 46.0927 56.0877C47.6784 56.6988 49.8981 57.7018 51.2272 58.9393Z"
+              fill="#3D5AFE"
+            />
+            <path
+              d="M64.5477 68.4035C65.2952 69.0994 65.8982 70.3337 66.2638 71.2184C66.3946 71.5351 66.9071 71.5351 67.038 71.2184C67.4035 70.3337 68.0065 69.0994 68.754 68.4035C69.4186 67.7847 70.5285 67.2832 71.3213 66.9777C71.6299 66.8588 71.6532 66.384 71.3562 66.2384C70.5632 65.8496 69.433 65.2266 68.754 64.5476C68.0387 63.8323 67.3853 62.6158 67.0027 61.8206C66.8667 61.5381 66.435 61.5381 66.299 61.8206C65.9164 62.6158 65.2631 63.8323 64.5477 64.5476C63.8688 65.2266 62.7386 65.8496 61.9455 66.2384C61.6485 66.384 61.6718 66.8588 61.9804 66.9777C62.7733 67.2832 63.8831 67.7847 64.5477 68.4035Z"
+              fill="#3D5AFE"
+            />
+          </g>
+          <defs>
+            <filter
+              id="insightIconShadowSolo"
+              x="7.76203"
+              y="7.7619"
+              width="100.953"
+              height="100.953"
+              filterUnits="userSpaceOnUse"
+              color-interpolation-filters="sRGB"
+            >
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset />
+              <feGaussianBlur stdDeviation="7.01059" />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0"
+              />
+              <feBlend
+                mode="normal"
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_3399_6834"
+              />
+              <feBlend
+                mode="normal"
+                in="SourceGraphic"
+                in2="effect1_dropShadow_3399_6834"
+                result="shape"
+              />
+            </filter>
+          </defs>
+        </svg>
       </Box>
     </Box>
   );
@@ -377,6 +489,10 @@ export default function Dashboard() {
   const [plant, setPlant] = useState("1000 - Hamburg");
   const [showOpexAlert, setShowOpexAlert] = useState(true);
   const [showInsightPopup, setShowInsightPopup] = useState(true);
+
+  function handleCloseInsight() {
+    setShowInsightPopup(false);
+  }
 
   const base = useMemo(
     () => ({
@@ -620,8 +736,10 @@ export default function Dashboard() {
           />
         </SimpleGrid>
       </Box>
-      {showInsightPopup && (
-        <InsightPopup onClose={() => setShowInsightPopup(false)} />
+      {showInsightPopup ? (
+        <InsightPopup onClose={handleCloseInsight} />
+      ) : (
+        <InsightCornerIcon onOpen={() => setShowInsightPopup(true)} />
       )}
     </Box>
   );
