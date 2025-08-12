@@ -435,6 +435,77 @@ function RightInfoPanel() {
   );
 }
 
+// New: Static actions chart-card (now enabled)
+function RightActionsPanel() {
+  const rows = [
+    {
+      priority: "High",
+      impact: "Loss < $1M",
+      title: "PM Optimization",
+      description:
+        "Identify & deactivate unnecessary PM based on failure history and execution data",
+      thinking:
+        "Meeting to discuss the root causes of delays in work orders and identify corrective actions to streamline operations.",
+    },
+    {
+      priority: "High",
+      impact: "Loss < $1M",
+      title: "Inventory Readiness",
+      description:
+        "Create document outlining strategies to improve inventory management to prevent delays",
+      thinking:
+        "Create a document outlining strategies to improve inventory management, ensuring sufficient component availability to prevent operational delays.",
+    },
+  ];
+  return (
+    <div className="chart-card actions-card" aria-live="polite">
+      <div className="chart-header">
+        <div>
+          <div className="chart-title">Actions for Maintenance Opex cost reductions</div>
+          <div className="chart-subtitle">Contributing to 7% increase in Maintenance Opex trend</div>
+        </div>
+      </div>
+
+      <div className="table-wrapper">
+        <table className="actions-table" role="table" aria-label="Actions list">
+          <thead>
+            <tr role="row" className="actions-row header">
+              <th className="col priority" role="columnheader">Priority</th>
+              <th className="col action" role="columnheader">Action</th>
+              <th className="col impact" role="columnheader">Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, idx) => (
+              <tr key={idx} role="row" className="actions-row">
+                <td className="col priority" role="cell">
+                  <span className="chip-high">{r.priority}</span>
+                </td>
+                <td className="col action" role="cell">
+                  <div className="action-main">{r.title}</div>
+                  <div className="action-sub">{r.description}</div>
+                </td>
+                <td className="col impact" role="cell">
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>{r.impact}</span>
+                    <div className="spacer" />
+                    <button className="btn-outline sm" type="button">Dismiss</button>
+                    <button className="btn sm" type="button">Approve</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ marginTop: 8 }}>
+        <button type="button" className="btn-outline sm">+ Add Action</button>
+      </div>
+    </div>
+  );
+}
+
 function RightHypothesisPanel() {
   return (
     <div className="chart-card" aria-live="polite">
@@ -908,7 +979,7 @@ function SubCauses({
   );
 }
 
-function CausesReport() {
+function CausesReport({ collapsed = false }) {
   const mini1 = [
     { month: "Jan", value: 118 },
     { month: "Feb", value: 131 },
@@ -984,7 +1055,8 @@ function CausesReport() {
         </div>
       </div>
 
-      <div className="report-causes-grid">
+      <div className={`report-body ${collapsed ? "collapsed" : "expanded"}`} aria-hidden={collapsed}>
+        <div className="report-causes-grid">
         <article className="report-cause">
           <div className="report-cause-head">
             <div className="report-cause-index">1.</div>
@@ -1143,21 +1215,22 @@ function CausesReport() {
         </div>
       </div>
 
-      <div className="report-sources">
-        <div className="sources-head">Sources go here</div>
-        <div className="sources-chips">
-          {[
-            "Hydraulic System Installment",
-            "Hydraulic System Installment",
-            "Repair Booster Pump",
-            "Hydraulic System Installment",
-            "Hydraulic System Installment",
-            "Repair Booster Pump",
-          ].map((t, i) => (
-            <span key={i} className="chip-soft">
-              {t}
-            </span>
-          ))}
+        <div className="report-sources">
+          <div className="sources-head">Sources go here</div>
+          <div className="sources-chips">
+            {[
+              "Hydraulic System Installment",
+              "Hydraulic System Installment",
+              "Repair Booster Pump",
+              "Hydraulic System Installment",
+              "Hydraulic System Installment",
+              "Repair Booster Pump",
+            ].map((t, i) => (
+              <span key={i} className="chip-soft">
+                {t}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -1658,6 +1731,7 @@ export default function Action() {
   const rightFeedRef = useRef(null);
   const reportScrollRef = useRef(null);
   const [rightScrollAuto, setRightScrollAuto] = useState(false);
+  const [showActionsPanel, setShowActionsPanel] = useState(false);
 
   // Stage transitions for right pane
   useEffect(() => {
@@ -1829,6 +1903,7 @@ export default function Action() {
     setPhase("chat");
     setTwoCol(false); // start in single column; shift after first assistant reply
     hasRequestedShiftRef.current = false; // allow shift scheduling for this round
+    setShowActionsPanel(false); // reset actions panel on new submit
     // Ask assistant (backend shim)
     sendPromptToAssistant(prompt);
   }
@@ -1850,6 +1925,11 @@ export default function Action() {
     } else {
       navigate("/");
     }
+  }
+
+  function handleFollowupClick(nextText) {
+    setText(nextText);
+    setShowActionsPanel(true);
   }
 
   return (
@@ -1922,7 +2002,7 @@ export default function Action() {
         )}
 
         {phase === "chat" && (
-          <div className="chat-container embedded">
+          <div className={`chat-container embedded ${showActionsPanel ? "wide" : ""}`}>
             <div className={`chat-body-grid ${twoCol ? "two-col" : ""}`}>
               <div className={`left-pane ${twoCol ? "shift-left" : ""}`}>
                 <div className={`messages`} role="log" aria-live="polite">
@@ -1955,25 +2035,21 @@ export default function Action() {
                       <button
                         type="button"
                         className="followup-btn"
-                        onClick={() => setText("Validate with site data")}
+                        onClick={() => handleFollowupClick("Validate with site data")}
                       >
                         Validate with site data →
                       </button>
                       <button
                         type="button"
                         className="followup-btn"
-                        onClick={() =>
-                          setText("Trace 3 months of permit delays")
-                        }
+                        onClick={() => handleFollowupClick("Trace 3 months of permit delays")}
                       >
                         Trace 3 months of permit delays →
                       </button>
                       <button
                         type="button"
                         className="followup-btn"
-                        onClick={() =>
-                          setText("Create a 3-month cost-reduction roadmap")
-                        }
+                        onClick={() => handleFollowupClick("Create a 3-month cost-reduction roadmap")}
                       >
                         Create a 3-month cost-reduction roadmap →
                       </button>
@@ -2032,7 +2108,12 @@ export default function Action() {
                       className="report-scroll panel-animate-in"
                       ref={reportScrollRef}
                     >
-                      <CausesReport />
+                      <CausesReport collapsed={showActionsPanel} />
+                      {showActionsPanel && (
+                        <div className="panel-animate-in">
+                          <RightActionsPanel />
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div
