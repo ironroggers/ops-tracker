@@ -938,6 +938,50 @@ function CausesReport() {
             </div>
           </div>
         </div>
+        <div className="report-head-actions" aria-hidden="true">
+          {/* <button type="button" className="icon-badge" title="Settings">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="#4B5563" strokeWidth="1.5"/><path d="M19.4 15a1 1 0 00.2-1.1l-1-1.7a7.5 7.5 0 000-2.4l1-1.7a1 1 0 00-.2-1.1l-1.1-1.1a1 1 0 00-1.1-.2l-1.7 1a7.5 7.5 0 00-2.4 0l-1.7-1a1 1 0 00-1.1.2L8.3 5a1 1 0 00-.2 1.1l1 1.7a7.5 7.5 0 000 2.4l-1 1.7a1 1 0 00.2 1.1l1.1 1.1a1 1 0 001.1.2l1.7-1a7.5 7.5 0 002.4 0l1.7 1a1 1 0 001.1-.2l1.1-1.1z" stroke="#4B5563" strokeWidth="1.5"/></svg>
+          </button> */}
+          <button type="button" className="icon-badge" title="Copy">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <rect
+                x="9"
+                y="9"
+                width="10"
+                height="10"
+                rx="2"
+                stroke="#4B5563"
+                strokeWidth="1.5"
+              />
+              <rect
+                x="5"
+                y="5"
+                width="10"
+                height="10"
+                rx="2"
+                stroke="#4B5563"
+                strokeWidth="1.5"
+              />
+            </svg>
+          </button>
+          <button type="button" className="icon-badge" title="Download">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 3v10m0 0l-3-3m3 3l3-3"
+                stroke="#4B5563"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M6 19h12"
+                stroke="#4B5563"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="report-causes-grid">
@@ -972,7 +1016,14 @@ function CausesReport() {
                       axisLine={false}
                       fontSize={11}
                     />
-                    <YAxis hide domain={[0, "dataMax + 10"]} />
+                    <YAxis
+                      domain={[115, 160]}
+                      ticks={[115, 160]}
+                      width={28}
+                      tickLine={false}
+                      axisLine={{ stroke: "#e5e7eb" }}
+                      fontSize={10}
+                    />
                     <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
                     <Bar
                       dataKey="value"
@@ -1022,7 +1073,14 @@ function CausesReport() {
                       axisLine={false}
                       fontSize={11}
                     />
-                    <YAxis hide domain={[0, "dataMax + 10"]} />
+                    <YAxis
+                      domain={[115, 160]}
+                      ticks={[115, 160]}
+                      width={28}
+                      tickLine={false}
+                      axisLine={{ stroke: "#e5e7eb" }}
+                      fontSize={10}
+                    />
                     <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
                     <Bar
                       dataKey="value"
@@ -1053,7 +1111,7 @@ function CausesReport() {
                   dataKey="value"
                   cx="50%"
                   cy="50%"
-                  innerRadius={70}
+                  innerRadius={64}
                   outerRadius={100}
                   cornerRadius={6}
                   paddingAngle={0}
@@ -1068,6 +1126,9 @@ function CausesReport() {
               </PieChart>
             </ResponsiveContainer>
             <div className="report-donut-center">60%</div>
+            <div className="report-callout">
+              Rapid increase in PM Work Orders
+            </div>
           </div>
           <div className="report-attrib-legend">
             <span className="legend-pill red">

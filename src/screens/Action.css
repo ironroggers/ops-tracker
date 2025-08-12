@@ -692,7 +692,7 @@
 .report-card {
   border: 1px solid var(--card-border);
   border-radius: 16px;
-  background: #ffffff;
+  background: #f3f4f6; /* light gray background per request */
   padding: 10px;
 }
 .report-head {
@@ -702,6 +702,22 @@
   padding: 10px 8px 6px;
   background: #f3f4f6;
   border-radius: 12px;
+}
+.report-head-actions {
+  display: inline-flex;
+  gap: 8px;
+}
+.icon-badge {
+  border: 1px solid var(--card-border);
+  background: #fff;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+}
+.icon-badge:hover {
+  background: #f8fafc;
 }
 .report-head-left {
   display: inline-flex;
@@ -783,6 +799,7 @@
   border: 1px solid var(--card-border);
   border-radius: 12px;
   padding: 10px;
+  background: white;
 }
 .report-attrib-title {
   text-align: center;
@@ -792,11 +809,15 @@
 }
 .report-attrib-grid {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  /* Stack donut and legend vertically for better visual balance */
+  grid-template-columns: 1fr;
   gap: 12px;
+  justify-items: center; /* center donut and legend */
 }
 .report-donut-wrap {
   position: relative;
+  width: 320px; /* keep donut size similar to previous layout */
+  margin: 0 auto;
 }
 .report-donut-center {
   position: absolute;
@@ -807,11 +828,25 @@
   font-size: 24px;
   color: var(--text-primary);
 }
+.report-callout {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  font-size: 12px;
+  color: #111827;
+}
 .report-attrib-legend {
   display: flex;
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
+  justify-content: center; /* center legend pills under donut */
 }
 .legend-pill {
   display: inline-flex;
@@ -821,21 +856,24 @@
   border-radius: 9999px;
   padding: 8px 12px;
   font-size: 13px;
+  background: #ffffff; /* white like screenshot */
+  color: #111827;
+  box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06);
 }
-.legend-pill.red {
-  background: #fff1f1;
-  color: #b91c1c;
+.legend-pill::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #9ca3af; /* default; overridden by color classes */
 }
-.legend-pill.blue {
-  background: #eef2ff;
-  color: #1e3a8a;
-}
+.legend-pill.red::before { background: #ef4444; }
+.legend-pill.blue::before { background: #3D5AFE; }
 .legend-count {
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
-  padding: 2px 6px;
   margin-left: 6px;
-  font-size: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #374151;
 }
 
 .report-sources {
