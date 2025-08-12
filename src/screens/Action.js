@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useRef,
   useState,
+  useLayoutEffect,
 } from "react";
 import "./Action.css";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -787,38 +788,41 @@ function ChartPanel({ chart }) {
 const MemoChartPanel = React.memo(ChartPanel);
 
 function AgentProgress({ onCrossThreshold, onProgressChange, threshold = 40 }) {
-  const [progress, setProgress] = useState(10);
+  // Time-based smooth progress for a natural, slower pace
+  const [progress, setProgress] = useState(0);
   const firedRef = useRef(false);
-  const intervalRef = useRef(0);
+  const rafRef = useRef(0);
+  const startRef = useRef(0);
+  const durationMs = 24000; // ~24s total for a ChatGPT-like pace
+
   useEffect(() => {
-    let id = 0;
-    id = setInterval(() => {
-      setProgress((p) => {
-        const next = Math.min(100, p + (2 + Math.floor(Math.random() * 3))); // +2..+4
-        if (next >= 100) clearInterval(id);
-        return next;
-      });
-    }, 300);
-    intervalRef.current = id;
-    return () => clearInterval(id);
+    const easeInOut = (t) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    startRef.current = performance.now();
+    const tick = (now) => {
+      const elapsed = now - startRef.current;
+      const t = Math.min(1, elapsed / durationMs);
+      // Hold slightly before 100 to mimic finalization step
+      const eased = easeInOut(t);
+      const pct = t < 0.985 ? Math.min(99, Math.round(eased * 100)) : 100;
+      setProgress(pct);
+      if (t < 1) rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
   }, []);
+
   useEffect(() => {
     if (!firedRef.current && progress >= threshold) {
       firedRef.current = true;
       onCrossThreshold?.();
     }
   }, [progress, threshold, onCrossThreshold]);
-  // Safety: if we somehow linger at 99%, finalize to 100
-  useEffect(() => {
-    if (progress >= 99 && progress < 100) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      const t = setTimeout(() => setProgress(100), 600);
-      return () => clearTimeout(t);
-    }
-  }, [progress]);
+
   useEffect(() => {
     onProgressChange?.(progress);
   }, [progress, onProgressChange]);
+
   return (
     <div className="agent-progress-card" aria-live="polite">
       <div className="agent-progress-head">
@@ -1355,9 +1359,9 @@ function CausesReport({ collapsed = false, onToggleCollapse }) {
               </PieChart>
             </ResponsiveContainer>
             <div className="report-donut-center">60%</div>
-            <div className="report-callout">
+            {/* <div className="report-callout">
               Rapid increase in PM Work Orders
-            </div>
+            </div> */}
           </div>
           <div className="report-attrib-legend">
             <span className="legend-pill red">
@@ -1866,6 +1870,113 @@ function CausesList({ onTakeAction, onPlansUpdate }) {
   );
 }
 
+// Crossfade-up transition between stages (pre-100%)
+function StageTransition({ stageKey, children, className, style }) {
+  const containerRef = useRef(null);
+  const inMeasureRef = useRef(null);
+  const lastChildrenRef = useRef(children);
+  const lastKeyRef = useRef(stageKey);
+  const [exiting, setExiting] = useState(null);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const inEl = inMeasureRef.current;
+    if (container && inEl) {
+      try {
+        const nextHeight = inEl.offsetHeight;
+        if (nextHeight > 0) {
+          container.style.height = `${nextHeight}px`;
+        }
+      } catch (_) {}
+    }
+  });
+
+  useEffect(() => {
+    if (stageKey !== lastKeyRef.current) {
+      setExiting({ key: lastKeyRef.current, node: lastChildrenRef.current });
+      const t = setTimeout(() => setExiting(null), 900); // match panel-animate-out
+      lastKeyRef.current = stageKey;
+      return () => clearTimeout(t);
+    }
+  }, [stageKey]);
+
+  useEffect(() => {
+    lastChildrenRef.current = children;
+  }, [children]);
+
+  return (
+    <div
+      className={`stage-container${className ? ` ${className}` : ""}`}
+      ref={containerRef}
+      aria-live="polite"
+      style={style}
+    >
+      {exiting ? (
+        <div
+          className="stage-layer out panel-animate-out"
+          key={`out-${exiting.key}`}
+        >
+          <div className="measure">{exiting.node}</div>
+        </div>
+      ) : null}
+      <div className="stage-layer in panel-animate-in" key={`in-${stageKey}`}>
+        <div className="measure" ref={inMeasureRef}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Typing animation for assistant messages to mimic ChatGPT operator
+function TypingText({ text, cps = 18, onDone }) {
+  const [count, setCount] = useState(0);
+  const intervalRef = useRef(0);
+  useEffect(() => {
+    const intervalMs = Math.max(20, Math.round(1000 / cps));
+    intervalRef.current = window.setInterval(() => {
+      setCount((c) => {
+        const next = Math.min(text.length, c + 1);
+        if (next >= text.length) {
+          window.clearInterval(intervalRef.current);
+          onDone?.();
+        }
+        return next;
+      });
+    }, intervalMs);
+    return () => window.clearInterval(intervalRef.current);
+  }, [text, cps, onDone]);
+  return <>{text.slice(0, count)}</>;
+}
+
+function ChatMessage({ message, onTypedDone }) {
+  if (message.role === "assistant") {
+    return (
+      <div className={`bubble-row ${message.role}`}>
+        <span className="assistant-avatar" aria-hidden="true">
+          <IconInnovaSmall />
+        </span>
+        <div className={`bubble ${message.role}`}>
+          {message.animated ? (
+            <TypingText
+              text={message.text}
+              cps={18}
+              onDone={() => onTypedDone?.(message.id)}
+            />
+          ) : (
+            message.text
+          )}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className={`bubble-row ${message.role}`}>
+      <div className={`bubble ${message.role}`}>{message.text}</div>
+    </div>
+  );
+}
+
 export default function Action() {
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -1918,10 +2029,15 @@ export default function Action() {
   // Smooth, continuous scroll loop synced with progress percentage
   const scrollStateRef = useRef({ raf: 0, running: false, target: 0 });
 
-  // Start/stop the animation loop when twoCol changes
+  // Start/stop the right-pane auto-scroll loop only after final report (100%)
   useEffect(() => {
-    if (!twoCol) return;
     const state = scrollStateRef.current;
+    // Only run when in two column and final report is visible
+    if (!twoCol || progressPct < 100) {
+      state.running = false;
+      if (state.raf) cancelAnimationFrame(state.raf);
+      return;
+    }
     state.running = true;
 
     const tick = () => {
@@ -1933,9 +2049,8 @@ export default function Action() {
       const current = el.scrollTop;
       const delta = target - current;
       const abs = Math.abs(delta);
-      // Spring-like approach for ultra-smooth motion
-      const stiffness = 0.12; // lower = smoother
-      const minStep = 0.2; // prevents tiny stalls
+      const stiffness = 0.12;
+      const minStep = 0.2;
       if (abs > 0.5) {
         el.scrollTop = current + delta * stiffness + Math.sign(delta) * minStep;
       } else {
@@ -1943,16 +2058,22 @@ export default function Action() {
       }
       state.raf = requestAnimationFrame(tick);
     };
-
     state.raf = requestAnimationFrame(tick);
     return () => {
       state.running = false;
       cancelAnimationFrame(state.raf);
     };
-  }, [twoCol]);
+  }, [twoCol, progressPct]);
 
   // Update target position whenever progress (or content) changes
   useEffect(() => {
+    // Do not auto-scroll before final report.
+    if (progressPct < 100) {
+      scrollStateRef.current.target = 0;
+      const el = rightFeedRef.current;
+      if (el) el.scrollTop = 0;
+      return;
+    }
     const el = rightFeedRef.current;
     if (!el) return;
     const max = Math.max(0, el.scrollHeight - el.clientHeight);
@@ -1968,12 +2089,10 @@ export default function Action() {
     }
   }, [progressPct]);
 
-  // Enable scrollbar only after first feed item after shimmer (references stage)
+  // Enable scrollbar only for the final report at 100%
   useEffect(() => {
-    if (rightStage === "references" || rightStage === "hypothesis") {
-      setRightScrollAuto(true);
-    }
-  }, [rightStage]);
+    setRightScrollAuto(progressPct === 100);
+  }, [progressPct]);
 
   useEffect(() => {
     setText(initialTextFromState);
@@ -2017,21 +2136,27 @@ export default function Action() {
       const result = await sendActionPrompt(prompt, {
         signal: controller.signal,
       });
-      const assistantMessages = (result?.messages ?? []).map((m, idx) => ({
-        id: Date.now() + idx + 1,
-        role: m.role,
-        text: m.text,
-      }));
+      const assistantMessages = (result?.messages ?? [])
+        .map((m, idx) => ({
+          id: Date.now() + idx + 1,
+          role: m.role,
+          text: m.text,
+        }))
+        .map((m, i, arr) => ({
+          ...m,
+          animated: m.role === "assistant" && i === arr.length - 1,
+        }));
       if (assistantMessages.length) {
         setMessages((prev) => [...prev, ...assistantMessages]);
         if (result?.chart) setChartData(result.chart);
-        // After the very first assistant response renders, wait briefly,
-        // then shift to the two-column layout smoothly. Run only once.
-        if (!hasRequestedShiftRef.current) {
+        // Open right panel only after the assistant finishes typing.
+        // If no typing animation is active, fall back to a short delay.
+        const hasAnimated = assistantMessages.some(
+          (m) => m.role === "assistant" && m.animated
+        );
+        if (!hasAnimated && !hasRequestedShiftRef.current) {
           hasRequestedShiftRef.current = true;
-          requestAnimationFrame(() => {
-            setTimeout(() => setTwoCol(true), 2000);
-          });
+          setTimeout(() => setTwoCol(true), 1200);
         }
       }
     } catch (err) {
@@ -2048,6 +2173,17 @@ export default function Action() {
     const t = setTimeout(() => setChartReady(true), 3000);
     return () => clearTimeout(t);
   }, [chartData]);
+
+  function markMessageDone(id) {
+    setMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, animated: false } : m))
+    );
+    // When the currently typing assistant message is done, open right pane if not already
+    if (!hasRequestedShiftRef.current) {
+      hasRequestedShiftRef.current = true;
+      setTwoCol(true);
+    }
+  }
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -2166,18 +2302,11 @@ export default function Action() {
               <div className={`left-pane ${twoCol ? "shift-left" : ""}`}>
                 <div className={`messages`} role="log" aria-live="polite">
                   {messages.map((m) => (
-                    <div key={m.id} className={`bubble-row ${m.role}`}>
-                      {m.role === "assistant" ? (
-                        <>
-                          <span className="assistant-avatar" aria-hidden="true">
-                            <IconInnovaSmall />
-                          </span>
-                          <div className={`bubble ${m.role}`}>{m.text}</div>
-                        </>
-                      ) : (
-                        <div className={`bubble ${m.role}`}>{m.text}</div>
-                      )}
-                    </div>
+                    <ChatMessage
+                      key={m.id}
+                      message={m}
+                      onTypedDone={markMessageDone}
+                    />
                   ))}
                 </div>
                 {twoCol && (
@@ -2258,7 +2387,7 @@ export default function Action() {
                 </form>
               </div>
               {twoCol && (
-                <div style={{ alignSelf: "start" }}>
+                <div style={{ alignSelf: "start" }} className="right-pane">
                   <div className="right-title">
                     Causes for increased Maintenance Opex
                   </div>
@@ -2276,43 +2405,37 @@ export default function Action() {
                     </div>
                   ) : (
                     <div
-                      className="right-feed"
                       ref={rightFeedRef}
-                      style={{ overflowY: rightScrollAuto ? "auto" : "hidden" }}
-                      aria-live="polite"
+                      style={{
+                        maxHeight: "calc(100vh - 200px)",
+                        overflowY: rightScrollAuto ? "auto" : "hidden",
+                      }}
                     >
-                      {/* Chart always first */}
-                      <div className="panel-animate-in">
-                        {chartReady ? (
-                          <MemoChartPanel chart={chartData} />
-                        ) : (
-                          <RightShimmerPanel showProgress={false} />
-                        )}
-                      </div>
-
-                      {/* Collecting stage when reached or later */}
-                      {(rightStage === "collecting" ||
-                        rightStage === "references" ||
-                        rightStage === "hypothesis") && (
-                        <div className="panel-animate-in">
-                          <RightInfoInitialPanel />
-                        </div>
-                      )}
-
-                      {/* References stage when reached or later */}
-                      {(rightStage === "references" ||
-                        rightStage === "hypothesis") && (
-                        <div className="panel-animate-in">
-                          <RightInfoPanel />
-                        </div>
-                      )}
-
-                      {/* Hypothesis stage */}
-                      {rightStage === "hypothesis" && (
-                        <div className="panel-animate-in">
-                          <RightHypothesisPanel />
-                        </div>
-                      )}
+                      <StageTransition
+                        stageKey={`${rightStage}-${
+                          chartReady ? "ready" : "loading"
+                        }`}
+                      >
+                        {(() => {
+                          if (rightStage === "chart") {
+                            return chartReady ? (
+                              <MemoChartPanel chart={chartData} />
+                            ) : (
+                              <RightShimmerPanel showProgress={false} />
+                            );
+                          }
+                          if (rightStage === "collecting") {
+                            return <RightInfoInitialPanel />;
+                          }
+                          if (rightStage === "references") {
+                            return <RightInfoPanel />;
+                          }
+                          if (rightStage === "hypothesis") {
+                            return <RightHypothesisPanel />;
+                          }
+                          return null;
+                        })()}
+                      </StageTransition>
                     </div>
                   )}
                 </div>

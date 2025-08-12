@@ -109,9 +109,11 @@
   display: grid;
   grid-template-columns: 1fr; /* start as single column */
   gap: 20px;
+  transition: grid-template-columns 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    gap 1100ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .chat-body-grid.two-col {
-  grid-template-columns: 420px 1fr; /* switch to two columns after first reply */
+  grid-template-columns: 460px 1fr; /* slightly wider left to reduce jump perception */
 }
 
 /* Left pane containing messages + input */
@@ -119,15 +121,23 @@
   display: grid;
   grid-template-rows: 1fr auto;
   height: 100%;
+  will-change: transform;
+  transition: transform 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: left center;
 }
 
-/* Slow, smooth slide-in for the whole left pane */
+/* Smooth lateral nudge for the left pane when right pane appears */
 .left-pane.shift-left {
-  animation: leftPaneIn 1100ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform: translateX(-32px);
 }
-@keyframes leftPaneIn {
+
+/* Right pane slide-in from right as it appears */
+.right-pane {
+  animation: rightPaneIn 900ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+}
+@keyframes rightPaneIn {
   from {
-    transform: translateX(-22px);
+    transform: translateX(24px);
     opacity: 0;
   }
   to {
@@ -151,14 +161,14 @@
 @keyframes progressFadeOut {
   to {
     opacity: 0;
-    transform: translateY(-8px) scale(0.98);
+    transform: translateY(-14px) scale(0.98);
   }
 }
 
 /* Generic, reusable panel animations for right-side content */
 .panel-animate-in {
   opacity: 0;
-  transform: translateY(12px) scale(0.98);
+  transform: translateY(16px) scale(0.98);
   will-change: transform, opacity;
   animation: progressFadeIn 1400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -168,6 +178,20 @@
   transform: translateY(0) scale(1);
   will-change: transform, opacity;
   animation: progressFadeOut 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Stage transition layout: layers stack and container height locks during crossfade */
+.stage-container {
+  position: relative;
+  min-height: 240px; /* ensure enough height so taller content (e.g., hypothesis) doesn't get clipped during transition */
+}
+.stage-container .stage-layer {
+  position: absolute;
+  inset: 0;
+}
+.stage-container .stage-layer .measure {
+  /* placeholder to maintain specificity; no additional styles needed */
+  display: block;
 }
 
 /* Right pane info block */
@@ -909,8 +933,12 @@
   border-radius: 9999px;
   background: #9ca3af; /* default; overridden by color classes */
 }
-.legend-pill.red::before { background: #ef4444; }
-.legend-pill.blue::before { background: #3D5AFE; }
+.legend-pill.red::before {
+  background: #ef4444;
+}
+.legend-pill.blue::before {
+  background: #3d5afe;
+}
 .legend-count {
   margin-left: 6px;
   font-weight: 700;
