@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import "./Dashboard.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Box, SimpleGrid, HStack, Text, Badge, Button } from "@chakra-ui/react";
 
 function formatCurrency(amount) {
@@ -163,6 +163,7 @@ function AlertBanner({
 }
 
 function InsightPopup({ onClose, actionTo = "/action" }) {
+  const navigate = useNavigate();
   const message =
     "I can see increase in OPEX from last 3 months. Lets find RCA and resolve this issue.";
   return (
@@ -237,9 +238,9 @@ function InsightPopup({ onClose, actionTo = "/action" }) {
             style={{ marginLeft: "11%" }}
           >
             <Button
-              as={Link}
-              to={actionTo}
-              state={{ initialText: message }}
+              onClick={() =>
+                navigate(actionTo, { state: { initialText: message } })
+              }
               bg="#3d5afe"
               color="white"
               _hover={{ bg: "#2f49ff" }}

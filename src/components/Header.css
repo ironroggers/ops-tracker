@@ -4,7 +4,7 @@
   z-index: 20;
   background: #ffffff;
   border-bottom: 1px solid #e6e8ef;
-  box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.02);
+  /* box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.02); */
 }
 
 /* Ensure header respects sidebar width */
@@ -12,7 +12,7 @@
   margin-left: 280px;
 }
 body.sidebar-collapsed .header-toolbar {
-  margin-left: 75px;
+  margin-left: 12px;
 }
 body.sidebar-expanded .header-toolbar {
   margin-left: 280px;
@@ -119,6 +119,7 @@ body.sidebar-expanded .header-toolbar {
   background: #ffffff; /* hide the input border under label */
   border-radius: 6px;
   z-index: 1;
+  cursor: pointer;
 }
 .field-select {
   appearance: none;
@@ -133,6 +134,7 @@ body.sidebar-expanded .header-toolbar {
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="%236b7280" d="M7 10l5 5 5-5z"/></svg>');
   background-repeat: no-repeat;
   background-position: right 10px center;
+  cursor: pointer;
 }
 
 .timeframes {
@@ -152,6 +154,7 @@ body.sidebar-expanded .header-toolbar {
   color: #6b7280;
   font-weight: 700;
   font-size: 12px;
+  cursor: pointer;
 }
 .chip-active {
   background: #c7d2fe;
@@ -169,6 +172,7 @@ body.sidebar-expanded .header-toolbar {
   border: 1px solid #e6e8ef;
   background: #ffffff;
   color: #4b5563;
+  cursor: pointer;
 }
 .icon-btn:hover {
   filter: brightness(0.98);
