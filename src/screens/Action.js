@@ -24,32 +24,17 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import WoPermitGif from "../assets/Create using AI (3).gif";
+import WoPermitGif from '../assets/Create using AI (3).gif';
 
 // Constants for execution timelines and AI behavior
-const TIMELINE_STEPS = [
-  "Creating EHS Meet",
-  "Inviting People",
-  "Finding Time",
-  "Blocking Calendar",
-];
-const WOP_STEPS = [
-  "Authoring Permit Forms",
-  "Attaching it with Workorders",
-  "Saving Edits",
-  "Done",
-];
-const ROUND_STEPS = [
-  "Analyzing Routes",
-  "Optimizing Sequence",
-  "Validating Safety",
-  "Publishing Plan",
-];
+const TIMELINE_STEPS = ['Creating EHS Meet', 'Inviting People', 'Finding Time', 'Blocking Calendar'];
+const WOP_STEPS = ['Authoring Permit Forms', 'Attaching it with Workorders', 'Saving Edits', 'Done'];
+const ROUND_STEPS = ['Analyzing Routes', 'Optimizing Sequence', 'Validating Safety', 'Publishing Plan'];
 const TIMELINE_STEP_MS = 1500;
 const AI_THINK_MS = 3000;
 const THINK_TYPE_INTERVAL_MS = 18;
 const THINK_CURSOR_BLINK_MS = 500;
-const GSI_SRC = "https://accounts.google.com/gsi/client";
+const GSI_SRC = 'https://accounts.google.com/gsi/client';
 const HARDCODED_ATTENDEES = [
   // Add actual email addresses here if needed
 ];
@@ -398,16 +383,8 @@ function RightInfoInitialPanel() {
         </span>
         <div className="info-content">
           <div className="info-heading">Collecting Real-time data</div>
-          <div
-            className="ticker"
-            role="status"
-            aria-label="Collecting real-time operational data"
-          >
-            <div
-              className={`ticker-line ${animFlip ? "ticker-b" : "ticker-a"}`}
-            >
-              {items[idx]}
-            </div>
+          <div className="ticker" role="status" aria-label="Collecting real-time operational data">
+            <div className={`ticker-line ${animFlip ? 'ticker-b' : 'ticker-a'}`}>{items[idx]}</div>
           </div>
         </div>
       </div>
@@ -420,10 +397,7 @@ function RightInfoPanel() {
   React.useEffect(() => {
     const t1 = setTimeout(() => setStep(2), 1600);
     const t2 = setTimeout(() => setStep(3), 3200);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
   return (
     <div className="chart-card" aria-live="polite">
@@ -446,9 +420,7 @@ function RightInfoPanel() {
             <span>Work Orders</span>
           </div>
           <div className="info-chip-row">
-            <span className="chip-soft">
-              WO-45219 – Replace mechanical seal on Pump P-102A
-            </span>
+            <span className="chip-soft">WO-45219 – Replace mechanical seal on Pump P-102A</span>
             <span className="chip-soft">Quarterly PM on Heat Exchanger</span>
           </div>
           <div className="info-body" style={{ marginTop: 8 }}>
@@ -485,13 +457,7 @@ function RightInfoPanel() {
 }
 
 // New: Static actions chart-card (now enabled)
-function RightActionsPanel({
-  collapsed = false,
-  onToggleCollapse,
-  onActionsChange,
-  onAnyApprove,
-  hideDismiss,
-}) {
+function RightActionsPanel({ collapsed = false, onToggleCollapse, onActionsChange, onAnyApprove, hideDismiss, onResolutionStateChange }) {
   const [actionStatuses, setActionStatuses] = useState({});
 
   const causeActions = [
@@ -504,20 +470,18 @@ function RightActionsPanel({
           priority: "High",
           impact: "Loss < $1M",
           title: "PM Optimization",
-          description:
-            "Identify & deactivate unnecessary PM based on failure history and execution data",
-          type: "document",
+          description: "Identify & deactivate unnecessary PM based on failure history and execution data",
+          type: "document"
         },
         {
           id: "c1-a2",
           priority: "Medium",
           impact: "Loss < $500K",
           title: "Risk-based PM Scheduling",
-          description:
-            "Risk-rank assets and adjust PM frequencies using criticality + condition data",
-          type: "wo-permit",
-        },
-      ],
+          description: "Risk-rank assets and adjust PM frequencies using criticality + condition data",
+          type: "wo-permit"
+        }
+      ]
     },
     {
       causeTitle: "Increase in MTTR due to Waiting for Permits",
@@ -528,60 +492,59 @@ function RightActionsPanel({
           priority: "High",
           impact: "Loss < $800K",
           title: "Permit Pre-check System",
-          description:
-            "Implement early permit pre-checks to reduce waiting time",
-          type: "wo-permit",
+          description: "Implement early permit pre-checks to reduce waiting time",
+          type: "wo-permit"
         },
         {
           id: "c2-a2",
           priority: "High",
           impact: "Loss < $600K",
           title: "Shift Handover Enhancement",
-          description:
-            "Introduce shift handover checklist including pending permits",
-          type: "meeting",
+          description: "Introduce shift handover checklist including pending permits",
+          type: "meeting"
         },
         {
           id: "c2-a3",
           priority: "Medium",
           impact: "Loss < $400K",
           title: "Operations SLA",
-          description:
-            "Create SLA with Operations for isolation/LOTO readiness",
-          type: "round-plan",
-        },
-      ],
-    },
+          description: "Create SLA with Operations for isolation/LOTO readiness",
+          type: "round-plan"
+        }
+      ]
+    }
   ];
 
   const handleApprove = (actionId) => {
     onAnyApprove?.();
-    setActionStatuses((prev) => ({
+    setActionStatuses(prev => ({
       ...prev,
-      [actionId]: "approved",
+      [actionId]: 'approved'
     }));
   };
 
   const handleDismiss = (actionId) => {
-    setActionStatuses((prev) => ({
+    setActionStatuses(prev => ({
       ...prev,
-      [actionId]: "dismissed",
+      [actionId]: 'dismissed'
     }));
   };
 
-  // Get approved actions for parent component
+  // Get approved actions for parent component and report resolution state
   React.useEffect(() => {
-    const approvedActions = causeActions.flatMap((cause) =>
-      cause.actions.filter((action) => actionStatuses[action.id] === "approved")
+    const approvedActions = causeActions.flatMap(cause =>
+      cause.actions.filter(action => actionStatuses[action.id] === 'approved')
     );
     onActionsChange?.(approvedActions);
-  }, [actionStatuses, onActionsChange]);
+
+    const allIds = causeActions.flatMap(cause => cause.actions.map(a => a.id));
+    const resolved = allIds.every(id => ['approved', 'dismissed'].includes(actionStatuses[id]));
+    onResolutionStateChange?.(resolved);
+  }, [actionStatuses, onActionsChange, onResolutionStateChange]);
 
   // Filter out dismissed actions
   const getVisibleActions = (actions) => {
-    return actions.filter(
-      (action) => actionStatuses[action.id] !== "dismissed"
-    );
+    return actions.filter(action => actionStatuses[action.id] !== 'dismissed');
   };
 
   return (
@@ -596,7 +559,7 @@ function RightActionsPanel({
               Project Plan for Maintenance Cost Reduction
             </div>
             <div className="report-subtitle">
-              Contributing to 7% increase in Maintenance Opex trend
+              Contributing to 17% increase in Maintenance Opex trend
             </div>
           </div>
         </div>
@@ -646,7 +609,8 @@ function RightActionsPanel({
           >
             <div
               className="cause-actions-header"
-              style={{ background: "#3D5AFE", padding: "12px 10px" }}
+              style={{ background: "#3D5AFE",
+                padding: "12px 10px" }}
             >
               <div
                 className="cause-actions-title"
@@ -656,7 +620,9 @@ function RightActionsPanel({
                   justifyContent: "space-between",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center" }}>
+                <div
+                  style={{ display: "flex", alignItems: "center" }}
+                >
                   <span
                     className="cause-rank-dark"
                     style={{
@@ -695,97 +661,57 @@ function RightActionsPanel({
             </div>
 
             <div className="table-wrapper">
-              <table
-                className="actions-table"
-                role="table"
-                aria-label="Actions list"
-              >
+              <table className="actions-table" role="table" aria-label="Actions list">
                 <thead>
                   <tr role="row" className="actions-row header">
-                    <th className="col priority" role="columnheader">
-                      Priority
-                    </th>
-                    <th className="col action" role="columnheader">
-                      Action
-                    </th>
-                    <th className="col impact" role="columnheader">
-                      Impact
-                    </th>
+                    <th className="col priority" role="columnheader">Priority</th>
+                    <th className="col action" role="columnheader">Action</th>
+                    <th className="col impact" role="columnheader">Impact</th>
                     <th className="col cta" role="columnheader"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {getVisibleActions(cause.actions).map((action, actionIdx) => {
                     const status = actionStatuses[action.id];
-                    const isApproved = status === "approved";
+                    const isApproved = status === 'approved';
                     return (
                       <tr key={actionIdx} role="row" className="actions-row">
                         <td className="col priority" role="cell">
-                          <span
-                            className={`${
-                              (action.priority || "").toLowerCase() === "high"
-                                ? "chip-high"
-                                : (action.priority || "").toLowerCase() ===
-                                  "low"
-                                ? "chip-low"
-                                : "chip-med"
-                            }`}
-                          >
-                            {action.priority}
-                          </span>
+                          <span className={`${((action.priority||'').toLowerCase()==='high')?'chip-high':((action.priority||'').toLowerCase()==='low')?'chip-low':'chip-med'}`}>{action.priority}</span>
                         </td>
                         <td className="col action" role="cell">
                           <div className="action-main">{action.title}</div>
                           <div className="action-sub">{action.description}</div>
-                          <div
-                            style={{
-                              marginTop: 6,
-                              fontSize: 12,
-                              color: "#6b7280",
-                            }}
-                          >
-                            Show Reasoning
-                          </div>
+                          <div style={{ marginTop: 6, fontSize: 12, color: '#6b7280' }}>Show Reasoning</div>
                         </td>
                         <td className="col impact" role="cell">
                           <span>{action.impact}</span>
                         </td>
                         <td className="col cta" role="cell">
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              gap: 8,
-                            }}
-                          >
+                          <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
                             {!hideDismiss && (
-                              <button
-                                className="btn-outline sm"
-                                type="button"
-                                onClick={() => handleDismiss(action.id)}
-                                disabled={isApproved}
-                                style={{
-                                  background: isApproved
-                                    ? "#f9f9f9"
-                                    : "#EFF1F5",
-                                  color: isApproved ? "#9ca3af" : "#525560",
-                                  border: "1px solid #e5e7eb",
-                                  borderRadius: "8px",
-                                  // padding: '10px 14px',
-                                  fontSize: "14px",
-                                  fontWeight: "500",
-                                  width: "85px",
-                                  height: "40px",
-                                  cursor: isApproved
-                                    ? "not-allowed"
-                                    : "pointer",
-                                  opacity: isApproved ? 0.5 : 1,
-                                  transition:
-                                    "background 160ms ease, border-color 160ms ease, transform 80ms ease, opacity 160ms ease",
-                                }}
-                              >
-                                Dismiss
-                              </button>
+                            <button
+                              className="btn-outline sm"
+                              type="button"
+                              onClick={() => handleDismiss(action.id)}
+                              disabled={isApproved}
+                              style={{
+                                background: isApproved ? '#f9f9f9' : '#EFF1F5',
+                                color: isApproved ? '#9ca3af' : '#525560',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '8px',
+                                // padding: '10px 14px',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                width: '85px',
+                                height: '40px',
+                                cursor: isApproved ? 'not-allowed' : 'pointer',
+                                opacity: isApproved ? 0.5 : 1,
+                                transition: 'background 160ms ease, border-color 160ms ease, transform 80ms ease, opacity 160ms ease'
+                              }}
+                            >
+                              Dismiss
+                            </button>
                             )}
                             <button
                               className="btn sm"
@@ -793,21 +719,20 @@ function RightActionsPanel({
                               onClick={() => handleApprove(action.id)}
                               disabled={isApproved}
                               style={{
-                                background: "#357A38",
-                                color: "white",
-                                border: "1px solid #e5e7eb",
-                                borderRadius: "8px",
+                                background: '#357A38',
+                                color: 'white',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '8px',
                                 // padding: '10px 14px',
-                                fontSize: "13px",
-                                fontWeight: "500",
-                                width: "87px",
-                                height: "40px",
-                                cursor: "pointer",
-                                transition:
-                                  "background 160ms ease, border-color 160ms ease, transform 80ms ease",
+                                fontSize: '13px',
+                                fontWeight: '500',
+                                width: '87px',
+                                height: '40px',
+                                cursor: 'pointer',
+                                transition: 'background 160ms ease, border-color 160ms ease, transform 80ms ease'
                               }}
                             >
-                              {isApproved ? "Approved" : "Approve"}
+                              {isApproved ? 'Approved' : 'Approve'}
                             </button>
                           </div>
                         </td>
@@ -858,7 +783,8 @@ function RightHypothesisPanel() {
         <div className="info-content">
           <div className="info-heading">Generating Hypothesis</div>
           <p className="info-body">
-            Uses RCA logic trees to generate possible causes.
+            Uses RCA logic trees to generate
+            possible causes.
           </p>
           <p className="info-body">
             Categorizes hypotheses into:
@@ -887,48 +813,16 @@ function RightHypothesisPanel() {
           <div className="mini-caption">Choosing from these</div>
           <div className="select-grid">
             <div className="select-chip">
-              <div className="select-title">PM frequency too high — 62%</div>
-              <div className="select-sub">
-                Strong correlation with PM WO surge in last 3 months
-              </div>
+              <div className="select-title">Cause 1 60%</div>
+              <div className="select-sub">Reason for choosing this cause</div>
             </div>
             <div className="select-chip">
-              <div className="select-title">Permit approval delays — 41%</div>
-              <div className="select-sub">
-                High overlap with longer MTTR and waiting time tags
-              </div>
+              <div className="select-title">Cause 2 40%</div>
+              <div className="select-sub">Reason for choosing this cause</div>
             </div>
             <div className="select-chip">
-              <div className="select-title">
-                Seal wear on Booster Pump P-102A — 35%
-              </div>
-              <div className="select-sub">
-                Repeat failures and increased vibration alerts
-              </div>
-            </div>
-            <div className="select-chip">
-              <div className="select-title">
-                Spare parts lead-time variance — 28%
-              </div>
-              <div className="select-sub">
-                Stockouts align with extended repair durations
-              </div>
-            </div>
-            <div className="select-chip">
-              <div className="select-title">
-                Operator round coverage gaps — 24%
-              </div>
-              <div className="select-sub">
-                Missed checks on critical assets before failures
-              </div>
-            </div>
-            <div className="select-chip">
-              <div className="select-title">
-                Ops–Maintenance scheduling conflicts — 21%
-              </div>
-              <div className="select-sub">
-                Clashes around isolation/LOTO windows delaying starts
-              </div>
+              <div className="select-title">Repair Booster Pump</div>
+              <div className="select-sub">Reason for choosing this cause</div>
             </div>
           </div>
         </div>
@@ -1420,21 +1314,10 @@ function CausesReport({ collapsed = false, onToggleCollapse }) {
     { month: "Mar", value: 159 },
   ];
   const mini2 = [
-    // More realistic, steadily increasing MTTR waiting on permits
-    { month: "Jan", value: 217 },
-    { month: "Feb", value: 224 },
-    { month: "Mar", value: 239 },
+    { month: "Jan", value: 116 },
+    { month: "Feb", value: 129 },
+    { month: "Mar", value: 152 },
   ];
-  // Dynamic percentage change labels (first → last month)
-  const pctChange = (series) => {
-    if (!Array.isArray(series) || series.length < 2) return 0;
-    const first = Number(series[0]?.value) || 0;
-    const last = Number(series[series.length - 1]?.value) || 0;
-    if (first === 0) return 0;
-    return Math.round(((last - first) / first) * 100);
-  };
-  const pct1 = pctChange(mini1);
-  const pct2 = pctChange(mini2);
   const donut = [
     { name: "Rapid increase in PM Work Orders", value: 60 },
     { name: "Increase in MTTR due to waiting for Permits", value: 40 },
@@ -1450,7 +1333,7 @@ function CausesReport({ collapsed = false, onToggleCollapse }) {
           <div>
             <div className="report-title">Top 2 Causes</div>
             <div className="report-subtitle">
-              Contributing to 7% increase in Maintenance Opex trend
+              Contributing to 17% increase in Maintenance Opex trend
             </div>
           </div>
         </div>
@@ -1492,180 +1375,180 @@ function CausesReport({ collapsed = false, onToggleCollapse }) {
         className={`report-body ${collapsed ? "collapsed" : "expanded"}`}
         aria-hidden={collapsed}
       >
-        <div className="report-causes-grid">
-          <article className="report-cause">
-            <div className="report-cause-head">
-              <div className="report-cause-index">1.</div>
-              <div className="report-cause-title">
-                Rapid Increase in PM Work Orders
-              </div>
+      <div className="report-causes-grid">
+        <article className="report-cause">
+          <div className="report-cause-head">
+            <div className="report-cause-index">1.</div>
+            <div className="report-cause-title">
+              Rapid Increase in PM Work Orders
             </div>
-            <p className="report-cause-desc">
-              Static PMs are not optimised with actual equipment condition and
-              criticality, leading to unnecessary maintenance tasks
-            </p>
-            <div className="report-mini">
-              <div className="report-mini-left">
-                <div className="report-mini-label">Trend</div>
-                <div className="report-mini-chart">
-                  <ResponsiveContainer width="100%" height={84}>
-                    <BarChart
-                      data={mini1}
-                      margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
-                    >
-                      <CartesianGrid
-                        vertical={false}
-                        stroke="#eef0f4"
-                        strokeDasharray="4 4"
-                      />
-                      <XAxis
-                        dataKey="month"
-                        tickLine={false}
-                        axisLine={false}
-                        fontSize={11}
-                      />
-                      <YAxis
-                        domain={[115, 160]}
-                        ticks={[115, 160]}
-                        width={28}
-                        tickLine={false}
-                        axisLine={{ stroke: "#e5e7eb" }}
-                        fontSize={10}
-                      />
-                      <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
-                      <Bar
-                        dataKey="value"
-                        radius={[4, 4, 0, 0]}
-                        fill="#ef4444"
-                        maxBarSize={18}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-              <div className="report-mini-stat">
-                <div className="report-mini-stat-val">+ {pct1}%</div>
-                <div className="report-mini-stat-sub">in last 3 months</div>
-              </div>
-            </div>
-          </article>
-
-          <article className="report-cause">
-            <div className="report-cause-head">
-              <div className="report-cause-index">2.</div>
-              <div className="report-cause-title">
-                Increase in MTTR waiting on Permits
-              </div>
-            </div>
-            <p className="report-cause-desc">
-              Permit delays are primarily due to coordination gaps between
-              Operations and Maintenance teams on ground.
-            </p>
-            <div className="report-mini">
-              <div className="report-mini-left">
-                <div className="report-mini-label">Trend</div>
-                <div className="report-mini-chart">
-                  <ResponsiveContainer width="100%" height={84}>
-                    <BarChart
-                      data={mini2}
-                      margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
-                    >
-                      <CartesianGrid
-                        vertical={false}
-                        stroke="#eef0f4"
-                        strokeDasharray="4 4"
-                      />
-                      <XAxis
-                        dataKey="month"
-                        tickLine={false}
-                        axisLine={false}
-                        fontSize={11}
-                      />
-                      <YAxis
-                        domain={[115, 160]}
-                        ticks={[115, 160]}
-                        width={28}
-                        tickLine={false}
-                        axisLine={{ stroke: "#e5e7eb" }}
-                        fontSize={10}
-                      />
-                      <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
-                      <Bar
-                        dataKey="value"
-                        radius={[4, 4, 0, 0]}
-                        fill="#ef4444"
-                        maxBarSize={18}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-              <div className="report-mini-stat">
-                <div className="report-mini-stat-val">+ {pct2}%</div>
-                <div className="report-mini-stat-sub">in last 3 months</div>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <div className="report-attrib">
-          <div className="report-attrib-title">Causes Attribution</div>
-          <div className="report-attrib-grid">
-            <div className="report-donut-wrap">
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie
-                    data={donut}
-                    dataKey="value"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={64}
-                    outerRadius={100}
-                    cornerRadius={6}
-                    paddingAngle={0}
+          </div>
+          <p className="report-cause-desc">
+            Static PMs are not optimised with actual equipment condition and
+            criticality, leading to unnecessary maintenance tasks
+          </p>
+          <div className="report-mini">
+            <div className="report-mini-left">
+              <div className="report-mini-label">Trend</div>
+              <div className="report-mini-chart">
+                <ResponsiveContainer width="100%" height={84}>
+                  <BarChart
+                    data={mini1}
+                    margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
                   >
-                    {donut.map((entry, i) => (
-                      <Cell
-                        key={entry.name}
-                        fill={donutColors[i % donutColors.length]}
+                    <CartesianGrid
+                      vertical={false}
+                      stroke="#eef0f4"
+                      strokeDasharray="4 4"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={11}
+                    />
+                      <YAxis
+                        domain={[115, 160]}
+                        ticks={[115, 160]}
+                        width={28}
+                        tickLine={false}
+                        axisLine={{ stroke: "#e5e7eb" }}
+                        fontSize={10}
                       />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="report-donut-center">60%</div>
+                    <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
+                    <Bar
+                      dataKey="value"
+                      radius={[4, 4, 0, 0]}
+                      fill="#ef4444"
+                      maxBarSize={18}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="report-mini-stat">
+              <div className="report-mini-stat-val">+ 38%</div>
+              <div className="report-mini-stat-sub">in last 3 months</div>
+            </div>
+          </div>
+        </article>
+
+        <article className="report-cause">
+          <div className="report-cause-head">
+            <div className="report-cause-index">2.</div>
+            <div className="report-cause-title">
+              Increase in MTTR waiting on Permits
+            </div>
+          </div>
+          <p className="report-cause-desc">
+            Permit delays are primarily due to the coordination gaps between
+            Operations and the Maintenance teams on ground.
+          </p>
+          <div className="report-mini">
+            <div className="report-mini-left">
+              <div className="report-mini-label">Trend</div>
+              <div className="report-mini-chart">
+                <ResponsiveContainer width="100%" height={84}>
+                  <BarChart
+                    data={mini2}
+                    margin={{ top: 8, left: 8, right: 8, bottom: 0 }}
+                  >
+                    <CartesianGrid
+                      vertical={false}
+                      stroke="#eef0f4"
+                      strokeDasharray="4 4"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={11}
+                    />
+                      <YAxis
+                        domain={[115, 160]}
+                        ticks={[115, 160]}
+                        width={28}
+                        tickLine={false}
+                        axisLine={{ stroke: "#e5e7eb" }}
+                        fontSize={10}
+                      />
+                    <Tooltip cursor={{ fill: "rgba(99,102,241,0.06)" }} />
+                    <Bar
+                      dataKey="value"
+                      radius={[4, 4, 0, 0]}
+                      fill="#ef4444"
+                      maxBarSize={18}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="report-mini-stat">
+              <div className="report-mini-stat-val">+ 38%</div>
+              <div className="report-mini-stat-sub">in last 3 months</div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div className="report-attrib">
+        <div className="report-attrib-title">Causes Attribution</div>
+        <div className="report-attrib-grid">
+          <div className="report-donut-wrap">
+            <ResponsiveContainer width="100%" height={240}>
+              <PieChart>
+                <Pie
+                  data={donut}
+                  dataKey="value"
+                  cx="50%"
+                  cy="50%"
+                    innerRadius={64}
+                  outerRadius={100}
+                  cornerRadius={6}
+                  paddingAngle={0}
+                >
+                  {donut.map((entry, i) => (
+                    <Cell
+                      key={entry.name}
+                      fill={donutColors[i % donutColors.length]}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="report-donut-center">60%</div>
               {/* <div className="report-callout">
               Rapid increase in PM Work Orders
             </div> */}
-            </div>
-            <div className="report-attrib-legend">
-              <span className="legend-pill red">
-                Increase in MTTR due to waiting for Permits
-                <span className="legend-count">3</span>
-              </span>
-              <span className="legend-pill blue">
-                Rapid increase in PM Work Orders
-                <span className="legend-count">5</span>
-              </span>
-            </div>
+          </div>
+          <div className="report-attrib-legend">
+            <span className="legend-pill red">
+              Increase in MTTR due to waiting for Permits
+              <span className="legend-count">3</span>
+            </span>
+            <span className="legend-pill blue">
+              Rapid increase in PM Work Orders
+              <span className="legend-count">5</span>
+            </span>
           </div>
         </div>
+      </div>
 
-        <div className="report-sources">
-          <div className="sources-head">Sources go here</div>
-          <div className="sources-chips">
-            {[
-              "Hydraulic System Installment",
-              "Hydraulic System Installment",
-              "Repair Booster Pump",
-              "Hydraulic System Installment",
-              "Hydraulic System Installment",
-              "Repair Booster Pump",
-            ].map((t, i) => (
-              <span key={i} className="chip-soft">
-                {t}
-              </span>
-            ))}
+      <div className="report-sources">
+        <div className="sources-head">Sources go here</div>
+        <div className="sources-chips">
+          {[
+            "Hydraulic System Installment",
+            "Hydraulic System Installment",
+            "Repair Booster Pump",
+            "Hydraulic System Installment",
+            "Hydraulic System Installment",
+            "Repair Booster Pump",
+          ].map((t, i) => (
+            <span key={i} className="chip-soft">
+              {t}
+            </span>
+          ))}
           </div>
         </div>
       </div>
@@ -1760,11 +1643,9 @@ function ActionPlanCards({
   }
 
   function approve(id) {
-    const currentApprovedCount = actions.filter(
-      (a) => a.status === "approved"
-    ).length;
+    const currentApprovedCount = actions.filter(a => a.status === "approved").length;
     updateStatus(id, "approved");
-
+    
     // Check if this is the first approved action to add the execution message
     if (currentApprovedCount === 0 && onAddMessage) {
       // Add a clickable message to execute all approved actions
@@ -1775,11 +1656,11 @@ function ActionPlanCards({
         text: "✅ Action approved! Click here to execute all approved actions.",
         animated: false,
         clickable: true,
-        action: "showExecution",
+        action: "showExecution"
       });
     }
   }
-
+  
   function reject(id) {
     updateStatus(id, "rejected");
   }
@@ -1844,12 +1725,7 @@ function ActionPlanCards({
   );
 }
 
-function CausesList({
-  onTakeAction,
-  onPlansUpdate,
-  onAddMessage,
-  onAnyApprove,
-}) {
+function CausesList({ onTakeAction, onPlansUpdate, onAddMessage, onAnyApprove }) {
   const causes = [
     {
       rank: 1,
@@ -1868,7 +1744,7 @@ function CausesList({
       title: "Increase in MTTR due to Waiting for Permits",
       percent: 30,
       description:
-        "Permit delays are primarily due to coordination gaps between Operations and Maintenance teams.",
+        "Permit delays are primarily due to the coordination gaps between Operations and the Maintenance teams.",
       metric: {
         type: "mttr",
         from: "7.8h",
@@ -2064,12 +1940,12 @@ function CausesList({
           <span className="causes-bullet" aria-hidden="true">
             <IconBrand32 />
           </span>
-          <div>
+        <div>
             <div className="causes-title">Top 2 Causes identified</div>
-            <div className="causes-subtitle">
+          <div className="causes-subtitle">
               Aggregated from 180+ WO inspections
-            </div>
           </div>
+        </div>
         </div>
       </div>
 
@@ -2274,20 +2150,16 @@ function ChatMessage({ message, onTypedDone, onMessageClick }) {
         <span className="assistant-avatar" aria-hidden="true">
           <IconInnovaSmall />
         </span>
-        <div
-          className={`bubble ${message.role} ${
-            message.clickable ? "clickable" : ""
-          }`}
+        <div 
+          className={`bubble ${message.role} ${message.clickable ? 'clickable' : ''}`}
           onClick={handleClick}
-          style={message.clickable ? { cursor: "pointer" } : {}}
+          style={message.clickable ? { cursor: 'pointer' } : {}}
         >
           {message.animated ? (
             <TypingText
               text={message.text}
               cps={26}
-              onDone={() => {
-                onTypedDone?.(message.id);
-              }}
+              onDone={() => { onTypedDone?.(message.id); }}
             />
           ) : (
             message.text
@@ -2304,15 +2176,7 @@ function ChatMessage({ message, onTypedDone, onMessageClick }) {
 }
 
 // Action Execution Panel
-function ActionExecutionPanel({
-  collapsed = false,
-  onToggleCollapse,
-  approvedActions = [],
-  executeAllSignal = 0,
-  executeOneRequest = null,
-  onAddMessage,
-  onActionComplete,
-}) {
+function ActionExecutionPanel({ collapsed = false, onToggleCollapse, approvedActions = [], executeAllSignal = 0, onAddMessage, onActionComplete }) {
   const [executedActions, setExecutedActions] = useState(new Set());
   const [executingActions, setExecutingActions] = useState(new Set());
   const [executionTimelines, setExecutionTimelines] = useState({});
@@ -2327,23 +2191,25 @@ function ActionExecutionPanel({
   const [failedActions, setFailedActions] = useState(new Set());
   const failedActionsRef = useRef(new Set());
 
+  // Helpers for realistic pacing (scoped to ActionExecutionPanel)
+  const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+  const randomMs = (min, max) => randomInt(min, max);
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   // Google Calendar integration states
   const [gsiReady, setGsiReady] = useState(false);
   const [tokenClient, setTokenClient] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [tokenExpiresAt, setTokenExpiresAt] = useState(null);
-  const [authStatus, setAuthStatus] = useState("unknown");
+  const [authStatus, setAuthStatus] = useState('unknown');
 
   const timelinesRef = useRef({});
   const thinkingRef = useRef({});
   const aiGenRef = useRef({});
-  const authAttemptRef = useRef("idle");
+  const authAttemptRef = useRef('idle');
   const pendingExecuteIndexRef = useRef(null);
 
-  const clientId = useMemo(
-    () => process.env.REACT_APP_GOOGLE_CLIENT_ID || "",
-    []
-  );
+  const clientId = useMemo(() => process.env.REACT_APP_GOOGLE_CLIENT_ID || '', []);
 
   // Preload WO-permit GIF
   useEffect(() => {
@@ -2358,13 +2224,12 @@ function ActionExecutionPanel({
     if (existing) {
       setGsiReady(true);
     } else {
-      const script = document.createElement("script");
+      const script = document.createElement('script');
       script.src = GSI_SRC;
       script.async = true;
       script.defer = true;
       script.onload = () => setGsiReady(true);
-      script.onerror = () =>
-        console.error("Failed to load Google Identity Services");
+      script.onerror = () => console.error('Failed to load Google Identity Services');
       document.body.appendChild(script);
     }
   }, []);
@@ -2376,46 +2241,42 @@ function ActionExecutionPanel({
     // @ts-ignore
     const tc = window.google?.accounts?.oauth2?.initTokenClient?.({
       client_id: clientId,
-      scope: "https://www.googleapis.com/auth/calendar.events",
+      scope: 'https://www.googleapis.com/auth/calendar.events',
       callback: (resp) => {
         if (resp && resp.access_token) {
           setAccessToken(resp.access_token);
           const seconds = Number(resp.expires_in) || 3600;
           setTokenExpiresAt(Date.now() + seconds * 1000);
-          setAuthStatus("authorized");
+          setAuthStatus('authorized');
           if (pendingExecuteIndexRef.current != null) {
             const actionId = pendingExecuteIndexRef.current;
             pendingExecuteIndexRef.current = null;
             handleCreateEventForAction(actionId);
           }
-        } else if (authAttemptRef.current === "silent") {
-          setAuthStatus("unauthorized");
+        } else if (authAttemptRef.current === 'silent') {
+          setAuthStatus('unauthorized');
         }
-        authAttemptRef.current = "idle";
+        authAttemptRef.current = 'idle';
       },
       error_callback: (err) => {
-        console.warn("Google auth error:", err);
-        if (authAttemptRef.current !== "silent") {
-          setExecutionInfo((prev) => ({
+        console.warn('Google auth error:', err);
+        if (authAttemptRef.current !== 'silent') {
+          setExecutionInfo(prev => ({
             ...prev,
-            [pendingExecuteIndexRef.current]:
-              "Authorization failed. Please try again.",
+            [pendingExecuteIndexRef.current]: 'Authorization failed. Please try again.'
           }));
           const failedId = pendingExecuteIndexRef.current;
           if (failedId != null) {
-            setFailedActions((prev) => new Set([...prev, failedId]));
-            failedActionsRef.current = new Set([
-              ...failedActionsRef.current,
-              failedId,
-            ]);
-            setExecutingActions((prev) => {
+            setFailedActions(prev => new Set([...prev, failedId]));
+            failedActionsRef.current = new Set([...failedActionsRef.current, failedId]);
+            setExecutingActions(prev => {
               const next = new Set(prev);
               next.delete(failedId);
               return next;
             });
           }
         }
-        authAttemptRef.current = "idle";
+        authAttemptRef.current = 'idle';
       },
     });
 
@@ -2423,9 +2284,9 @@ function ActionExecutionPanel({
 
     if (tc) {
       // Silent auth check
-      authAttemptRef.current = "silent";
+      authAttemptRef.current = 'silent';
       // @ts-ignore
-      tc.requestAccessToken({ prompt: "" });
+      tc.requestAccessToken({ prompt: '' });
     }
   }, [gsiReady, clientId]);
 
@@ -2433,10 +2294,10 @@ function ActionExecutionPanel({
   useEffect(() => {
     return () => {
       Object.values(timelinesRef.current).forEach(({ timers }) => {
-        timers?.forEach((t) => clearTimeout(t));
+        timers?.forEach(t => clearTimeout(t));
       });
       Object.values(thinkingRef.current).forEach(({ timers }) => {
-        timers?.forEach((t) => clearTimeout(t) || clearInterval(t));
+        timers?.forEach(t => clearTimeout(t) || clearInterval(t));
       });
       Object.values(aiGenRef.current).forEach((entry) => {
         if (entry?.typingId) clearInterval(entry.typingId);
@@ -2449,50 +2310,32 @@ function ActionExecutionPanel({
   }, []);
 
   const normalizeType = (type) => {
-    const s = String(type ?? "")
-      .toLowerCase()
-      .trim();
-    if (s === "meeting") return "meeting";
-    if (
-      s === "wo-permit" ||
-      s === "wo permit" ||
-      s === "permit" ||
-      s === "wo" ||
-      s === "wo_permit" ||
-      s === "wopermit"
-    )
-      return "wo-permit";
-    if (
-      s === "round-plan" ||
-      s === "round plan" ||
-      s === "roundplan" ||
-      s === "round_plan"
-    )
-      return "round-plan";
-    return "document";
+    const s = String(type ?? '').toLowerCase().trim();
+    if (s === 'meeting') return 'meeting';
+    if (s === 'wo-permit' || s === 'wo permit' || s === 'permit' || s === 'wo' || s === 'wo_permit' || s === 'wopermit') return 'wo-permit';
+    if (s === 'round-plan' || s === 'round plan' || s === 'roundplan' || s === 'round_plan') return 'round-plan';
+    return 'document';
   };
 
   const buildAIThought = (actionText) => {
-    const subject = actionText || "this action";
+    const subject = actionText || 'this action';
     return `Planning execution for ${subject}: Analyzing requirements → Checking dependencies → Preparing resources → Executing steps → Validating completion.`;
   };
 
   const buildAIDocument = (actionId, actionText) => {
-    const action = approvedActions.find((a) => a.id === actionId);
+    const action = approvedActions.find(a => a.id === actionId);
     const title = action?.title || `Action Document`;
     const today = new Date().toLocaleString();
     return (
       `${title}\n\n` +
       `Generated: ${today}\n\n` +
       `Executive Summary\n` +
-      `- Objective: ${actionText || "Complete the assigned action."}\n` +
+      `- Objective: ${actionText || 'Complete the assigned action.'}\n` +
       `- Scope: Define what is in and out of scope for this action.\n` +
       `- Outcome: What success looks like upon completion.\n\n` +
       `Details\n` +
       `1) Context\n` +
-      `   Background and constraints related to: ${
-        actionText || "the action."
-      }\n\n` +
+      `   Background and constraints related to: ${actionText || 'the action.'}\n\n` +
       `2) Analysis\n` +
       `   Key findings, risks, and mitigations. Include data points and references.\n\n` +
       `3) Plan\n` +
@@ -2509,142 +2352,152 @@ function ActionExecutionPanel({
 
   const startAIGeneration = (actionId, actionText) => {
     const fullText = buildAIDocument(actionId, actionText);
-    setDocContents((prev) => ({ ...prev, [actionId]: "" }));
+    setDocContents(prev => ({ ...prev, [actionId]: '' }));
+
+    // Pre-writing phases for realism
+    setExecutionInfo(prev => ({
+      ...prev,
+      [actionId]: `Collecting references… (${randomInt(8, 18)} docs)`
+    }));
+    const phase1 = setTimeout(() => {
+      setExecutionInfo(prev => ({ ...prev, [actionId]: 'Drafting outline…' }));
+    }, randomMs(900, 1400));
+    const phase2 = setTimeout(() => {
+      setExecutionInfo(prev => ({ ...prev, [actionId]: 'Writing first draft…' }));
+    }, randomMs(1800, 2400));
 
     let cursor = 0;
-    const tick = () => {
-      const remaining = fullText.length - cursor;
-      if (remaining <= 0) {
-        setAiGenStates((prev) => {
-          const next = { ...prev };
-          delete next[actionId];
-          return next;
-        });
-        completeAction(actionId);
-        setExecutionInfo((prev) => ({
-          ...prev,
-          [actionId]: "Document generated and ready for download.",
-        }));
-        setTimeout(() => {
-          setExecutionInfo((prev) => {
+    let ticks = 0;
+    const startTyping = () => {
+      const typingId = setInterval(() => {
+        ticks += 1;
+        const remaining = fullText.length - cursor;
+        if (remaining <= 0) {
+          clearInterval(typingId);
+          setAiGenStates(prev => {
             const next = { ...prev };
             delete next[actionId];
             return next;
           });
-        }, 3000);
-        return;
-      }
-      const chunkLen = Math.min(remaining, Math.floor(Math.random() * 4) + 1);
-      const nextChunk = fullText.slice(cursor, cursor + chunkLen);
-      cursor += chunkLen;
-      setDocContents((prev) => ({
-        ...prev,
-        [actionId]: (prev[actionId] || "") + nextChunk,
-      }));
+          clearTimeout(phase1);
+          clearTimeout(phase2);
+          completeAction(actionId);
+          setExecutionInfo(prev => ({
+            ...prev,
+            [actionId]: 'Document generated and ready for download.'
+          }));
+          setTimeout(() => {
+            setExecutionInfo(prev => {
+              const next = { ...prev };
+              delete next[actionId];
+              return next;
+            });
+          }, 3000);
+          return;
+        }
+        // Slower typing with occasional short pauses
+        const chunkLen = Math.min(remaining, randomInt(1, 2));
+        const nextChunk = fullText.slice(cursor, cursor + chunkLen);
+        cursor += chunkLen;
+        setDocContents(prev => ({ ...prev, [actionId]: (prev[actionId] || '') + nextChunk }));
+        if (ticks % randomInt(40, 60) === 0) {
+          // brief pause to mimic thinking
+          clearInterval(typingId);
+          setTimeout(startTyping, randomMs(250, 500));
+        }
+      }, randomMs(32, 48));
+      aiGenRef.current[actionId] = { typingId, cursor: 0, fullText, phase: 'writing' };
+      setAiGenStates(prev => ({ ...prev, [actionId]: { isGenerating: true } }));
     };
 
-    const typingId = setInterval(tick, 18);
-    aiGenRef.current[actionId] = {
-      typingId,
-      cursor: 0,
-      fullText,
-      phase: "writing",
-    };
-    setAiGenStates((prev) => ({ ...prev, [actionId]: { isGenerating: true } }));
+    // Begin typing after initial phases
+    setTimeout(startTyping, randomMs(2200, 3000));
   };
 
   const handleCreateEventForAction = async (actionId) => {
     try {
       if (!accessToken) {
-        throw new Error("No access token");
+        throw new Error('No access token');
       }
 
-      const action = approvedActions.find((a) => a.id === actionId);
+      const action = approvedActions.find(a => a.id === actionId);
       const now = Date.now();
       const start = new Date(now + 60 * 60 * 1000).toISOString(); // 1 hour from now
       const end = new Date(now + 90 * 60 * 1000).toISOString(); // 1.5 hours from now
 
       const event = {
-        summary: action?.title || "Action Meeting",
-        description: action?.description || "Scheduled via Action Execution",
+        summary: action?.title || 'Action Meeting',
+        description: action?.description || 'Scheduled via Action Execution',
         start: { dateTime: start },
         end: { dateTime: end },
         reminders: { useDefault: true },
         attendees: HARDCODED_ATTENDEES.map((email) => ({ email })),
       };
 
-      const resp = await fetch(
-        "https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=all",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(event),
-        }
-      );
+      const resp = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=all', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(event),
+      });
 
       if (resp.status === 200 || resp.status === 201) {
         // Meeting creation successful
         completeAction(actionId);
-        setExecutionInfo((prev) => ({
+        setExecutionInfo(prev => ({
           ...prev,
-          [actionId]: "Meeting scheduled and invites sent successfully.",
+          [actionId]: 'Meeting scheduled and invites sent successfully.'
         }));
         setTimeout(() => {
-          setExecutionInfo((prev) => {
+          setExecutionInfo(prev => {
             const next = { ...prev };
             delete next[actionId];
             return next;
           });
         }, 3000);
       } else {
-        throw new Error("Calendar API error");
+        throw new Error('Calendar API error');
       }
     } catch (e) {
-      console.error("Failed to create calendar event:", e);
-      setExecutionInfo((prev) => ({
+      console.error('Failed to create calendar event:', e);
+      setExecutionInfo(prev => ({
         ...prev,
-        [actionId]: "Failed to schedule meeting. Please try again.",
+        [actionId]: 'Failed to schedule meeting. Please try again.'
       }));
-      setExecutingActions((prev) => {
+      setExecutingActions(prev => {
         const next = new Set(prev);
         next.delete(actionId);
         return next;
       });
-      setFailedActions((prev) => new Set([...prev, actionId]));
-      failedActionsRef.current = new Set([
-        ...failedActionsRef.current,
-        actionId,
-      ]);
+      setFailedActions(prev => new Set([...prev, actionId]));
+      failedActionsRef.current = new Set([...failedActionsRef.current, actionId]);
     }
   };
 
-  const startThinking = (actionId, actionText) => {
+  const startThinking = (actionId, actionText, thinkMs) => {
     const thoughtFull = buildAIThought(actionText);
 
     if (thinkingRef.current[actionId]) {
-      thinkingRef.current[actionId].timers?.forEach(
-        (t) => clearTimeout(t) || clearInterval(t)
-      );
+      thinkingRef.current[actionId].timers?.forEach(t => clearTimeout(t) || clearInterval(t));
     }
 
     thinkingRef.current[actionId] = {
       thoughtFull,
-      thoughtVisible: "",
+      thoughtVisible: '',
       thoughtCursor: 0,
       blinkOn: true,
-      timers: [],
+      timers: []
     };
 
-    setThinkingStates((prev) => ({
+    setThinkingStates(prev => ({
       ...prev,
       [actionId]: {
         isThinking: true,
-        thoughtVisible: "",
-        blinkOn: true,
-      },
+        thoughtVisible: '',
+        blinkOn: true
+      }
     }));
 
     const thoughtTypingId = setInterval(() => {
@@ -2658,19 +2511,16 @@ function ActionExecutionPanel({
       }
 
       const chunkLen = Math.min(remaining, Math.floor(Math.random() * 3) + 1);
-      const nextChunk = state.thoughtFull.slice(
-        state.thoughtCursor,
-        state.thoughtCursor + chunkLen
-      );
+      const nextChunk = state.thoughtFull.slice(state.thoughtCursor, state.thoughtCursor + chunkLen);
       state.thoughtCursor += chunkLen;
       state.thoughtVisible += nextChunk;
 
-      setThinkingStates((prev) => ({
+      setThinkingStates(prev => ({
         ...prev,
         [actionId]: {
           ...prev[actionId],
-          thoughtVisible: state.thoughtVisible,
-        },
+          thoughtVisible: state.thoughtVisible
+        }
       }));
     }, THINK_TYPE_INTERVAL_MS);
 
@@ -2679,30 +2529,28 @@ function ActionExecutionPanel({
       if (!state) return;
 
       state.blinkOn = !state.blinkOn;
-      setThinkingStates((prev) => ({
+      setThinkingStates(prev => ({
         ...prev,
         [actionId]: {
           ...prev[actionId],
-          blinkOn: state.blinkOn,
-        },
+          blinkOn: state.blinkOn
+        }
       }));
     }, THINK_CURSOR_BLINK_MS);
 
     thinkingRef.current[actionId].timers = [thoughtTypingId, blinkId];
 
     const finishThinkingId = setTimeout(() => {
-      setThinkingStates((prev) => {
+      setThinkingStates(prev => {
         const next = { ...prev };
         delete next[actionId];
         return next;
       });
       if (thinkingRef.current[actionId]) {
-        thinkingRef.current[actionId].timers.forEach(
-          (t) => clearTimeout(t) || clearInterval(t)
-        );
+        thinkingRef.current[actionId].timers.forEach(t => clearTimeout(t) || clearInterval(t));
         delete thinkingRef.current[actionId];
       }
-    }, AI_THINK_MS);
+    }, Math.max(thinkMs || AI_THINK_MS, 1200));
 
     thinkingRef.current[actionId].timers.push(finishThinkingId);
   };
@@ -2711,83 +2559,98 @@ function ActionExecutionPanel({
     let steps, stepDuration;
 
     switch (actionType) {
-      case "meeting":
-        steps = TIMELINE_STEPS;
-        stepDuration = TIMELINE_STEP_MS;
+      case 'meeting':
+        steps = [...TIMELINE_STEPS];
+        // Slow down and vary timing per step
+        stepDuration = randomMs(TIMELINE_STEP_MS + 800, TIMELINE_STEP_MS + 1800);
         break;
-      case "wo-permit":
-        steps = WOP_STEPS;
-        stepDuration = TIMELINE_STEP_MS;
+      case 'wo-permit':
+        {
+          const count = randomInt(3, 7);
+          steps = [
+            `Authoring ${count} Permit Forms`,
+            `Attaching to ${count} Workorders`,
+            'Saving Edits',
+            'Done'
+          ];
+          stepDuration = randomMs(TIMELINE_STEP_MS + 900, TIMELINE_STEP_MS + 2000);
+        }
         break;
-      case "round-plan":
-        steps = ROUND_STEPS;
-        stepDuration = TIMELINE_STEP_MS;
+      case 'round-plan':
+        steps = [
+          `Analyzing Routes for ${randomInt(9, 18)} assets`,
+          `Optimizing Sequence (v${randomInt(2, 5)} draft)`,
+          `Validating ${randomInt(4, 8)} Safety Checks`,
+          'Publishing Plan'
+        ];
+        stepDuration = randomMs(TIMELINE_STEP_MS + 900, TIMELINE_STEP_MS + 2000);
         break;
-      case "document":
+      case 'document':
         // For documents, expand the editor and start AI generation
-        setExpandedDocs((prev) => ({ ...prev, [actionId]: true }));
-        const action = approvedActions.find((a) => a.id === actionId);
+        setExpandedDocs(prev => ({ ...prev, [actionId]: true }));
+        const action = approvedActions.find(a => a.id === actionId);
         startAIGeneration(actionId, action?.description || action?.title);
         return;
       default:
-        steps = ["Preparing", "Executing", "Validating", "Completing"];
-        stepDuration = 1000;
+        steps = ['Preparing', 'Executing', 'Validating', 'Completing'];
+        stepDuration = randomMs(1600, 2600);
     }
 
     if (timelinesRef.current[actionId]) {
-      timelinesRef.current[actionId].timers?.forEach((t) => clearTimeout(t));
+      timelinesRef.current[actionId].timers?.forEach(t => clearTimeout(t));
     }
 
     timelinesRef.current[actionId] = {
       steps,
       current: -1,
       timers: [],
-      completed: false,
+      completed: false
     };
 
-    setExecutionTimelines((prev) => ({
+    setExecutionTimelines(prev => ({
       ...prev,
       [actionId]: {
         steps,
         current: -1,
-        completed: false,
-      },
+        completed: false
+      }
     }));
 
+    // Use variable per-step delays for a more organic feel
     const timers = [];
+    let accum = 0;
     steps.forEach((_, stepIdx) => {
+      const thisStepMs = stepDuration + randomMs(-300, 600);
+      accum += Math.max(600, thisStepMs);
       const timerId = setTimeout(() => {
         if (timelinesRef.current[actionId]) {
           timelinesRef.current[actionId].current = stepIdx;
-          setExecutionTimelines((prev) => ({
+          setExecutionTimelines(prev => ({
             ...prev,
             [actionId]: {
               ...prev[actionId],
-              current: stepIdx,
-            },
+              current: stepIdx
+            }
           }));
         }
-      }, stepIdx * stepDuration);
+      }, accum);
       timers.push(timerId);
     });
 
     const completeId = setTimeout(() => {
       if (timelinesRef.current[actionId]) {
         timelinesRef.current[actionId].completed = true;
-        setExecutionTimelines((prev) => ({
+        setExecutionTimelines(prev => ({
           ...prev,
           [actionId]: {
             ...prev[actionId],
-            completed: true,
-          },
+            completed: true
+          }
         }));
 
-        setExecutedActions((prev) => new Set([...prev, actionId]));
-        executedActionsRef.current = new Set([
-          ...executedActionsRef.current,
-          actionId,
-        ]);
-        setExecutingActions((prev) => {
+        setExecutedActions(prev => new Set([...prev, actionId]));
+        executedActionsRef.current = new Set([...executedActionsRef.current, actionId]);
+        setExecutingActions(prev => {
           const next = new Set(prev);
           next.delete(actionId);
           return next;
@@ -2795,33 +2658,33 @@ function ActionExecutionPanel({
 
         let message;
         switch (actionType) {
-          case "meeting":
-            message = "Meeting scheduled and invites sent.";
+          case 'meeting':
+            message = 'Meeting scheduled and invites sent.';
             break;
-          case "wo-permit":
-            message = "Edited 4 Workorders and added Permits.";
+          case 'wo-permit':
+            message = 'Edited Workorders and added Permits.';
             break;
-          case "round-plan":
-            message = "Round plan optimized and published.";
+          case 'round-plan':
+            message = 'Round plan optimized and published.';
             break;
           default:
-            message = "Action completed successfully.";
+            message = 'Action completed successfully.';
         }
 
-        setExecutionInfo((prev) => ({
+        setExecutionInfo(prev => ({
           ...prev,
-          [actionId]: message,
+          [actionId]: message
         }));
 
         setTimeout(() => {
-          setExecutionInfo((prev) => {
+          setExecutionInfo(prev => {
             const next = { ...prev };
             delete next[actionId];
             return next;
           });
         }, 3000);
       }
-    }, steps.length * stepDuration);
+    }, accum + randomMs(600, 1200));
     timers.push(completeId);
 
     timelinesRef.current[actionId].timers = timers;
@@ -2832,8 +2695,9 @@ function ActionExecutionPanel({
       return;
     }
 
-    const actionType = normalizeType(action.type || "document");
+    const actionType = normalizeType(action.type || 'document');
     const actionTitle = action.title || action.description;
+    const thinkMs = randomMs(2600, 5200);
 
     // Add chat message when action starts executing
     if (onAddMessage) {
@@ -2841,63 +2705,57 @@ function ActionExecutionPanel({
         id: Date.now(),
         role: "assistant",
         text: `Executing ${actionTitle}`,
-        animated: true,
+        animated: true
       });
     }
 
-    setExecutingActions((prev) => new Set([...prev, action.id]));
+    setExecutingActions(prev => new Set([...prev, action.id]));
 
-    startThinking(action.id, actionTitle);
+    startThinking(action.id, actionTitle, thinkMs);
 
     setTimeout(() => {
       if (!executedActions.has(action.id)) {
-        if (actionType === "meeting") {
+        // Show timeline for all types; documents expand editor and write content
+        startExecutionTimeline(action.id, actionType);
+        if (actionType === 'meeting') {
           // For meetings, handle Google Calendar integration
           if (!accessToken && tokenClient) {
             pendingExecuteIndexRef.current = action.id;
-            authAttemptRef.current = "exec";
+            authAttemptRef.current = 'exec';
             // @ts-ignore
-            tokenClient.requestAccessToken({ prompt: "consent" });
+            tokenClient.requestAccessToken({ prompt: 'consent' });
           } else if (accessToken) {
             handleCreateEventForAction(action.id);
           } else {
-            setExecutionInfo((prev) => ({
+            setExecutionInfo(prev => ({
               ...prev,
-              [action.id]:
-                "Google Calendar not available. Please check configuration.",
+              [action.id]: 'Google Calendar not available. Please check configuration.'
             }));
-            setExecutingActions((prev) => {
+            setExecutingActions(prev => {
               const next = new Set(prev);
               next.delete(action.id);
               return next;
             });
-            setFailedActions((prev) => new Set([...prev, action.id]));
-            failedActionsRef.current = new Set([
-              ...failedActionsRef.current,
-              action.id,
-            ]);
+            setFailedActions(prev => new Set([...prev, action.id]));
+            failedActionsRef.current = new Set([...failedActionsRef.current, action.id]);
           }
-        } else {
-          startExecutionTimeline(action.id, actionType);
         }
       }
-    }, AI_THINK_MS);
+    }, thinkMs);
   };
 
   const handleDocChange = (actionId, value) => {
-    setDocContents((prev) => ({ ...prev, [actionId]: value }));
+    setDocContents(prev => ({ ...prev, [actionId]: value }));
   };
 
   const handleDownloadDoc = (actionId) => {
-    const text = docContents[actionId] || "";
-    const action = approvedActions.find((a) => a.id === actionId);
-    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const text = docContents[actionId] || '';
+    const action = approvedActions.find(a => a.id === actionId);
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = `${
-      action?.title?.replace(/[^a-z0-9]/gi, "_") || "Action_Document"
-    }.txt`;
+    a.download = `${action?.title?.replace(/[^a-z0-9]/gi, '_') || 'Action_Document'}.txt`;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
@@ -2907,66 +2765,57 @@ function ActionExecutionPanel({
   };
 
   const handleEmailDoc = (actionId) => {
-    const text = docContents[actionId] || "";
-    const action = approvedActions.find((a) => a.id === actionId);
-    const subject = encodeURIComponent(
-      `Action Document: ${action?.title || "Generated Document"}`
-    );
-    const body = encodeURIComponent(
-      `Please find the generated action document below:\n\n${text}`
-    );
+    const text = docContents[actionId] || '';
+    const action = approvedActions.find(a => a.id === actionId);
+    const subject = encodeURIComponent(`Action Document: ${action?.title || 'Generated Document'}`);
+    const body = encodeURIComponent(`Please find the generated action document below:\n\n${text}`);
     window.open(`mailto:?subject=${subject}&body=${body}`);
   };
 
   const getTypeLabel = (type) => {
     const normalizedType = normalizeType(type);
     switch (normalizedType) {
-      case "meeting":
-        return "Meeting";
-      case "wo-permit":
-        return "WO Permit";
-      case "round-plan":
-        return "Round Plan";
-      case "document":
-        return "Document";
-      default:
-        return "Document";
+      case 'meeting': return 'Meeting';
+      case 'wo-permit': return 'WO Permit';
+      case 'round-plan': return 'Round Plan';
+      case 'document': return 'Document';
+      default: return 'Document';
     }
   };
 
   const getTypeIcon = (type) => {
     const normalizedType = normalizeType(type);
     switch (normalizedType) {
-      case "meeting":
+      case 'meeting':
         return (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
           </svg>
         );
-      case "wo-permit":
+      case 'wo-permit':
         return (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
-            <polyline points="14,2 14,8 20,8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-            <polyline points="10,9 9,9 8,9" />
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10,9 9,9 8,9"/>
           </svg>
         );
-      case "round-plan":
+      case 'round-plan':
         return (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
           </svg>
         );
       default:
         return (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14,2 14,8 20,8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-            <polyline points="10,9 9,9 8,9" />
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10,9 9,9 8,9"/>
           </svg>
         );
     }
@@ -2998,33 +2847,19 @@ function ActionExecutionPanel({
 
     (async () => {
       // snapshot to keep order stable
-      const queue = approvedActions.filter((a) => !executedActions.has(a.id));
+      const queue = approvedActions.filter(a => !executedActions.has(a.id));
       for (const action of queue) {
-        if (
-          !executedActions.has(action.id) &&
-          !executingActions.has(action.id)
-        ) {
+        if (!executedActions.has(action.id) && !executingActions.has(action.id)) {
           handleExecuteAction(action);
         }
         await waitForActionCompletion(action.id);
+        // brief breather between actions
+        await sleep(randomMs(700, 1500));
       }
       executingAllRef.current = false;
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [executeAllSignal]);
-
-  // Execute a single approved action when requested by parent
-  useEffect(() => {
-    if (!executeOneRequest || !executeOneRequest.actionId) return;
-    const action = approvedActions.find(
-      (a) => a.id === executeOneRequest.actionId
-    );
-    if (!action) return;
-    if (!executedActions.has(action.id) && !executingActions.has(action.id)) {
-      handleExecuteAction(action);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [executeOneRequest?.tick]);
 
   // Keep ref in sync with state for completion checks
   useEffect(() => {
@@ -3035,21 +2870,16 @@ function ActionExecutionPanel({
   }, [failedActions]);
 
   const renderStatusPill = (isExecuted, isExecuting) => {
-    if (isExecuted)
-      return <span className="status-pill approved">Executed</span>;
-    if (isExecuting)
-      return <span className="status-pill proposed">Executing</span>;
+    if (isExecuted) return <span className="status-pill approved">Executed</span>;
+    if (isExecuting) return <span className="status-pill proposed">Executing</span>;
     return <span className="status-pill proposed">Ready</span>;
   };
 
   const completeAction = (actionId) => {
-    setExecutedActions((prev) => new Set([...prev, actionId]));
-    executedActionsRef.current = new Set([
-      ...executedActionsRef.current,
-      actionId,
-    ]);
+    setExecutedActions(prev => new Set([...prev, actionId]));
+    executedActionsRef.current = new Set([...executedActionsRef.current, actionId]);
     onActionComplete?.(actionId);
-    setExecutingActions((prev) => {
+    setExecutingActions(prev => {
       const next = new Set(prev);
       next.delete(actionId);
       return next;
@@ -3066,8 +2896,7 @@ function ActionExecutionPanel({
           <div>
             <div className="report-title">Action Execution</div>
             <div className="report-subtitle">
-              {approvedActions.length} action
-              {approvedActions.length !== 1 ? "s" : ""} ready for execution
+              {approvedActions.length} action{approvedActions.length !== 1 ? 's' : ''} ready for execution
             </div>
           </div>
         </div>
@@ -3105,64 +2934,25 @@ function ActionExecutionPanel({
         </div>
       </div>
 
-      <div
-        className={`report-body ${collapsed ? "collapsed" : "expanded"}`}
-        aria-hidden={collapsed}
-      >
+      <div className={`report-body ${collapsed ? "collapsed" : "expanded"}`} aria-hidden={collapsed}>
         {approvedActions.length === 0 ? (
-          <div
-            style={{ textAlign: "center", padding: "32px", color: "#6b7280" }}
-          >
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              style={{ margin: "0 auto 16px" }}
-            >
-              <path
-                d="M9 12l2 2 4-4"
-                stroke="#d1d5db"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle cx="12" cy="12" r="9" stroke="#d1d5db" strokeWidth="2" />
+          <div style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" style={{ margin: '0 auto 16px' }}>
+              <path d="M9 12l2 2 4-4" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="12" cy="12" r="9" stroke="#d1d5db" strokeWidth="2"/>
             </svg>
-            <div
-              style={{
-                fontSize: "16px",
-                fontWeight: "500",
-                marginBottom: "8px",
-              }}
-            >
-              No actions approved yet
-            </div>
-            <div style={{ fontSize: "14px" }}>
-              Approve actions from the Project Plan to see them here
-            </div>
+            <div style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px' }}>No actions approved yet</div>
+            <div style={{ fontSize: '14px' }}>Approve actions from the Project Plan to see them here</div>
           </div>
         ) : (
           <div className="table-wrapper">
-            <table
-              className="actions-table"
-              role="table"
-              aria-label="Execution actions list"
-            >
+            <table className="actions-table" role="table" aria-label="Execution actions list">
               <thead>
                 <tr role="row" className="actions-row header">
-                  <th className="col priority" role="columnheader">
-                    Priority
-                  </th>
-                  <th className="col action" role="columnheader">
-                    Action
-                  </th>
-                  <th className="col impact" role="columnheader">
-                    Impact
-                  </th>
-                  <th className="col cta" role="columnheader">
-                    Status
-                  </th>
+                  <th className="col priority" role="columnheader">Priority</th>
+                  <th className="col action" role="columnheader">Action</th>
+                  <th className="col impact" role="columnheader">Impact</th>
+                  <th className="col cta" role="columnheader">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -3172,7 +2962,7 @@ function ActionExecutionPanel({
                   const thinkingState = thinkingStates[action.id];
                   const timeline = executionTimelines[action.id];
                   const info = executionInfo[action.id];
-                  const actionType = normalizeType(action.type || "document");
+                  const actionType = normalizeType(action.type || 'document');
                   const isDocExpanded = expandedDocs[action.id];
                   const aiGenState = aiGenStates[action.id];
 
@@ -3180,38 +2970,12 @@ function ActionExecutionPanel({
                     <React.Fragment key={action.id}>
                       <tr role="row" className="actions-row">
                         <td className="col priority" role="cell">
-                          <span
-                            className={`${
-                              (action.priority || "").toLowerCase() === "high"
-                                ? "chip-high"
-                                : (action.priority || "").toLowerCase() ===
-                                  "low"
-                                ? "chip-low"
-                                : "chip-med"
-                            }`}
-                          >
-                            {action.priority}
-                          </span>
+                          <span className={`${((action.priority||'').toLowerCase()==='high')?'chip-high':((action.priority||'').toLowerCase()==='low')?'chip-low':'chip-med'}`}>{action.priority}</span>
                         </td>
                         <td className="col action" role="cell">
-                          <div
-                            className="action-main"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 8,
-                            }}
-                          >
-                            <span
-                              className="type-chip"
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: 6,
-                              }}
-                            >
-                              {getTypeIcon(actionType)}{" "}
-                              {getTypeLabel(actionType)}
+                          <div className="action-main" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span className="type-chip" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                              {getTypeIcon(actionType)} {getTypeLabel(actionType)}
                             </span>
                             {action.title}
                           </div>
@@ -3225,357 +2989,239 @@ function ActionExecutionPanel({
                         </td>
                       </tr>
 
-                      {(thinkingState?.isThinking ||
-                        (actionType === "meeting" &&
-                          timeline &&
-                          !timeline.completed) ||
-                        ((actionType === "wo-permit" ||
-                          actionType === "round-plan") &&
-                          timeline &&
-                          !timeline.completed) ||
-                        (actionType === "document" && isDocExpanded) ||
-                        info) && (
+                      {(thinkingState?.isThinking || (actionType === 'meeting' && timeline && !timeline.completed) || ((actionType === 'wo-permit' || actionType === 'round-plan') && timeline && !timeline.completed) || (actionType === 'document' && isDocExpanded) || info) && (
                         <tr>
-                          <td colSpan={4} style={{ background: "#fafafa" }}>
-                            <div
-                              style={{
-                                padding: "12px 16px",
-                                display: "grid",
-                                gap: 12,
-                              }}
-                            >
+                          <td colSpan={4} style={{ background: '#fafafa' }}>
+                            <div style={{ padding: '12px 16px', display: 'grid', gap: 12 }}>
                               {thinkingState?.isThinking && (
-                                <div
-                                  style={{
-                                    background: "#f0f9ff",
-                                    border: "1px solid #bae6fd",
-                                    borderRadius: "12px",
-                                    padding: "16px",
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      fontSize: "14px",
-                                      fontWeight: "600",
-                                      color: "#0369a1",
-                                      marginBottom: "8px",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "8px",
-                                    }}
-                                  >
-                                    <svg
-                                      width="16"
-                                      height="16"
-                                      viewBox="0 0 24 24"
-                                      fill="currentColor"
-                                      style={{ animation: "pulse 2s infinite" }}
-                                    >
-                                      <path d="M12 2l3.09 6.26L22 9l-5.91 3.74L17.45 19 12 16.27 6.55 19l1.36-6.26L2 9l6.91-.74L12 2z" />
+                                <div style={{
+                                  background: '#f0f9ff',
+                                  border: '1px solid #bae6fd',
+                                  borderRadius: '12px',
+                                  padding: '16px'
+                                }}>
+                                  <div style={{
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    color: '#0369a1',
+                                    marginBottom: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px'
+                                  }}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ animation: 'pulse 2s infinite' }}>
+                                      <path d="M12 2l3.09 6.26L22 9l-5.91 3.74L17.45 19 12 16.27 6.55 19l1.36-6.26L2 9l6.91-.74L12 2z"/>
                                     </svg>
                                     AI Planning Execution
                                   </div>
-                                  <p
-                                    style={{
-                                      fontStyle: "italic",
-                                      whiteSpace: "pre-wrap",
-                                      margin: 0,
-                                      color: "#0c4a6e",
-                                      fontSize: "13px",
-                                      lineHeight: "1.5",
-                                    }}
-                                  >
+                                  <p style={{
+                                    fontStyle: 'italic',
+                                    whiteSpace: 'pre-wrap',
+                                    margin: 0,
+                                    color: '#0c4a6e',
+                                    fontSize: '13px',
+                                    lineHeight: '1.5'
+                                  }}>
                                     {thinkingState.thoughtVisible}
-                                    <span
-                                      style={{
-                                        opacity: thinkingState.blinkOn ? 1 : 0,
-                                      }}
-                                    >
-                                      |
-                                    </span>
+                                    <span style={{ opacity: thinkingState.blinkOn ? 1 : 0 }}>|</span>
                                   </p>
                                 </div>
                               )}
 
                               {/* Meeting timeline */}
-                              {actionType === "meeting" &&
-                                timeline &&
-                                !timeline.completed && (
-                                  <div
-                                    style={{
-                                      background: "#f8fafc",
-                                      border: "1px solid #e2e8f0",
-                                      borderRadius: "12px",
-                                      padding: "16px",
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        fontSize: "14px",
-                                        fontWeight: "600",
-                                        color: "#374151",
-                                        marginBottom: "12px",
-                                      }}
-                                    >
-                                      Creating Calendar Event
-                                    </div>
-                                    <div
-                                      style={{ display: "grid", gap: "8px" }}
-                                    >
-                                      {timeline.steps.map((label, stepIdx) => {
-                                        const isDone =
-                                          timeline.current > stepIdx;
-                                        const isCurrent =
-                                          timeline.current === stepIdx;
-                                        return (
-                                          <div
-                                            key={stepIdx}
-                                            style={{
-                                              display: "flex",
-                                              alignItems: "center",
-                                              gap: "12px",
-                                            }}
-                                          >
-                                            <div
-                                              style={{
-                                                width: "12px",
-                                                height: "12px",
-                                                borderRadius: "50%",
-                                                background: isDone
-                                                  ? "#10b981"
-                                                  : isCurrent
-                                                  ? "#3b82f6"
-                                                  : "#d1d5db",
-                                                boxShadow: isCurrent
-                                                  ? "0 0 0 4px rgba(59, 130, 246, 0.15)"
-                                                  : "none",
-                                                transition: "all 0.3s ease",
-                                              }}
-                                            />
-                                            <span
-                                              style={{
-                                                fontSize: "13px",
-                                                color:
-                                                  isDone || isCurrent
-                                                    ? "#374151"
-                                                    : "#9ca3af",
-                                                fontWeight: isCurrent
-                                                  ? "600"
-                                                  : "400",
-                                              }}
-                                            >
-                                              {label}
-                                            </span>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
+                              {actionType === 'meeting' && timeline && !timeline.completed && (
+                                <div style={{
+                                  background: '#f8fafc',
+                                  border: '1px solid #e2e8f0',
+                                  borderRadius: '12px',
+                                  padding: '16px'
+                                }}>
+                                  <div style={{
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    color: '#374151',
+                                    marginBottom: '12px'
+                                  }}>
+                                    Creating Calendar Event
                                   </div>
-                                )}
+                                  <div style={{ display: 'grid', gap: '8px' }}>
+                                    {timeline.steps.map((label, stepIdx) => {
+                                      const isDone = timeline.current > stepIdx;
+                                      const isCurrent = timeline.current === stepIdx;
+                                      return (
+                                        <div key={stepIdx} style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '12px'
+                                        }}>
+                                          <div style={{
+                                            width: '12px',
+                                            height: '12px',
+                                            borderRadius: '50%',
+                                            background: isDone ? '#10b981' : isCurrent ? '#3b82f6' : '#d1d5db',
+                                            boxShadow: isCurrent ? '0 0 0 4px rgba(59, 130, 246, 0.15)' : 'none',
+                                            transition: 'all 0.3s ease'
+                                          }} />
+                                          <span style={{
+                                            fontSize: '13px',
+                                            color: isDone || isCurrent ? '#374151' : '#9ca3af',
+                                            fontWeight: isCurrent ? '600' : '400'
+                                          }}>
+                                            {label}
+                                          </span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
 
                               {/* WO-PERMIT / Round-plan timeline */}
-                              {(actionType === "wo-permit" ||
-                                actionType === "round-plan") &&
-                                timeline &&
-                                !timeline.completed && (
-                                  <div
+                              {(actionType === 'wo-permit' || actionType === 'round-plan') && timeline && !timeline.completed && (
+                                <div style={{
+                                  background: '#f8fafc',
+                                  border: '1px solid #e2e8f0',
+                                  borderRadius: '12px',
+                                  padding: '16px',
+                                  textAlign: 'center'
+                                }}>
+                                  {!woGifLoaded && (
+                                    <div style={{
+                                      width: '100%',
+                                      height: '200px',
+                                      background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%)',
+                                      backgroundSize: '400% 100%',
+                                      animation: 'shimmer 1.2s ease-in-out infinite',
+                                      borderRadius: '8px',
+                                      marginBottom: '16px'
+                                    }} />
+                                  )}
+                                  <img
+                                    src={WoPermitGif}
+                                    alt={actionType === 'wo-permit' ? "Authoring permit forms" : "Creating round plan"}
                                     style={{
-                                      background: "#f8fafc",
-                                      border: "1px solid #e2e8f0",
-                                      borderRadius: "12px",
-                                      padding: "16px",
-                                      textAlign: "center",
+                                      width: '100%',
+                                      maxWidth: '320px',
+                                      borderRadius: '8px',
+                                      display: woGifLoaded ? 'block' : 'none',
+                                      margin: '0 auto 16px'
                                     }}
-                                  >
-                                    {!woGifLoaded && (
-                                      <div
-                                        style={{
-                                          width: "100%",
-                                          height: "200px",
-                                          background:
-                                            "linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%)",
-                                          backgroundSize: "400% 100%",
-                                          animation:
-                                            "shimmer 1.2s ease-in-out infinite",
-                                          borderRadius: "8px",
-                                          marginBottom: "16px",
-                                        }}
-                                      />
-                                    )}
-                                    <img
-                                      src={WoPermitGif}
-                                      alt={
-                                        actionType === "wo-permit"
-                                          ? "Authoring permit forms"
-                                          : "Creating round plan"
-                                      }
-                                      style={{
-                                        width: "100%",
-                                        maxWidth: "320px",
-                                        borderRadius: "8px",
-                                        display: woGifLoaded ? "block" : "none",
-                                        margin: "0 auto 16px",
-                                      }}
-                                      onLoad={() => setWoGifLoaded(true)}
-                                    />
-                                    <div
-                                      style={{ display: "grid", gap: "8px" }}
-                                    >
-                                      {timeline.steps.map((label, stepIdx) => {
-                                        const isCurrent =
-                                          timeline.current === stepIdx;
-                                        const isDone =
-                                          timeline.current > stepIdx;
-                                        return (
-                                          <div
-                                            key={stepIdx}
-                                            style={{
-                                              display: "flex",
-                                              alignItems: "center",
-                                              gap: "12px",
-                                              justifyContent: "center",
-                                            }}
-                                          >
-                                            <div
-                                              style={{
-                                                width: "10px",
-                                                height: "10px",
-                                                borderRadius: "50%",
-                                                background: isDone
-                                                  ? "#10b981"
-                                                  : isCurrent
-                                                  ? "#3b82f6"
-                                                  : "#d1d5db",
-                                                boxShadow: isCurrent
-                                                  ? "0 0 0 4px rgba(59, 130, 246, 0.15)"
-                                                  : "none",
-                                              }}
-                                            />
-                                            <span
-                                              style={{
-                                                fontSize: "13px",
-                                                color:
-                                                  isDone || isCurrent
-                                                    ? "#374151"
-                                                    : "#9ca3af",
-                                                fontWeight: isCurrent
-                                                  ? "600"
-                                                  : "400",
-                                              }}
-                                            >
-                                              {label}
-                                            </span>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
+                                    onLoad={() => setWoGifLoaded(true)}
+                                  />
+                                  <div style={{ display: 'grid', gap: '8px' }}>
+                                    {timeline.steps.map((label, stepIdx) => {
+                                      const isCurrent = timeline.current === stepIdx;
+                                      const isDone = timeline.current > stepIdx;
+                                      return (
+                                        <div key={stepIdx} style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '12px',
+                                          justifyContent: 'center'
+                                        }}>
+                                          <div style={{
+                                            width: '10px',
+                                            height: '10px',
+                                            borderRadius: '50%',
+                                            background: isDone ? '#10b981' : isCurrent ? '#3b82f6' : '#d1d5db',
+                                            boxShadow: isCurrent ? '0 0 0 4px rgba(59, 130, 246, 0.15)' : 'none'
+                                          }} />
+                                          <span style={{
+                                            fontSize: '13px',
+                                            color: isDone || isCurrent ? '#374151' : '#9ca3af',
+                                            fontWeight: isCurrent ? '600' : '400'
+                                          }}>
+                                            {label}
+                                          </span>
+                                        </div>
+                                      );
+                                    })}
                                   </div>
-                                )}
+                                </div>
+                              )}
 
                               {/* Document editor */}
-                              {actionType === "document" && isDocExpanded && (
-                                <div
-                                  style={{
-                                    background: "#f9fafb",
-                                    border: "1px solid #e5e7eb",
-                                    borderRadius: "12px",
-                                    padding: "20px",
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "space-between",
-                                      marginBottom: "16px",
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        fontSize: "14px",
-                                        fontWeight: "600",
-                                        color: "#374151",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "8px",
-                                      }}
-                                    >
-                                      <svg
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 24 24"
-                                        fill="currentColor"
-                                      >
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                        <polyline points="14,2 14,8 20,8" />
-                                        <line x1="16" y1="13" x2="8" y2="13" />
-                                        <line x1="16" y1="17" x2="8" y2="17" />
-                                        <polyline points="10,9 9,9 8,9" />
+                              {actionType === 'document' && isDocExpanded && (
+                                <div style={{
+                                  background: '#f9fafb',
+                                  border: '1px solid #e5e7eb',
+                                  borderRadius: '12px',
+                                  padding: '20px'
+                                }}>
+                                  <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginBottom: '16px'
+                                  }}>
+                                    <div style={{
+                                      fontSize: '14px',
+                                      fontWeight: '600',
+                                      color: '#374151',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px'
+                                    }}>
+                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14,2 14,8 20,8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <polyline points="10,9 9,9 8,9"/>
                                       </svg>
-                                      {aiGenState?.isGenerating
-                                        ? "AI is writing document..."
-                                        : "Document Editor"}
+                                      {aiGenState?.isGenerating ? 'AI is writing document...' : 'Document Editor'}
                                     </div>
-                                    <div
-                                      style={{ display: "flex", gap: "8px" }}
-                                    >
+                                    <div style={{ display: 'flex', gap: '8px' }}>
                                       <button
                                         style={{
-                                          background: "#ffffff",
-                                          border: "1px solid #d1d5db",
-                                          borderRadius: "8px",
-                                          padding: "6px 12px",
-                                          fontSize: "12px",
-                                          fontWeight: "500",
-                                          color: "#374151",
-                                          cursor: "pointer",
+                                          background: '#ffffff',
+                                          border: '1px solid #d1d5db',
+                                          borderRadius: '8px',
+                                          padding: '6px 12px',
+                                          fontSize: '12px',
+                                          fontWeight: '500',
+                                          color: '#374151',
+                                          cursor: 'pointer'
                                         }}
-                                        onClick={() =>
-                                          handleDownloadDoc(action.id)
-                                        }
+                                        onClick={() => handleDownloadDoc(action.id)}
                                       >
                                         Download
                                       </button>
                                       <button
                                         style={{
-                                          background: "#3b82f6",
-                                          border: "none",
-                                          borderRadius: "8px",
-                                          padding: "6px 12px",
-                                          fontSize: "12px",
-                                          fontWeight: "500",
-                                          color: "#ffffff",
-                                          cursor: "pointer",
+                                          background: '#3b82f6',
+                                          border: 'none',
+                                          borderRadius: '8px',
+                                          padding: '6px 12px',
+                                          fontSize: '12px',
+                                          fontWeight: '500',
+                                          color: '#ffffff',
+                                          cursor: 'pointer'
                                         }}
-                                        onClick={() =>
-                                          handleEmailDoc(action.id)
-                                        }
+                                        onClick={() => handleEmailDoc(action.id)}
                                       >
                                         Email
                                       </button>
                                     </div>
                                   </div>
                                   <textarea
-                                    value={docContents[action.id] || ""}
-                                    onChange={(e) =>
-                                      handleDocChange(action.id, e.target.value)
-                                    }
+                                    value={docContents[action.id] || ''}
+                                    onChange={(e) => handleDocChange(action.id, e.target.value)}
                                     placeholder="Document content will appear here..."
                                     style={{
-                                      width: "100%",
-                                      minHeight: "300px",
-                                      background: "#ffffff",
-                                      color: "#1f2937",
-                                      border: "1px solid #d1d5db",
-                                      borderRadius: "8px",
-                                      padding: "16px",
-                                      fontSize: "14px",
-                                      lineHeight: "1.6",
-                                      fontFamily:
-                                        "Georgia, 'Times New Roman', Times, serif",
-                                      resize: "vertical",
-                                      outline: "none",
-                                      boxSizing: "border-box",
+                                      width: '100%',
+                                      minHeight: '300px',
+                                      background: '#ffffff',
+                                      color: '#1f2937',
+                                      border: '1px solid #d1d5db',
+                                      borderRadius: '8px',
+                                      padding: '16px',
+                                      fontSize: '14px',
+                                      lineHeight: '1.6',
+                                      fontFamily: "Georgia, 'Times New Roman', Times, serif",
+                                      resize: 'vertical',
+                                      outline: 'none',
+                                      boxSizing: 'border-box'
                                     }}
                                     readOnly={aiGenState?.isGenerating}
                                   />
@@ -3584,17 +3230,15 @@ function ActionExecutionPanel({
 
                               {/* Execution Info */}
                               {info && (
-                                <div
-                                  style={{
-                                    background: "#d1fae5",
-                                    border: "1px solid #10b981",
-                                    borderRadius: "8px",
-                                    padding: "12px",
-                                    fontSize: "13px",
-                                    color: "#047857",
-                                    fontWeight: "500",
-                                  }}
-                                >
+                                <div style={{
+                                  background: '#d1fae5',
+                                  border: '1px solid #10b981',
+                                  borderRadius: '8px',
+                                  padding: '12px',
+                                  fontSize: '13px',
+                                  color: '#047857',
+                                  fontWeight: '500'
+                                }}>
                                   ✓ {info}
                                 </div>
                               )}
@@ -3642,18 +3286,14 @@ export default function Action() {
   const [reportCollapsed, setReportCollapsed] = useState(false);
   const [actionsCollapsed, setActionsCollapsed] = useState(false);
   const [executionCollapsed, setExecutionCollapsed] = useState(false);
-  const [showExecutionFromMessage, setShowExecutionFromMessage] =
-    useState(false);
   const [executeAllSignal, setExecuteAllSignal] = useState(0);
-  const [executeOneSignal, setExecuteOneSignal] = useState({
-    actionId: null,
-    tick: 0,
-  });
   const [showAgentProgress, setShowAgentProgress] = useState(true);
   const [assistantCompleted, setAssistantCompleted] = useState(false);
   const [dismissedFollowups, setDismissedFollowups] = useState(new Set());
   const [followupsVisible, setFollowupsVisible] = useState(true);
   const [hideDismissButtons, setHideDismissButtons] = useState(false);
+  const [allActionsResolved, setAllActionsResolved] = useState(false);
+  const [showExecutionPanel, setShowExecutionPanel] = useState(false);
 
   // Stage transitions for right pane
   useEffect(() => {
@@ -3829,14 +3469,14 @@ export default function Action() {
       });
       const assistantMessages = (result?.messages ?? [])
         .map((m, idx) => ({
-          id: Date.now() + idx + 1,
-          role: m.role,
-          text: m.text,
+        id: Date.now() + idx + 1,
+        role: m.role,
+        text: m.text,
         }))
         .map((m, i, arr) => ({
           ...m,
           animated: m.role === "assistant" && i === arr.length - 1,
-        }));
+      }));
       if (assistantMessages.length) {
         setMessages((prev) => [...prev, ...assistantMessages]);
         if (result?.chart) setChartData(result.chart);
@@ -3896,6 +3536,8 @@ export default function Action() {
     setDismissedFollowups(new Set()); // reset follow-ups visibility for new round
     setFollowupsVisible(true); // show follow-ups for new round
     setHideDismissButtons(false); // reset dismiss visibility
+    setAllActionsResolved(false); // reset resolution state
+    setShowExecutionPanel(false); // hide execution until invoked
     // Ask assistant (backend shim)
     sendPromptToAssistant(prompt);
   }
@@ -3955,77 +3597,26 @@ export default function Action() {
   }
 
   function handleAddMessage(message) {
-    setMessages((prev) => [...prev, message]);
+    setMessages(prev => [...prev, message]);
   }
 
   function handleMessageClick(message) {
     if (message.action === "showExecution") {
-      setShowExecutionFromMessage(true);
-      // Scroll to execution panel or show it in some way
-      setTimeout(() => {
-        const executionPanel = document.querySelector(
-          '[aria-label="Action Execution Report"]'
-        );
-        if (executionPanel) {
-          executionPanel.scrollIntoView({ behavior: "smooth" });
-        }
-      }, 100);
+      handleExecuteAllApproved();
     }
   }
 
   function handleExecuteAllApproved() {
-    setShowExecutionFromMessage(true);
+    setShowExecutionPanel(true);
     // trigger sequential execution in ActionExecutionPanel
     setExecuteAllSignal((x) => x + 1);
     setTimeout(() => {
-      const executionPanel = document.querySelector(
-        '[aria-label="Action Execution Report"]'
-      );
+      const executionPanel = document.querySelector('[aria-label="Action Execution Report"]');
       if (executionPanel) {
-        executionPanel.scrollIntoView({ behavior: "smooth" });
+        executionPanel.scrollIntoView({ behavior: 'smooth' });
       }
     }, 100);
   }
-
-  function handleExecuteOneApproved(actionId) {
-    // Find the action to get its title
-    const action = approvedActions.find((a) => a.id === actionId);
-    const actionTitle = action?.title || action?.description || "Action";
-
-    // Add user message first
-    handleAddMessage({
-      id: Date.now(),
-      role: "user",
-      text: actionTitle,
-    });
-
-    setShowExecutionFromMessage(true);
-    setExecuteOneSignal((prev) => ({ actionId, tick: (prev?.tick || 0) + 1 }));
-    setTimeout(() => {
-      const executionPanel = document.querySelector(
-        '[aria-label="Action Execution Report"]'
-      );
-      if (executionPanel) {
-        executionPanel.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 100);
-  }
-
-  // Fade out and unmount the agent progress card when reaching 100%
-  useEffect(() => {
-    if (progressPct >= 100 && showAgentProgress) {
-      const t = setTimeout(() => setShowAgentProgress(false), 900);
-      return () => clearTimeout(t);
-    }
-  }, [progressPct, showAgentProgress]);
-
-  // After assistant finishes typing a follow-up response, collapse the first report
-  useEffect(() => {
-    if (assistantCompleted && showActionsPanel) {
-      const t = setTimeout(() => setReportCollapsed(true), 600);
-      return () => clearTimeout(t);
-    }
-  }, [assistantCompleted, showActionsPanel]);
 
   function handleAnyActionApprove() {
     setFollowupsVisible(false);
@@ -4034,10 +3625,8 @@ export default function Action() {
   }
 
   function handleActionComplete(actionId) {
-    // Remove the completed action from approvedActions (left checklist)
-    setApprovedActions((prev) =>
-      prev.filter((action) => action.id !== actionId)
-    );
+    // Keep completed actions in the approved list so they remain visible in the execution section
+    // If needed later, we can annotate executed state rather than removing them
   }
 
   return (
@@ -4064,9 +3653,7 @@ export default function Action() {
       <div className="action-content">
         {phase === "input" && (
           <div className="action-card" role="region" aria-label="Assistant">
-            <h1 className="action-title">
-              Let's chat and optimise your next action !
-            </h1>
+            <h1 className="action-title">Let's chat and optimise your next action !</h1>
             <form className="action-form" onSubmit={handleSubmit}>
               <label className="sr-only" htmlFor="action-textarea">
                 Describe your task
@@ -4112,24 +3699,21 @@ export default function Action() {
         )}
 
         {phase === "chat" && (
-          <div className={`chat-container embedded ${twoCol ? "wide" : ""}`}>
+          <div
+            className={`chat-container embedded ${
+              twoCol ? "wide" : ""
+            }`}
+          >
             <div className={`chat-body-grid ${twoCol ? "two-col" : ""}`}>
               <div
-                className={`left-pane ${
-                  twoCol && assistantCompleted ? "shift-left" : ""
-                }`}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  minHeight: 0,
-                  maxHeight: "calc(100vh - 180px)",
-                }}
+                className={`left-pane ${twoCol && assistantCompleted ? "shift-left" : ""}`}
+                 style={{ display: 'flex', flexDirection: 'column', minHeight: 0, maxHeight: 'calc(100vh - 180px)' }}
               >
                 <div
                   className={`messages`}
                   role="log"
                   aria-live="polite"
-                  style={{ overflowY: "auto", flex: 1, paddingRight: 8 }}
+                  style={{ overflowY: 'auto', flex: 1, paddingRight: 8 }}
                 >
                   {messages.map((m) => (
                     <ChatMessage
@@ -4140,92 +3724,69 @@ export default function Action() {
                     />
                   ))}
                 </div>
-                {twoCol && showAgentProgress && (
-                  <div
-                    className={
-                      progressPct >= 100
-                        ? "panel-animate-out"
-                        : "panel-animate-in"
-                    }
-                  >
-                    <AgentProgress
-                      onCrossThreshold={() => setProgressAtTop(true)}
-                      onProgressChange={setProgressPct}
-                      threshold={30}
-                    />
-                  </div>
+                {twoCol && (
+                  showAgentProgress && (
+                    <div className={progressPct >= 100 ? "panel-animate-out" : "panel-animate-in"}>
+                  <AgentProgress
+                    onCrossThreshold={() => setProgressAtTop(true)}
+                    onProgressChange={setProgressPct}
+                    threshold={30}
+                  />
+                    </div>
+                  )
                 )}
                 {twoCol && progressPct >= 100 && followupsVisible && (
                   <div className="followups-card">
                     <div className="followups-title">Suggested Follow-ups</div>
                     <div className="followup-list">
                       {!dismissedFollowups.has("validateWithSiteData") && (
-                        <button
-                          type="button"
-                          className="followup-btn"
+                      <button
+                        type="button"
+                        className="followup-btn"
                           onClick={() =>
-                            handleFollowupClick(
-                              "Validate with site data",
-                              "validateWithSiteData"
-                            )
+                            handleFollowupClick("Validate with site data", "validateWithSiteData")
                           }
-                        >
-                          Validate with site data →
-                        </button>
+                      >
+                        Validate with site data →
+                      </button>
                       )}
                       {!dismissedFollowups.has("trace3MonthsPermitDelays") && (
-                        <button
-                          type="button"
-                          className="followup-btn"
-                          onClick={() =>
-                            handleFollowupClick(
-                              "Trace 3 months of permit delays",
-                              "trace3MonthsPermitDelays"
-                            )
-                          }
-                        >
-                          Trace 3 months of permit delays →
-                        </button>
+                      <button
+                        type="button"
+                        className="followup-btn"
+                        onClick={() =>
+                            handleFollowupClick("Trace 3 months of permit delays", "trace3MonthsPermitDelays")
+                        }
+                      >
+                        Trace 3 months of permit delays →
+                      </button>
                       )}
-                      {!dismissedFollowups.has(
-                        "create3MonthCostReductionRoadmap"
-                      ) && (
-                        <button
-                          type="button"
-                          className="followup-btn"
-                          onClick={() =>
+                      {!dismissedFollowups.has("create3MonthCostReductionRoadmap") && (
+                      <button
+                        type="button"
+                        className="followup-btn"
+                        onClick={() =>
                             handleFollowupClick(
                               "Create a 3-month cost-reduction roadmap",
                               "create3MonthCostReductionRoadmap"
                             )
-                          }
-                        >
-                          Create a 3-month cost-reduction roadmap →
-                        </button>
+                        }
+                      >
+                        Create a 3-month cost-reduction roadmap →
+                      </button>
                       )}
                     </div>
                   </div>
                 )}
-                {twoCol && progressPct >= 100 && approvedActions.length > 0 && (
-                  <div className="followups-card" style={{ marginTop: 12 }}>
-                    <div className="followups-title">
-                      Action Execution Engine
-                    </div>
-                    <div
-                      className="followup-list"
-                      style={{ marginTop: 8, display: "grid", gap: "8px" }}
+                {twoCol && progressPct >= 100 && allActionsResolved && (
+                  <div style={{ marginTop: 12 }}>
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={handleExecuteAllApproved}
                     >
-                      {approvedActions.map((a) => (
-                        <button
-                          key={a.id}
-                          type="button"
-                          className="followup-btn"
-                          onClick={() => handleExecuteOneApproved(a.id)}
-                        >
-                          Execute: {a.title} →
-                        </button>
-                      ))}
-                    </div>
+                      Invoke Execution Agent
+                    </button>
                   </div>
                 )}
                 <form className="chat-input-form" onSubmit={handleSubmit}>
@@ -4291,32 +3852,24 @@ export default function Action() {
                           {assistantCompleted ? (
                             <RightActionsPanel
                               collapsed={actionsCollapsed}
-                              onToggleCollapse={() =>
-                                setActionsCollapsed(!actionsCollapsed)
-                              }
+                              onToggleCollapse={() => setActionsCollapsed(!actionsCollapsed)}
                               onActionsChange={setApprovedActions}
                               onAnyApprove={handleAnyActionApprove}
                               hideDismiss={hideDismissButtons}
+                              onResolutionStateChange={setAllActionsResolved}
                             />
                           ) : (
                             <RightShimmerPanel showProgress={false} />
                           )}
                         </div>
                       )}
-                      {(approvedActions.length > 0 ||
-                        showExecutionFromMessage) && (
-                        <div
-                          className="panel-animate-in"
-                          style={{ marginTop: "16px" }}
-                        >
+                      {showExecutionPanel && (
+                        <div className="panel-animate-in" style={{ marginTop: '16px' }}>
                           <ActionExecutionPanel
                             collapsed={executionCollapsed}
-                            onToggleCollapse={() =>
-                              setExecutionCollapsed(!executionCollapsed)
-                            }
+                            onToggleCollapse={() => setExecutionCollapsed(!executionCollapsed)}
                             approvedActions={approvedActions}
                             executeAllSignal={executeAllSignal}
-                            executeOneRequest={executeOneSignal}
                             onAddMessage={handleAddMessage}
                             onActionComplete={handleActionComplete}
                           />
@@ -4339,9 +3892,9 @@ export default function Action() {
                         {(() => {
                           if (rightStage === "chart") {
                             return chartReady ? (
-                              <MemoChartPanel chart={chartData} />
-                            ) : (
-                              <RightShimmerPanel showProgress={false} />
+                          <MemoChartPanel chart={chartData} />
+                        ) : (
+                          <RightShimmerPanel showProgress={false} />
                             );
                           }
                           if (rightStage === "collecting") {
@@ -4356,10 +3909,10 @@ export default function Action() {
                           return null;
                         })()}
                       </StageTransition>
-                    </div>
-                  )}
-                </div>
-              )}
+                        </div>
+                      )}
+                        </div>
+                      )}
             </div>
           </div>
         )}
@@ -4433,29 +3986,16 @@ export default function Action() {
       {/* Add CSS animations */}
       <style jsx>{`
         @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
         @keyframes pulse {
-          0%,
-          100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
         }
         @keyframes shimmer {
-          0% {
-            background-position: -400px 0;
-          }
-          100% {
-            background-position: 400px 0;
-          }
+          0% { background-position: -400px 0; }
+          100% { background-position: 400px 0; }
         }
       `}</style>
     </div>
