@@ -699,19 +699,19 @@ export default function Dashboard() {
             Icon={IconShield}
             value={metrics.safety.count}
             unit="this period"
-            subtitle="Lower is better"
-            accent="accent-safety"
+            // subtitle="Lower is better"
+            accent="accent-cost"
             trendPercent={metrics.safety.trendPercent}
             trendDirection={metrics.safety.trendDirection}
             sparklineData={metrics.safety.spark}
-            sparklineColor="#ea580c"
+            sparklineColor="#6b7280"
           />
           <KpiCard
             title="Asset Downtime"
             Icon={IconClock}
             value={formatHours(metrics.downtime.hours)}
             unit="hours"
-            subtitle="Total across critical assets"
+            // subtitle="Total across critical assets"
             accent="accent-downtime"
             trendPercent={metrics.downtime.trendPercent}
             trendDirection={metrics.downtime.trendDirection}
@@ -721,27 +721,27 @@ export default function Dashboard() {
           <KpiCard
             title="Maintenance Cost"
             Icon={IconWrench}
-            value={formatCurrency(metrics.cost.usd)}
+            value="USD 9.8 M"
             unit=""
             subtitle="Material + labor"
-            accent="accent-cost"
+            accent="accent-safety"
             trendPercent={metrics.cost.trendPercent}
             trendDirection={metrics.cost.trendDirection}
             sparklineData={metrics.cost.spark}
-            sparklineColor="#6b7280"
+            sparklineColor="#ea580c"
           />
           <KpiCard
             title="Productivity"
             Icon={IconChart}
             value={`${metrics.productivity.rate}%`}
             unit="rate"
-            subtitle="Output vs capacity"
+            // subtitle="Output vs capacity"
             accent="accent-productivity"
             trendPercent={metrics.productivity.trendPercent}
             trendDirection={metrics.productivity.trendDirection}
             sparklineData={metrics.productivity.spark}
             sparklineColor="#059669"
-            progressPercent={metrics.productivity.rate}
+            // progressPercent={metrics.productivity.rate}
           />
         </SimpleGrid>
       </Box>

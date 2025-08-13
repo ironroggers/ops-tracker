@@ -45,7 +45,7 @@ export async function sendActionPrompt(prompt, options = {}) {
       { month: "Aug", value: 515 },
     ],
     trendYoY: "+21% YoY",
-    vsLastQuarter: "↑ 7% vs last quarter",
+    vsLastQuarter: "↑ 17% in last 6 months",
   };
 
   return {
