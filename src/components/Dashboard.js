@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import "./Dashboard.css";
 import { Link, useNavigate } from "react-router-dom";
 import { Box, SimpleGrid, HStack, Text, Badge, Button } from "@chakra-ui/react";
+import { formatCompactCurrency } from "../utils/number";
 
 function formatCurrency(amount) {
   const formatter = new Intl.NumberFormat(undefined, {
@@ -519,6 +520,12 @@ export default function Dashboard() {
         trendDirection: "up",
         spark: [30, 32, 34, 35, 36, 38, 40],
       },
+      profit: {
+        usd: 980000,
+        trendPercent: 5,
+        trendDirection: "up",
+        spark: [820000, 840000, 860000, 880000, 900000, 950000, 980000],
+      },
       productivity: {
         rate: 92,
         trendPercent: 3,
@@ -542,6 +549,7 @@ export default function Dashboard() {
         hours: Number((base.downtime.hours * m).toFixed(1)),
       },
       cost: { ...base.cost, usd: Math.round(base.cost.usd * m) },
+      profit: { ...base.profit, usd: Math.round(base.profit.usd * m) },
       productivity: base.productivity,
     };
   }, [base, timeframe]);

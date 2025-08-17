@@ -24,7 +24,8 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import WoPermitGif from "../assets/Create using AI (3).gif";
+import WoPermitGif from '../assets/Create using AI (3).gif';
+import { formatCompactCurrency } from "../utils/number";
 
 // Constants for execution timelines and AI behavior
 const TIMELINE_STEPS = [
@@ -500,23 +501,32 @@ function RightActionsPanel({
       causeTitle: "Rapid Increase in PM Work Orders",
       causePercent: 70,
       actions: [
+        // {
+        //   id: "c1-a1",
+        //   priority: "High",
+        //   impact: "~220K",
+        //   title: "PM Optimization",
+        //   description:
+        //     "Identify & deactivate unnecessary PM based on failure history and execution data",
+        //   type: "document",
+        // },
+        {
+          id: "c1-a2",
+          priority: "High",
+          impact: "220K",
+          title: "Shift Basic PMs to Operators",
+          description:
+            "Create Clean-Inspect-Lubricate (CIL) tasks for simple equipment checks",
+          type: "round-plan",
+        },
         {
           id: "c1-a1",
           priority: "High",
-          impact: "Loss < $1M",
-          title: "PM Optimization",
+          impact: "~100K",
+          title: "Create SOP for Operator Execution",
           description:
-            "Identify & deactivate unnecessary PM based on failure history and execution data",
+            "Draft & publish \"Optimized PM Planning SOP\" and \"CIL Task Execution SOP\"",
           type: "document",
-        },
-        {
-          id: "c1-a2",
-          priority: "Medium",
-          impact: "Loss < $500K",
-          title: "Risk-based PM Scheduling",
-          description:
-            "Risk-rank assets and adjust PM frequencies using criticality + condition data",
-          type: "wo-permit",
         },
       ],
     },
@@ -527,26 +537,27 @@ function RightActionsPanel({
         {
           id: "c2-a1",
           priority: "High",
-          impact: "Loss < $800K",
-          title: "Permit Pre-check System",
+          impact: "~110K",
+          title: "Create Digital Permits for next 1 week",
           description:
-            "Implement early permit pre-checks to reduce waiting time",
+            "Scan upcoming schedule, auto-generates LOTO/Confined Space permits 1 week ahead\n" +
+              "\ne",
           type: "wo-permit",
         },
         {
           id: "c2-a2",
-          priority: "High",
-          impact: "Loss < $600K",
-          title: "Shift Handover Enhancement",
+          priority: "Medium",
+          impact: "~80K",
+          title: "Weekly Cross-Functional Permit Cadence",
           description:
-            "Introduce shift handover checklist including pending permits",
+            "Create recurring 30-min sync between Ops, Maintenance, and EHS to review upcoming permit needs",
           type: "meeting",
         },
         {
           id: "c2-a3",
-          priority: "Medium",
-          impact: "Loss < $400K",
-          title: "Operations SLA",
+          priority: "Low",
+          impact: "~10K",
+          title: "LOTO readiness",
           description:
             "Create SLA with Operations for isolation/LOTO readiness",
           type: "round-plan",
@@ -757,7 +768,15 @@ function RightActionsPanel({
                           </div>
                         </td>
                         <td className="col impact" role="cell">
-                          <span>{action.impact}</span>
+                          <span>{(() => {
+                            const m = /\$?([\d,.]+)\s*([KkMm])?/.exec(action.impact || '');
+                            if (!m) return action.impact;
+                            const num = Number(m[1].replace(/[,\s]/g, '')) || 0;
+                            const scale = (m[2] || '').toLowerCase() === 'm' ? 1_000_000 : (m[2] || '').toLowerCase() === 'k' ? 1_000 : 1;
+                            const value = num * scale;
+                            const compact = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 1 }).format(value).replace(/([^\d\s])(?=\d)/, '$1 ');
+                            return action.impact.replace(/\$?[\d,.]+\s*[KkMm]?/, compact);
+                          })()}</span>
                         </td>
                         <td className="col cta" role="cell">
                           <div
@@ -1621,12 +1640,11 @@ function CausesReport({ collapsed = false, onToggleCollapse }) {
           <div className="sources-head">Sources </div>
           <div className="sources-chips">
             {[
-              "Hydraulic System Installment",
-              "Hydraulic System Installment",
-              "Repair Booster Pump",
-              "Hydraulic System Installment",
-              "Hydraulic System Installment",
-              "Repair Booster Pump",
+              "Permits Release Cycles",
+              "MTTR Data",
+              "Innovapptive Playbook",
+              "PM Workorders",
+              "Asset Criticality data",
             ].map((t, i) => (
               <span key={i} className="chip-soft">
                 {t}
@@ -2277,6 +2295,7 @@ function ActionExecutionPanel({
   executeAllSignal = 0,
   onAddMessage,
   onActionComplete,
+  onExecuteAllClick
 }) {
   const [executedActions, setExecutedActions] = useState(new Set());
   const [executingActions, setExecutingActions] = useState(new Set());
@@ -2291,6 +2310,7 @@ function ActionExecutionPanel({
   const executedActionsRef = useRef(new Set());
   const [failedActions, setFailedActions] = useState(new Set());
   const failedActionsRef = useRef(new Set());
+  const [invokeHidden, setInvokeHidden] = useState(false);
 
   // Helpers for realistic pacing (scoped to ActionExecutionPanel)
   const randomInt = (min, max) =>
@@ -2443,9 +2463,20 @@ function ActionExecutionPanel({
     return "document";
   };
 
-  const buildAIThought = (actionText) => {
-    const subject = actionText || "this action";
-    return `Planning execution for ${subject}: Analyzing requirements → Checking dependencies → Preparing resources → Executing steps → Validating completion.`;
+  const buildAIThought = (actionText, actionType) => {
+    const subject = actionText || 'this action';
+    const t = String(actionType || '').toLowerCase();
+    if (t === 'meeting') {
+      return `Setting up a meeting for ${subject}… Checking calendars, assembling the right invitees, proposing time slots, drafting a brief agenda, and preparing reminders.`;
+    }
+    if (t === 'wo-permit') {
+      return `Preparing work permits for ${subject}… Reviewing the work order context, fetching correct permit templates, pre-filling scope and isolation details, validating hazards and mitigations, then routing for approvals.`;
+    }
+    if (t === 'round-plan') {
+      return `Designing a round plan for ${subject}… Mapping assets, sequencing an efficient route, balancing shift durations, weaving in safety checks, and publishing the walk-through with checkpoints.`;
+    }
+    // document
+    return `Authoring documentation for ${subject}… Collecting references, outlining sections, writing a clear draft, refining wording, and preparing a shareable version for review.`;
   };
 
   const buildAIDocument = (actionId, actionText) => {
@@ -2627,8 +2658,8 @@ function ActionExecutionPanel({
     }
   };
 
-  const startThinking = (actionId, actionText, thinkMs) => {
-    const thoughtFull = buildAIThought(actionText);
+  const startThinking = (actionId, actionText, thinkMs, actionType) => {
+    const thoughtFull = buildAIThought(actionText, actionType);
 
     if (thinkingRef.current[actionId]) {
       thinkingRef.current[actionId].timers?.forEach(
@@ -2826,6 +2857,9 @@ function ActionExecutionPanel({
           return next;
         });
 
+        // Use shared completion path so parent receives onActionComplete
+        completeAction(actionId);
+
         let message;
         switch (actionType) {
           case "meeting":
@@ -2867,21 +2901,41 @@ function ActionExecutionPanel({
 
     const actionType = normalizeType(action.type || "document");
     const actionTitle = action.title || action.description;
-    const thinkMs = randomMs(2600, 5200);
+    const thinkMs = (() => {
+      switch (actionType) {
+        case 'meeting':
+          return randomMs(1800, 3600);
+        case 'wo-permit':
+          return randomMs(3200, 6400);
+        case 'round-plan':
+          return randomMs(3000, 6000);
+        case 'document':
+        default:
+          return randomMs(4200, 8000);
+      }
+    })();
 
     // Add chat message when action starts executing
     if (onAddMessage) {
       onAddMessage({
         id: Date.now(),
         role: "assistant",
-        text: `Executing ${actionTitle}`,
+        text: `Initiating Project Execution`,
+        animated: true,
+      });
+    }
+    if (onAddMessage) {
+      onAddMessage({
+        id: Date.now(),
+        role: "assistant",
+        text: `Initiating Project Execution for ${actionTitle}`,
         animated: true,
       });
     }
 
     setExecutingActions((prev) => new Set([...prev, action.id]));
 
-    startThinking(action.id, actionTitle, thinkMs);
+    startThinking(action.id, actionTitle, thinkMs, actionType);
 
     setTimeout(() => {
       if (!executedActions.has(action.id)) {
@@ -3079,6 +3133,14 @@ function ActionExecutionPanel({
     });
   };
 
+  // Execution progress across approved actions
+  const totalApproved = approvedActions.length;
+  const completedCount = executedActions.size;
+  const executingCount = executingActions.size;
+  const showExecProgress = totalApproved > 0 && (executingCount > 0 || completedCount > 0) && completedCount < totalApproved;
+  const execPercent = totalApproved ? Math.round((completedCount / totalApproved) * 100) : 0;
+  const allExecuted = totalApproved > 0 && completedCount >= totalApproved;
+
   return (
     <section className="report-card" aria-label="Action Execution Report">
       <div className="report-head">
@@ -3094,7 +3156,52 @@ function ActionExecutionPanel({
             </div>
           </div>
         </div>
-        <div className="report-head-actions" aria-hidden="true">
+        <div className="report-head-actions" aria-hidden="true" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {!allExecuted && approvedActions.length > 0 && !invokeHidden ? (
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                setInvokeHidden(true);
+                onExecuteAllClick?.();
+              }}
+              aria-label="Invoke Execution Agent"
+              style={{
+                background: '#3D5AFE',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '10px 12px',
+                fontSize: '13px',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 4px 10px rgba(61,90,254,0.2)'
+              }}
+            >
+              <span style={{ display: 'inline-flex', transform: 'scale(1.05) translateY(0.5px)' }}>
+                <IconSparkle />
+              </span>
+              Invoke Execution Agent
+            </button>
+          ) : null}
+          {allExecuted ? (
+            <span
+              aria-label="Agent Executed Successfully"
+              style={{
+                color: '#065f46',
+                background: '#d1fae5',
+                border: '1px solid #10b981',
+                borderRadius: '10px',
+                padding: '8px 10px',
+                fontSize: '12px',
+                fontWeight: 700
+              }}
+            >
+              Agent Executed Successfully
+            </span>
+          ) : null}
           <button type="button" className="icon-badge" title="Copy">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <rect
@@ -3241,7 +3348,15 @@ function ActionExecutionPanel({
                           <div className="action-sub">{action.description}</div>
                         </td>
                         <td className="col impact" role="cell">
-                          <span>{action.impact}</span>
+                          <span>{(() => {
+                            const m = /\$?([\d,.]+)\s*([KkMm])?/.exec(action.impact || '');
+                            if (!m) return action.impact;
+                            const num = Number(m[1].replace(/[,\s]/g, '')) || 0;
+                            const scale = (m[2] || '').toLowerCase() === 'm' ? 1_000_000 : (m[2] || '').toLowerCase() === 'k' ? 1_000 : 1;
+                            const value = num * scale;
+                            const compact = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 1 }).format(value).replace(/([^\d\s])(?=\d)/, '$1 ');
+                            return action.impact.replace(/\$?[\d,.]+\s*[KkMm]?/, compact);
+                          })()}</span>
                         </td>
                         <td className="col cta" role="cell">
                           {renderStatusPill(isExecuted, isExecuting)}
@@ -3673,6 +3788,9 @@ export default function Action() {
   const [hideDismissButtons, setHideDismissButtons] = useState(false);
   const [allActionsResolved, setAllActionsResolved] = useState(false);
   const [showExecutionPanel, setShowExecutionPanel] = useState(false);
+  const [executionCompletedCount, setExecutionCompletedCount] = useState(0);
+  const [showCompletionToast, setShowCompletionToast] = useState(false);
+  const completionNotifiedRef = useRef(false);
 
   // Stage transitions for right pane
   useEffect(() => {
@@ -3956,7 +4074,7 @@ export default function Action() {
       const assistantMsg = {
         id: now + 1,
         role: "assistant",
-        text: `Lets Act upon ${nextText}`,
+        text: `Okay! Lets ${nextText}`,
         animated: true,
       };
       setMessages((prev) => [...prev, assistantMsg]);
@@ -3987,6 +4105,7 @@ export default function Action() {
 
   function handleExecuteAllApproved() {
     setShowExecutionPanel(true);
+    setExecutionCompletedCount(0);
     // trigger sequential execution in ActionExecutionPanel
     setExecuteAllSignal((x) => x + 1);
     setTimeout(() => {
@@ -4008,7 +4127,21 @@ export default function Action() {
   function handleActionComplete(actionId) {
     // Keep completed actions in the approved list so they remain visible in the execution section
     // If needed later, we can annotate executed state rather than removing them
+    setExecutionCompletedCount((x) => x + 1);
   }
+
+  useEffect(() => {
+    if (
+      approvedActions.length > 0 &&
+      executionCompletedCount >= approvedActions.length &&
+      !completionNotifiedRef.current
+    ) {
+      completionNotifiedRef.current = true;
+      setShowCompletionToast(true);
+      const t = setTimeout(() => setShowCompletionToast(false), 4000);
+      return () => clearTimeout(t);
+    }
+  }, [executionCompletedCount, approvedActions]);
 
   return (
     <div className="action-overlay">
@@ -4163,26 +4296,77 @@ export default function Action() {
                           className="followup-btn"
                           onClick={() =>
                             handleFollowupClick(
-                              "Create a 3-month cost-reduction roadmap",
+                              "Create cost-reduction plan",
                               "create3MonthCostReductionRoadmap"
                             )
-                          }
-                        >
-                          Create a 3-month cost-reduction roadmap →
-                        </button>
+                        }
+                      >
+                        Create cost-reduction plan →
+                      </button>
                       )}
                     </div>
                   </div>
                 )}
                 {twoCol && progressPct >= 100 && allActionsResolved && (
-                  <div style={{ marginTop: 12 }}>
+                  <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: '12px', color: '#6b7280' }}>
+                        Progress: {approvedActions.length ? Math.round((executionCompletedCount / approvedActions.length) * 100) : 0}%
+                      </span>
+                    </div>
+                    {approvedActions.length > 0 && executionCompletedCount >= approvedActions.length ? (
+                      <span
+                        aria-label="Agent Executed Successfully"
+                        style={{
+                          color: '#065f46',
+                          background: '#d1fae5',
+                          border: '1px solid #10b981',
+                          borderRadius: '10px',
+                          padding: '10px 14px',
+                          fontSize: '14px',
+                          fontWeight: 600
+                        }}
+                      >
+                        Agent Executed Successfully
+                      </span>
+                    ) : (
                     <button
                       type="button"
                       className="btn"
                       onClick={handleExecuteAllApproved}
+                      aria-label="Invoke Execution Agent"
+                      style={{
+                        background: '#3D5AFE',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '10px',
+                        padding: '12px 16px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        boxShadow: '0 6px 14px rgba(61,90,254,0.2)'
+                      }}
                     >
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: 22,
+                          height: 22,
+                          lineHeight: 0
+                        }}
+                      >
+                        <span style={{ display: 'inline-flex', transform: 'scale(1.15) translateY(0.5px)' }}>
+                          <IconSparkle />
+                        </span>
+                      </span>
                       Invoke Execution Agent
                     </button>
+                    )}
                   </div>
                 )}
                 <form className="chat-input-form" onSubmit={handleSubmit}>
@@ -4275,6 +4459,7 @@ export default function Action() {
                             executeAllSignal={executeAllSignal}
                             onAddMessage={handleAddMessage}
                             onActionComplete={handleActionComplete}
+                            onExecuteAllClick={handleExecuteAllApproved}
                           />
                         </div>
                       )}
@@ -4378,6 +4563,7 @@ export default function Action() {
                 className="btn-outline"
                 type="button"
                 onClick={() => navigate("/")}
+                style={{ background: '#3D5AFE', color: '#fff' }}
               >
                 Back to Dashboard
               </button>
@@ -4387,31 +4573,72 @@ export default function Action() {
       </div>
 
       {/* Add CSS animations */}
+      {showCompletionToast && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            top: 16,
+            right: 16,
+            background: '#ecfdf5',
+            color: '#065f46',
+            border: '1px solid #10b981',
+            borderRadius: 12,
+            padding: '10px 14px',
+            boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+            zIndex: 1000,
+            fontSize: 13,
+            fontWeight: 700
+          }}
+        >
+          Governance Analysis Completed Successfully
+        </div>
+      )}
+      {approvedActions.length > 0 && executionCompletedCount >= approvedActions.length && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 12,
+            left: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            zIndex: 900,
+            pointerEvents: 'none'
+          }}
+        >
+          <button
+            type="button"
+            className="btn"
+            onClick={() => navigate('/')}
+            style={{
+              pointerEvents: 'auto',
+              background: '#111827',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '12px 16px',
+              fontSize: '14px',
+              fontWeight: 700
+            }}
+          >
+            Back to the dashboard
+          </button>
+        </div>
+      )}
       <style jsx>{`
         @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
         @keyframes pulse {
-          0%,
-          100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
         }
         @keyframes shimmer {
-          0% {
-            background-position: -400px 0;
-          }
-          100% {
-            background-position: 400px 0;
-          }
+          0% { background-position: -400px 0; }
+          100% { background-position: 400px 0; }
         }
       `}</style>
     </div>
